@@ -1,7 +1,6 @@
 package com.github.tartaricacid.touhoulittlemaid.client.renderer.entity;
 
 import com.github.tartaricacid.touhoulittlemaid.client.renderer.entity.state.MaidFishingHookRenderState;
-import com.github.tartaricacid.touhoulittlemaid.compat.oculus.OculusCompat;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.entity.projectile.MaidFishingHook;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -115,12 +114,6 @@ public class MaidFishingHookRenderer<T extends MaidFishingHook, S extends MaidFi
                 float fraction2 = fraction(i + 1);
                 stringVertex(xa, ya, za, width, buffer, pose, fraction1, fraction2, colors[0], colors[1], colors[2]);
                 stringVertex(xa, ya, za, width, buffer, pose, fraction2, fraction1, colors[0], colors[1], colors[2]);
-            }
-            if (OculusCompat.isOculusInstalled()) {
-                buffer.addVertex(pose, 0.0f, 0.0f, 0.0f)
-                        .setLineWidth(width)
-                        .setColor(0, 0, 0, 255)
-                        .setNormal(pose, 0.0F, 0.0F, 0.0F);
             }
         });
     }

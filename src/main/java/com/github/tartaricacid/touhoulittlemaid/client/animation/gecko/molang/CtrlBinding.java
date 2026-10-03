@@ -2,7 +2,6 @@ package com.github.tartaricacid.touhoulittlemaid.client.animation.gecko.molang;
 
 import com.github.tartaricacid.touhoulittlemaid.client.animation.gecko.Priority;
 import com.github.tartaricacid.touhoulittlemaid.client.animation.gecko.molang.functions.*;
-import com.github.tartaricacid.touhoulittlemaid.compat.immersivemelodies.client.ImmersiveMelodiesCompat;
 import com.github.tartaricacid.touhoulittlemaid.entity.favorability.Type;
 import com.github.tartaricacid.touhoulittlemaid.entity.item.EntitySit;
 import com.github.tartaricacid.touhoulittlemaid.geckolib3.core.molang.binding.ContextBinding;
@@ -75,8 +74,7 @@ public class CtrlBinding extends ContextBinding {
         function("armor", ArmorCheck.armorCheck());
         function("ride", RideCheck.rideCheck());
 
-        // 模组的
-        ImmersiveMelodiesCompat.addBinding(this);
+
         addModPlaceholder();
 
         // 硬编码预测函数用

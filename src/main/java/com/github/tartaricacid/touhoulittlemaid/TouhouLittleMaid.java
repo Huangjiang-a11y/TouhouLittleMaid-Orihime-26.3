@@ -1,7 +1,6 @@
 package com.github.tartaricacid.touhoulittlemaid;
 
 import com.github.tartaricacid.touhoulittlemaid.api.ILittleMaid;
-import com.github.tartaricacid.touhoulittlemaid.compat.aquaculture.AquacultureCompat;
 import com.github.tartaricacid.touhoulittlemaid.entity.info.CommonDefaultPack;
 import com.github.tartaricacid.touhoulittlemaid.init.*;
 import com.github.tartaricacid.touhoulittlemaid.init.registry.CommandRegistry;
@@ -24,7 +23,6 @@ public final class TouhouLittleMaid {
         initRegister();
 
         CommonDefaultPack.initCommonDefaultPack();
-        AquacultureCompat.init();
     }
 
     private static void initRegister() {

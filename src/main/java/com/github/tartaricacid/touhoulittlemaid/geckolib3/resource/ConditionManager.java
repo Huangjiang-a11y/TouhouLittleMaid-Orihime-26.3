@@ -10,7 +10,6 @@ public class ConditionManager {
     public final ConditionalUse useOffhand = new ConditionalUse(InteractionHand.OFF_HAND);
     public final ConditionalHold holdMainhand = new ConditionalHold(InteractionHand.MAIN_HAND);
     public final ConditionalHold holdOffhand = new ConditionalHold(InteractionHand.OFF_HAND);
-    public final ConditionTAC tac = new ConditionTAC();
     public final ConditionArmor armor = new ConditionArmor();
     public final ConditionalVehicle vehicle = new ConditionalVehicle();
     public final ConditionalPassenger passenger = new ConditionalPassenger();
@@ -23,7 +22,6 @@ public class ConditionManager {
         useOffhand.addTest(name);
         holdMainhand.addTest(name);
         holdOffhand.addTest(name);
-        tac.addTest(name);
         armor.addTest(name);
         vehicle.addTest(name);
         passenger.addTest(name);

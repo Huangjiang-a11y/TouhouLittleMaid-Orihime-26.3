@@ -3,7 +3,6 @@ package com.github.tartaricacid.touhoulittlemaid.entity.task.crop;
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.api.ILittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.api.task.ISpecialCropHandler;
-import com.github.tartaricacid.touhoulittlemaid.compat.kaleidoscope.KaleidoscopeCompat;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import net.minecraft.world.item.Item;
@@ -24,7 +23,6 @@ public class SpecialCropManager {
         SpecialCropManager manager = new SpecialCropManager();
 
         manager.add(Items.NETHER_WART, Blocks.NETHER_WART, new NetherWartCropHandler());
-        KaleidoscopeCompat.addCropHandlers(manager);
         for (ILittleMaid littleMaid : TouhouLittleMaid.EXTENSIONS) {
             littleMaid.registerSpecialCropHandler(manager);
         }

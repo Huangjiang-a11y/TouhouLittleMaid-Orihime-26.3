@@ -2,7 +2,6 @@ package com.github.tartaricacid.touhoulittlemaid.client.renderer.entity.gecko.la
 
 import com.github.tartaricacid.touhoulittlemaid.client.renderer.entity.gecko.GeckoMaidRenderData;
 import com.github.tartaricacid.touhoulittlemaid.client.renderer.entity.state.EntityMaidRenderState;
-import com.github.tartaricacid.touhoulittlemaid.compat.simplehats.SimpleHatsCompat;
 import com.github.tartaricacid.touhoulittlemaid.geckolib3.geo.GeoLayerRenderer;
 import com.github.tartaricacid.touhoulittlemaid.geckolib3.geo.render.built.GeoLocatorType;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -37,9 +36,7 @@ public class GeckoLayerMaidBipedHead implements GeoLayerRenderer<EntityMaidRende
     public void submit(SubmitNodeCollector submitNode, PoseStack poseStack, EntityMaidRenderState state, GeckoMaidRenderData data, CameraRenderState camera) {
         var headSkull = state.wornHeadType != null;
         var headBlock = !state.headBlock.isEmpty();
-        var simpleHat = !state.simpleHat.isEmpty();
-
-        if (!headSkull && !headBlock && !simpleHat) {
+        if (!headSkull && !headBlock) {
             return;
         }
 
@@ -63,9 +60,6 @@ public class GeckoLayerMaidBipedHead implements GeoLayerRenderer<EntityMaidRende
                 state.headBlock.submit(locator, submitNode, state.lightCoords, OverlayTexture.NO_OVERLAY, state.outlineColor);
             }
 
-            if (simpleHat) {
-                SimpleHatsCompat.submit(state.simpleHat, locator, submitNode, camera);
-            }
         });
     }
 

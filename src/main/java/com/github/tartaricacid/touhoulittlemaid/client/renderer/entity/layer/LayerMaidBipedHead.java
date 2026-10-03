@@ -4,7 +4,6 @@ import com.github.tartaricacid.simplebedrockmodel.client.bedrock.model.BedrockPa
 import com.github.tartaricacid.touhoulittlemaid.client.model.bedrock.EntityMaidModel;
 import com.github.tartaricacid.touhoulittlemaid.client.renderer.entity.EntityMaidRenderer;
 import com.github.tartaricacid.touhoulittlemaid.client.renderer.entity.state.EntityMaidRenderState;
-import com.github.tartaricacid.touhoulittlemaid.compat.simplehats.SimpleHatsCompat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.object.skull.SkullModelBase;
 import net.minecraft.client.renderer.PlayerSkinRenderCache;
@@ -74,9 +73,6 @@ public class LayerMaidBipedHead extends RenderLayer<EntityMaidRenderState, Entit
             poseStack.popPose();
         }
 
-        if (!state.simpleHat.isEmpty()) {
-            SimpleHatsCompat.submit(state.simpleHat, poseStack, submitNode, state.camera);
-        }
 
         poseStack.popPose();
     }

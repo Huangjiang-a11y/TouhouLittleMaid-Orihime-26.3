@@ -8,7 +8,6 @@ import com.github.tartaricacid.touhoulittlemaid.client.model.bedrock.EntityMaidM
 import com.github.tartaricacid.touhoulittlemaid.client.renderer.entity.gecko.GeckoMaidRenderData;
 import com.github.tartaricacid.touhoulittlemaid.client.resource.models.SpecialMaidModelResolver;
 import com.github.tartaricacid.touhoulittlemaid.client.resource.pojo.MaidModelInfo;
-import com.github.tartaricacid.touhoulittlemaid.compat.simplehats.SimpleHatsCompat;
 import com.github.tartaricacid.touhoulittlemaid.config.subconfig.MaidConfig;
 import com.github.tartaricacid.touhoulittlemaid.entity.backpack.BackpackManager;
 import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.ChatBubbleDataCollection;
@@ -174,7 +173,6 @@ public class EntityMaidRenderState extends HumanoidRenderState {
     /**
      * 装饰栏，Simple Hats 兼容
      */
-    public final ItemStackRenderState simpleHat = new ItemStackRenderState();
     /**
      * 装饰栏，物品
      */
@@ -232,7 +230,6 @@ public class EntityMaidRenderState extends HumanoidRenderState {
         backBanner = null;
 
         headBlock.clear();
-        simpleHat.clear();
         backItem.clear();
 
         gameTime = 0;
@@ -345,10 +342,6 @@ public class EntityMaidRenderState extends HumanoidRenderState {
             return;
         }
 
-        // 如果是装饰栏是 Simple Hats 的兼容物品，渲染在头上
-        if (SimpleHatsCompat.isHatItem(showItem)) {
-            SimpleHatsCompat.extract(state.simpleHat, showItem);
-        }
     }
 
     private static void extractChatBubbleState(EntityMaid maid, EntityMaidRenderState state, float partialTicks) {

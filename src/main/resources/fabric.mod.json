@@ -23,12 +23,6 @@
     ],
     "modmenu": [
       "cn.sh1rocu.touhoulittlemaid.compat.modmenu.ModMenuApiImpl"
-    ],
-    "jade": [
-      "com.github.tartaricacid.touhoulittlemaid.compat.jade.JadePlugin"
-    ],
-    "jei_mod_plugin": [
-      "com.github.tartaricacid.touhoulittlemaid.compat.jei.MaidJeiPlugin"
     ]
   },
   "mixins": [
@@ -38,7 +32,7 @@
   "accessWidener": "touhou_little_maid.classtweaker",
   "depends": {
     "fabric-api": "*",
-    "minecraft": ">=26.2",
+    "minecraft": ">=26.3",
     "forgeconfigapiport": "*"
   }
 }
