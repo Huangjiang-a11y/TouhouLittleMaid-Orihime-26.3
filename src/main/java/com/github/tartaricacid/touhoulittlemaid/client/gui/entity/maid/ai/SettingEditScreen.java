@@ -16,6 +16,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import com.github.tartaricacid.touhoulittlemaid.util.migrate.ScreenUtil;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.MultiLineEditBox;
@@ -29,13 +30,15 @@ import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.PointerBuffer;
-import org.lwjgl.system.MemoryStack;
-import org.lwjgl.util.tinyfd.TinyFileDialogs;
+import org.lwjgl.sdl.SDLDialog;
+import org.lwjgl.sdl.SDL_DialogFileCallback;
+import org.lwjgl.sdl.SDL_DialogFileFilter;
+import org.lwjgl.system.MemoryUtil;
 
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
@@ -108,29 +111,84 @@ public class SettingEditScreen extends Screen {
                 Component.translatable("gui.back"), b -> this.onClose()));
     }
 
+    // ---- SDL 文件对话框资源：异步回调期间必须保持强引用，回调触发后再释放 ----
+    @Nullable
+    private static SDL_DialogFileCallback tlm$saveDialogCallback;
+    @Nullable
+    private static SDL_DialogFileFilter.Buffer tlm$saveDialogFilters;
+    @Nullable
+    private static ByteBuffer tlm$dialogFilterName;
+    @Nullable
+    private static ByteBuffer tlm$dialogFilterPattern;
+    @Nullable
+    private static ByteBuffer tlm$dialogDefaultPath;
+
     private void exportSetting(MutableComponent export) {
-        try (MemoryStack memoryStack = MemoryStack.stackPush()) {
-            String title = export.getString();
-            String defaultFileName = "%s.yml".formatted(this.maid.getName().getString());
-            String path = SettingReader.getSettingsFolder().resolve(defaultFileName).toString();
-            String fileFilter = Component.translatable("gui.touhou_little_maid.button.maid_ai_chat_config.edit_custom_setting.export.format").getString();
+        // 26.3 随 GLFW 一并移除了 tinyfd（Mojang 的 LWJGL 模块清单里已无 lwjgl-tinyfd），
+        // 文件对话框改用 SDL3（lwjgl-sdl）。注意：SDL 的对话框 API 不支持自定义标题。
+        String defaultFileName = "%s.yml".formatted(this.maid.getName().getString());
+        String defaultPath = SettingReader.getSettingsFolder().resolve(defaultFileName).toString();
+        String filterName = Component.translatable("gui.touhou_little_maid.button.maid_ai_chat_config.edit_custom_setting.export.format").getString();
 
-            PointerBuffer filterPattern = memoryStack.mallocPointer(1);
-            filterPattern.put(memoryStack.UTF8("*.yml"));
-            filterPattern.flip();
+        tlm$freeDialogResources();
+        tlm$dialogFilterName = MemoryUtil.memUTF8(filterName);
+        tlm$dialogFilterPattern = MemoryUtil.memUTF8("*.yml");
+        tlm$dialogDefaultPath = MemoryUtil.memUTF8(defaultPath);
+        tlm$saveDialogFilters = SDL_DialogFileFilter.calloc(1);
+        tlm$saveDialogFilters.name(tlm$dialogFilterName).pattern(tlm$dialogFilterPattern);
 
-            String result = TinyFileDialogs.tinyfd_saveFileDialog(title, path, filterPattern, fileFilter);
-            if (StringUtils.isBlank(result)) {
-                return;
+        tlm$saveDialogCallback = SDL_DialogFileCallback.create((userdata, filelist, filter) -> {
+            // 回调可能来自 SDL 自己的线程：此处只读取指针，随后切回客户端线程再动游戏状态
+            String chosen = null;
+            if (filelist != MemoryUtil.NULL) {
+                long first = MemoryUtil.memGetAddress(filelist);
+                if (first != MemoryUtil.NULL) {
+                    chosen = MemoryUtil.memUTF8(first);
+                }
             }
+            String result = chosen;
+            Minecraft.getInstance().execute(() -> {
+                tlm$freeDialogResources();
+                if (StringUtils.isNotBlank(result)) {
+                    this.tlm$saveSettingFile(result);
+                }
+            });
+        });
+        SDLDialog.SDL_ShowSaveFileDialog(tlm$saveDialogCallback, Minecraft.getInstance().getWindow().handle(),
+                MemoryUtil.NULL, tlm$saveDialogFilters, tlm$dialogDefaultPath);
+    }
 
-            File exportFile = new File(result);
+    private static void tlm$freeDialogResources() {
+        if (tlm$saveDialogCallback != null) {
+            tlm$saveDialogCallback.free();
+            tlm$saveDialogCallback = null;
+        }
+        if (tlm$saveDialogFilters != null) {
+            tlm$saveDialogFilters.free();
+            tlm$saveDialogFilters = null;
+        }
+        tlm$dialogFilterName = tlm$freeBuffer(tlm$dialogFilterName);
+        tlm$dialogFilterPattern = tlm$freeBuffer(tlm$dialogFilterPattern);
+        tlm$dialogDefaultPath = tlm$freeBuffer(tlm$dialogDefaultPath);
+    }
+
+    @Nullable
+    private static ByteBuffer tlm$freeBuffer(@Nullable ByteBuffer buffer) {
+        if (buffer != null) {
+            MemoryUtil.memFree(buffer);
+        }
+        return null;
+    }
+
+    private void tlm$saveSettingFile(String path) {
+        try {
+            File exportFile = new File(path);
             MetaData metaData = getMetaData();
             CharacterSetting setting = new CharacterSetting(metaData, this.customSetting.getValue());
             setting.save(exportFile);
 
             if (Screens.getMinecraft(this).player != null) {
-                Component tip = Component.translatable("gui.touhou_little_maid.button.maid_ai_chat_config.edit_custom_setting.export.success", result)
+                Component tip = Component.translatable("gui.touhou_little_maid.button.maid_ai_chat_config.edit_custom_setting.export.success", path)
                         .withStyle(ChatFormatting.GRAY);
                 Screens.getMinecraft(this).player.sendSystemMessage(tip);
             }

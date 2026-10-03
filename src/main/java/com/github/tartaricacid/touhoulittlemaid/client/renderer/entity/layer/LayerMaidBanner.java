@@ -54,30 +54,27 @@ public class LayerMaidBanner extends RenderLayer<EntityMaidRenderState, EntityMa
 
             poseStack.translate(0, -0.25, 0.25);
             poseStack.scale(0.5F, 0.5F, 0.5F);
-            poseStack.mulPose(Axis.XN.rotationDegrees(5));
+            poseStack.rotate(Axis.XN.rotationDegrees(5));
 
             // 杆子
             RenderType renderType = RenderTypes.entityCutout(TEXTURE);
             submitNode.submitModel(
                     root, Unit.INSTANCE, poseStack, renderType, light,
-                    NO_OVERLAY, state.outlineColor, null
-            );
+                    NO_OVERLAY, state.outlineColor);
 
             BannerPatternLayers patterns = state.backBanner.patterns;
             DyeColor baseColor = state.backBanner.baseColor;
             SpriteId sprite = Sheets.BANNER_BASE;
 
             // 旗帜图案
-            poseStack.mulPose(Axis.YN.rotationDegrees(90));
+            poseStack.rotate(Axis.YN.rotationDegrees(90));
             poseStack.translate(0.75, 0.2, 0.1);
             submitNode.submitModel(
                     flag, 0f, poseStack, light, NO_OVERLAY, -1,
-                    sprite, sprites, state.outlineColor, null
-            );
+                    sprite, sprites, state.outlineColor);
             submitPatterns(
                     sprites, poseStack, submitNode, light, NO_OVERLAY, flag,
-                    0f, true, baseColor, patterns, null
-            );
+                    0f, true, baseColor, patterns);
 
             poseStack.popPose();
         }

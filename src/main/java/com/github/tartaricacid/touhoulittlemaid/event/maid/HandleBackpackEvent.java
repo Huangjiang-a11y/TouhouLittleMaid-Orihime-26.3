@@ -7,6 +7,7 @@ import com.github.tartaricacid.touhoulittlemaid.entity.backpack.BackpackManager;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.init.InitTrigger;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
+import net.minecraft.util.Prediction;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
@@ -22,7 +23,7 @@ public class HandleBackpackEvent {
             if (maid.isOwnedBy(player) && !maid.backpackHasDelay() && maidBackpack != BackpackManager.getEmptyBackpack()) {
                 maid.setBackpackDelay();
                 player.getCooldowns().addCooldown(stack, 20);
-                player.getInventory().placeItemBackInInventory(maidBackpack.getTakeOffItemStack(stack, player, maid));
+                player.getInventory().placeItemBackInInventory(maidBackpack.getTakeOffItemStack(stack, player, maid), Prediction.SERVER_ONLY);
                 maidBackpack.onTakeOff(stack, player, maid);
                 maid.setMaidBackpackType(BackpackManager.getEmptyBackpack());
                 stack.hurtAndBreak(1, player, event.getPlayer().getEquipmentSlotForItem(stack));
@@ -34,7 +35,7 @@ public class HandleBackpackEvent {
                 if (maid.isOwnedBy(player) && !maid.backpackHasDelay() && backpack != BackpackManager.getEmptyBackpack() && backpack != maidBackpack) {
                     maid.setBackpackDelay();
                     BackpackManager.addBackpackCooldown(player);
-                    player.getInventory().placeItemBackInInventory(maidBackpack.getTakeOffItemStack(stack, player, maid));
+                    player.getInventory().placeItemBackInInventory(maidBackpack.getTakeOffItemStack(stack, player, maid), Prediction.SERVER_ONLY);
                     maidBackpack.onTakeOff(stack, player, maid);
                     maid.setMaidBackpackType(backpack);
                     backpack.onPutOn(stack, player, maid);

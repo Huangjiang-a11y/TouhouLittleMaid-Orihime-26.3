@@ -46,7 +46,7 @@ public abstract class AbstractStoreMaidItem extends Item implements IItemEntity 
             entity.setGlowingTag(true);
         }
         if (!entity.isInvulnerable()) {
-            entity.setInvulnerable(true);
+            entity.setPermanentlyInvulnerable(true);
         }
         Vec3 position = entity.position();
         int minY = entity.level.getMinY();

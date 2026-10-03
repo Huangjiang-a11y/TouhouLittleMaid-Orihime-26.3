@@ -12,6 +12,7 @@ import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.behavior.BehaviorUtils;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
@@ -98,7 +99,7 @@ public class MaidFeedOwnerTask extends MaidCheckRateTask {
                     ItemsUtil.insertItemStacked(inv, feedResult, false, null);
                 }
 
-                maid.swing(InteractionHand.MAIN_HAND);
+                maid.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, true);
                 this.setNextCheckTickCount(5);
                 if (maid.getOwner() instanceof ServerPlayer serverPlayer) {
                     InitTrigger.MAID_EVENT.trigger(serverPlayer, TriggerType.MAID_FEED_PLAYER);

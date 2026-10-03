@@ -6,6 +6,7 @@ import com.github.tartaricacid.touhoulittlemaid.init.InitTrigger;
 import com.github.tartaricacid.touhoulittlemaid.item.ItemFilm;
 import com.google.common.collect.Lists;
 import com.mojang.serialization.MapCodec;
+import net.minecraft.util.Prediction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
@@ -49,7 +50,6 @@ public class BlockShrine extends BaseEntityBlock {
             Block.box(0, 16, 0, 16, 22, 16)
     );
 
-    private static final MapCodec<BlockShrine> CODEC = simpleCodec(BlockShrine::new);
 
     public BlockShrine(Identifier id) {
         super(BlockBehaviour.Properties.of()
@@ -84,7 +84,7 @@ public class BlockShrine extends BaseEntityBlock {
         if (playerIn.isShiftKeyDown()) {
             if (!shrine.isEmpty()) {
                 ItemStack storageItem = shrine.extractStorageItem();
-                playerIn.getInventory().placeItemBackInInventory(storageItem);
+                playerIn.getInventory().placeItemBackInInventory(storageItem, Prediction.SERVER_ONLY);
                 worldIn.playSound(null, pos, SoundEvents.ITEM_FRAME_REMOVE_ITEM,
                         SoundSource.PLAYERS, 1, 1);
             }
@@ -146,10 +146,6 @@ public class BlockShrine extends BaseEntityBlock {
         return this.defaultBlockState().setValue(FACING, opposite);
     }
 
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
 
     @Nullable
     @Override

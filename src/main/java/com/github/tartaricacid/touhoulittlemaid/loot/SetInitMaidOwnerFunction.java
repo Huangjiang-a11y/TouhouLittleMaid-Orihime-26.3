@@ -6,6 +6,7 @@ import com.github.tartaricacid.touhoulittlemaid.item.ItemSmartSlab;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.resources.Identifier;
+import net.minecraft.core.Holder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -15,7 +16,7 @@ import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 
-import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class SetInitMaidOwnerFunction extends LootItemConditionalFunction {
@@ -24,8 +25,8 @@ public class SetInitMaidOwnerFunction extends LootItemConditionalFunction {
             instance -> commonFields(instance).apply(instance, SetInitMaidOwnerFunction::new)
     );
 
-    protected SetInitMaidOwnerFunction(List<LootItemCondition> predicates) {
-        super(predicates);
+    protected SetInitMaidOwnerFunction(Optional<Holder<LootItemCondition>> condition) {
+        super(condition);
     }
 
     @Override
@@ -40,7 +41,7 @@ public class SetInitMaidOwnerFunction extends LootItemConditionalFunction {
     @Override
     protected ItemStack run(ItemStack stack, LootContext context) {
         if (stack.is(InitItems.SMART_SLAB_INIT)) {
-            Entity entity = context.getOptionalParameter(LootContextParams.THIS_ENTITY);
+            Entity entity = context.getOptional(LootContextParams.THIS_ENTITY);
             if (entity instanceof Player player) {
                 UUID uuid = player.getUUID();
                 ItemSmartSlab.setInitMaidOwner(stack, uuid);
@@ -57,7 +58,7 @@ public class SetInitMaidOwnerFunction extends LootItemConditionalFunction {
 
         @Override
         public LootItemFunction build() {
-            return new SetInitMaidOwnerFunction(this.getConditions());
+            return new SetInitMaidOwnerFunction(this.getCondition());
         }
     }
 }

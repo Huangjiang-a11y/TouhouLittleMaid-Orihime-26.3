@@ -10,6 +10,7 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.behavior.BehaviorUtils;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
@@ -62,7 +63,7 @@ public class MaidFeedAnimalTask extends MaidCheckRateTask {
                 if(slot != -1) {
                     ItemStack food = ItemsUtil.extractItem(availableInv, slot, 1, false, null);
                     if (!food.isEmpty()) {
-                        maid.swing(InteractionHand.MAIN_HAND);
+                        maid.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, true);
                         feedEntity.setInLove(null);
                         if (maid.getOwner() instanceof ServerPlayer serverPlayer) {
                             InitTrigger.MAID_EVENT.trigger(serverPlayer, TriggerType.MAID_FEED_ANIMAL);

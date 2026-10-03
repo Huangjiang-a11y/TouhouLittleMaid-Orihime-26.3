@@ -13,6 +13,7 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.behavior.Behavior;
 import net.minecraft.world.entity.ai.behavior.PositionTracker;
@@ -72,7 +73,7 @@ public class MaidStealEdibleUseTask extends Behavior<EntityMaid> {
                     if (result) {
                         int points = edibleBlock.getFavorabilityPoints(maid, blockPos, blockState);
                         maid.getFavorabilityManager().apply(Type.STEAL_EDIBLE_BLOCK, points);
-                        maid.swing(InteractionHand.MAIN_HAND);
+                        maid.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, true);
                     }
                     maid.getBrain().eraseMemory(InitBrains.TARGET_POS);
                     maid.getBrain().eraseMemory(MemoryModuleType.WALK_TARGET);
@@ -93,7 +94,7 @@ public class MaidStealEdibleUseTask extends Behavior<EntityMaid> {
                     if (edibleBlock.canPlaceAsFood(maid, stack, i)) {
                         boolean result = edibleBlock.placeAsFood(maid, blockPos, stack, i);
                         if (result) {
-                            maid.swing(InteractionHand.MAIN_HAND);
+                            maid.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, true);
                             //Fixme 替换可变的ItemStack
                             ItemsUtil.extractItem(inv, i, originalAmount - stack.count(), false, null);
                         }

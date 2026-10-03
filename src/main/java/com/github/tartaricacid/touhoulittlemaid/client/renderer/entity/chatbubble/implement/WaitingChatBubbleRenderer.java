@@ -56,7 +56,7 @@ public class WaitingChatBubbleRenderer implements IChatBubbleRenderer {
         graphics.getPoseStack().pushPose();
         float time = (Util.getMillis() % 3600);
         graphics.getPoseStack().translate(8, this.height / 2f, 0);
-        graphics.getPoseStack().mulPose(Axis.ZP.rotationDegrees(time));
+        graphics.getPoseStack().rotate(Axis.ZP.rotationDegrees(time));
         graphics.blit(this.icon, -8, -8, 0, 0, 16, 16, 16, 16);
         graphics.getPoseStack().popPose();
 

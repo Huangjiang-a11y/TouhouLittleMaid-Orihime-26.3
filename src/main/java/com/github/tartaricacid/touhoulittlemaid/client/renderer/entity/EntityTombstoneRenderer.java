@@ -67,7 +67,7 @@ public class EntityTombstoneRenderer extends EntityRenderer<EntityTombstone, Ent
         RenderType renderType = RenderTypes.entityCutout(texture);
 
         submitNodeCollector.submitModel(this.tombstoneModel, state, poseStack, renderType, state.lightCoords,
-                OverlayTexture.NO_OVERLAY, state.outlineColor, null);
+                OverlayTexture.NO_OVERLAY, state.outlineColor);
 
         poseStack.popPose();
         if (!state.maidName.equals(Component.empty())) {
@@ -82,7 +82,7 @@ public class EntityTombstoneRenderer extends EntityRenderer<EntityTombstone, Ent
         if (state.distanceToCameraSq < (NAME_SHOW_DISTANCE * NAME_SHOW_DISTANCE)) {
             poseStack.pushPose();
             poseStack.translate(0.0F, yOffset, 0.0F);
-            poseStack.mulPose(camera.orientation);
+            poseStack.rotate(camera.orientation);
             poseStack.scale(-0.025F, -0.025F, 0.025F);
             Font font = this.getFont();
             float width = (float) (-font.width(component) / 2);

@@ -127,11 +127,15 @@ public class GarageKitRenderer implements BlockEntityRenderer<BlockEntityGarageK
         poseStack.pushPose();
         poseStack.scale(0.5f, 0.5f, 0.5f);
         poseStack.translate(1, 1.5, 1);
-        poseStack.mulPose(Axis.ZN.rotationDegrees(180));
+        poseStack.rotate(Axis.ZN.rotationDegrees(180));
         collector.submitModel(
-                this.baseModel, Unit.INSTANCE, poseStack, RenderTypes.entityCutout(TEXTURE),
-                state.lightCoords, OverlayTexture.NO_OVERLAY, 0, state.breakProgress
-        );
+                         this.baseModel, Unit.INSTANCE, poseStack, RenderTypes.entityCutout(TEXTURE),
+                         state.lightCoords, OverlayTexture.NO_OVERLAY, 0
+                 );
+                 if (state.breakProgress != null) {
+                     // 26.3：方块破坏进度改由独立的 submitCrumblingOverlay 提交
+                     collector.submitCrumblingOverlay(this.baseModel, Unit.INSTANCE, poseStack, RenderTypes.entityCutout(TEXTURE), state.lightCoords, OverlayTexture.NO_OVERLAY, 0, state.breakProgress);
+                 }
         poseStack.popPose();
     }
 
@@ -146,16 +150,16 @@ public class GarageKitRenderer implements BlockEntityRenderer<BlockEntityGarageK
 
         switch (state.facing) {
             case EAST:
-                poseStack.mulPose(Axis.YP.rotationDegrees(90));
+                poseStack.rotate(Axis.YP.rotationDegrees(90));
                 break;
             case WEST:
-                poseStack.mulPose(Axis.YP.rotationDegrees(270));
+                poseStack.rotate(Axis.YP.rotationDegrees(270));
                 break;
             case SOUTH:
                 break;
             case NORTH:
             default:
-                poseStack.mulPose(Axis.YP.rotationDegrees(180));
+                poseStack.rotate(Axis.YP.rotationDegrees(180));
                 break;
         }
 

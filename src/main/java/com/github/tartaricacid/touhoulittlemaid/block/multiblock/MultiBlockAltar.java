@@ -113,6 +113,6 @@ public class MultiBlockAltar implements IMultiBlock {
     }
 
     private StructureTemplate getAltarTemplate(ServerLevel world, Identifier location) {
-        return world.getStructureManager().getOrCreate(location);
+        return world.getStructureTemplateManager().getOrCreate(location);
     }
 }

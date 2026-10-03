@@ -37,7 +37,7 @@ public class HandItemCheck extends LivingEntityFunction {
     }
 
     public static HandItemCheck swingCheck() {
-        return new HandItemCheck((entity, hand) -> entity.swinging && !entity.isSleeping());
+        return new HandItemCheck((entity, hand) -> entity.isSwinging() && !entity.isSleeping());
     }
 
     public static HandItemCheck useCheck() {

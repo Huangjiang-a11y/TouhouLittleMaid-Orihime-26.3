@@ -43,12 +43,16 @@ public abstract class JoyRenderer<T extends BlockEntityJoy> implements BlockEnti
     public void submit(JoyRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
         poseStack.pushPose();
         poseStack.translate(0.5, 1.5, 0.5);
-        poseStack.mulPose(Axis.ZN.rotationDegrees(180));
-        poseStack.mulPose(Axis.YN.rotationDegrees(180 - state.facing.get2DDataValue() * 90));
+        poseStack.rotate(Axis.ZN.rotationDegrees(180));
+        poseStack.rotate(Axis.YN.rotationDegrees(180 - state.facing.get2DDataValue() * 90));
         collector.submitModel(
-                this.model, Unit.INSTANCE, poseStack, RenderTypes.entityCutout(this.texture),
-                state.lightCoords, OverlayTexture.NO_OVERLAY, 0, state.breakProgress
-        );
+                         this.model, Unit.INSTANCE, poseStack, RenderTypes.entityCutout(this.texture),
+                         state.lightCoords, OverlayTexture.NO_OVERLAY, 0
+                 );
+                 if (state.breakProgress != null) {
+                     // 26.3：方块破坏进度改由独立的 submitCrumblingOverlay 提交
+                     collector.submitCrumblingOverlay(this.model, Unit.INSTANCE, poseStack, RenderTypes.entityCutout(this.texture), state.lightCoords, OverlayTexture.NO_OVERLAY, 0, state.breakProgress);
+                 }
         poseStack.popPose();
     }
 

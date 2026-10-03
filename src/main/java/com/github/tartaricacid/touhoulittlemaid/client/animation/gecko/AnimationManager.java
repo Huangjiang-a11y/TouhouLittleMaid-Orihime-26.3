@@ -97,7 +97,7 @@ public final class AnimationManager {
     public static PlayState predicateOffhandHold(AnimationEvent<GeckoMaidEntity<?>> event) {
         EntityMaid maid = event.getAnimatableEntity().getMaid();
         Mob entity = maid;
-        if (!entity.swinging && !entity.isUsingItem()) {
+        if (!entity.isSwinging() && !entity.isUsingItem()) {
             ItemStack offhandItem = entity.getItemInHand(InteractionHand.OFF_HAND);
             if (offhandItem.is(Items.CROSSBOW) && CrossbowItem.isCharged(offhandItem)) {
                 return playAnimation(event, "hold_offhand:charged_crossbow", LoopType.LOOP);
@@ -121,7 +121,7 @@ public final class AnimationManager {
 
     public static PlayState predicateMainhandHold(AnimationEvent<GeckoMaidEntity<?>> event) {
         EntityMaid maid = event.getAnimatableEntity().getMaid();
-        if (!maid.swinging && !maid.isUsingItem()) {
+        if (!maid.isSwinging() && !maid.isUsingItem()) {
             ItemStack mainHandItem = maid.getItemInHand(InteractionHand.MAIN_HAND);
             if (mainHandItem.is(Items.CROSSBOW) && CrossbowItem.isCharged(mainHandItem)) {
                 return playAnimation(event, "hold_mainhand:charged_crossbow", LoopType.LOOP);
@@ -157,17 +157,17 @@ public final class AnimationManager {
 
     public static PlayState predicateSwing(AnimationEvent<GeckoMaidEntity<?>> event) {
         EntityMaid maid = event.getAnimatableEntity().getMaid();
-        if (maid.swinging && !maid.isSleeping()) {
-            if (maid.swingTime == 0 && event.getAnimatableEntity().getStateTracker().setEntityTickState(EntityTickStates.SWING)) {
+        if (maid.isSwinging() && !maid.isSleeping()) {
+            if (maid.getSwingAnimation(0f) == 0f && event.getAnimatableEntity().getStateTracker().setEntityTickState(EntityTickStates.SWING)) {
                 event.getCodedController().indicateReload();
             }
             var manager = event.getAnimatableEntity().getGeckoContainer().conditionManager();
-            ConditionalSwing conditionalSwing = (maid.swingingArm == InteractionHand.MAIN_HAND) ? manager.swing : manager.swingOffhand;
+            ConditionalSwing conditionalSwing = (maid.getCurrentSwing().hand() == InteractionHand.MAIN_HAND) ? manager.swing : manager.swingOffhand;
             String name = conditionalSwing.doTest(maid);
             if (StringUtils.isNoneBlank(name)) {
                 return playAnimation(event, name, LoopType.PLAY_ONCE);
             }
-            String defaultSwing = (maid.swingingArm == InteractionHand.MAIN_HAND) ? "swing_hand" : "swing_offhand";
+            String defaultSwing = (maid.getCurrentSwing().hand() == InteractionHand.MAIN_HAND) ? "swing_hand" : "swing_offhand";
             return playAnimation(event, defaultSwing, LoopType.PLAY_ONCE);
         }
         return PlayState.CONTINUE;
@@ -293,7 +293,7 @@ public final class AnimationManager {
     }
 
     private static boolean checkSwingAndUse(EntityMaid maid, InteractionHand hand) {
-        if (maid.swinging && maid.swingingArm == hand) {
+        if (maid.isSwinging() && maid.getCurrentSwing().hand() == hand) {
             return false;
         }
         return !maid.isUsingItem() || maid.getUsedItemHand() != hand;

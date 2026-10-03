@@ -3,22 +3,19 @@ package com.github.tartaricacid.touhoulittlemaid.init.registry;
 import com.github.tartaricacid.touhoulittlemaid.compat.patchouli.PatchouliCompat;
 import net.fabricmc.loader.api.FabricLoader;
 
+/**
+ * 26.3 移植：只保留白名单内的模组兼容 —— forgeconfigapiport / trinkets /
+ * IPN / sodium / modmenu / cloth-config / patchouli / iris。
+ * 其余第三方兼容（jei、jade、curios 本体、背包类、农夫乐事、枪械类等）已剥离。
+ */
 public final class CompatRegistry {
-    public static final String TOP = "theoneprobe";
     public static final String PATCHOULI = "patchouli";
-    // public static final String CLOTH_CONFIG = "cloth_config";
-    // 为什么Fabric端的id要改（
+    // 为什么 Fabric 端的 id 要改（
     public static final String CLOTH_CONFIG = "cloth-config";
-    public static final String CARRY_ON = "carryon";
-    public static final String SBACKPACK = "sophisticatedbackpacks";
-    public static final String TBACKPACK = "travelersbackpack";
     public static final String TRINKETS = "trinkets";
-    public static final String IMMERSIVE_MELODIES = "immersive_melodies";
 
     public static void onEnqueue() {
         checkModLoad(PATCHOULI, PatchouliCompat::init);
-        // checkModLoad(SBACKPACK, SBackpackCompat::init);
-        // checkModLoad(TRINKETS, CuriosCompat::init);
     }
 
     private static void checkModLoad(String modId, Runnable runnable) {

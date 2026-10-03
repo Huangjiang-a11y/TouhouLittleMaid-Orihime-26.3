@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.behavior.BehaviorUtils;
@@ -62,7 +63,7 @@ public class MaidMilkTask extends MaidCheckRateTask {
                 bucket.shrink(1);
                 ItemsUtil.insertItemStacked(availableInv, new ItemStack(Items.MILK_BUCKET), false, null);
             }
-            maid.swing(InteractionHand.MAIN_HAND);
+            maid.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, true);
             maid.playSound(SoundEvents.COW_MILK, 1.0F, 1.0F);
             milkTarget = null;
         }

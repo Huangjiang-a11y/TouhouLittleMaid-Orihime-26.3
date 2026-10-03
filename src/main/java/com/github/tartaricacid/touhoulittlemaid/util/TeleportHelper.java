@@ -6,6 +6,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 public final class TeleportHelper {
@@ -35,14 +36,14 @@ public final class TeleportHelper {
 
     private static boolean teleport(EntityMaid maid, double x, double y, double z) {
         BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos(x, y, z);
-        while (blockPos.getY() > maid.level.getMinY() && !maid.level.getBlockState(blockPos).blocksMotion()) {
+        while (blockPos.getY() > maid.level.getMinY() && !tlm$blocksMotion(maid.level, blockPos)) {
             blockPos.move(Direction.DOWN);
         }
         BlockState blockState = maid.level.getBlockState(blockPos);
-        boolean isMotion = blockState.blocksMotion();
+        boolean isMotion = tlm$blocksMotion(maid.level, blockPos);
         boolean isWater = blockState.getFluidState().is(FluidTags.WATER);
         if (isMotion && !isWater) {
-            boolean teleportIsSuccess = maid.randomTeleport(x, y, z, true);
+            boolean teleportIsSuccess = maid.randomTeleport(x, y, z, true, bs -> true);
             if (teleportIsSuccess && !maid.isSilent()) {
                 maid.level.playSound(null, maid.xo, maid.yo, maid.zo, SoundEvents.ENDERMAN_TELEPORT, maid.getSoundSource(), 1.0F, 1.0F);
                 maid.playSound(SoundEvents.ENDERMAN_TELEPORT, 1.0F, 1.0F);
@@ -55,5 +56,11 @@ public final class TeleportHelper {
 
     private static int randomIntInclusive(RandomSource random, int min, int max) {
         return random.nextInt(max - min + 1) + min;
+    }
+
+    /** 26.3 移除了 BlockState#blocksMotion()，用"非空气且碰撞箱非空"等价判断。 */
+    private static boolean tlm$blocksMotion(Level level, BlockPos pos) {
+        BlockState state = level.getBlockState(pos);
+        return !state.isAir() && !state.getCollisionShape(level, pos).isEmpty();
     }
 }

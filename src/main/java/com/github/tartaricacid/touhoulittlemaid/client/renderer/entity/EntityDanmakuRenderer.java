@@ -17,7 +17,7 @@ import net.minecraft.resources.Identifier;
 
 public class EntityDanmakuRenderer extends EntityRenderer<EntityDanmaku, EntityDanmakuRenderState> {
     private static final Identifier DANMAKU_TEXTURE = IdentifierUtil.modLoc("textures/entity/danmaku.png");
-    private static final RenderType RENDER_TYPE = RenderTypes.entityTranslucentCullItemTarget(DANMAKU_TEXTURE);
+    private static final RenderType RENDER_TYPE = RenderTypes.entityTranslucentCull(DANMAKU_TEXTURE);
     private static final int TEX_WIDTH = 416;
     private static final int TEX_HEIGHT = 128;
     private static final int CELL_SIZE = 32;
@@ -49,7 +49,7 @@ public class EntityDanmakuRenderer extends EntityRenderer<EntityDanmaku, EntityD
 
             poseStack.pushPose();
             poseStack.translate(0, 0.1, 0);
-            poseStack.mulPose(camera.orientation);
+            poseStack.rotate(camera.orientation);
 
             submitNodeCollector.submitCustomGeometry(poseStack, RENDER_TYPE, (pose, buffer) -> {
                 vertex(buffer, pose, state.lightCoords, -size, size, (startU + 0) / TEX_WIDTH, (startV + 0) / TEX_HEIGHT);

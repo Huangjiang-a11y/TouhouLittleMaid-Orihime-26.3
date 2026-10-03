@@ -18,7 +18,6 @@ import javax.annotation.Nullable;
 
 public class BlockKeyboard extends BlockJoy {
     public static final VoxelShape SHAPE = Block.box(4, 0, 4, 12, 10, 12);
-    private static final MapCodec<BlockKeyboard> CODEC = simpleCodec(BlockKeyboard::new);
 
     public BlockKeyboard(Properties properties) {
         super(properties);
@@ -54,8 +53,4 @@ public class BlockKeyboard extends BlockJoy {
         return SHAPE;
     }
 
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
 }

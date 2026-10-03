@@ -41,8 +41,8 @@ public class LayerMaidBackItem extends RenderLayer<EntityMaidRenderState, Entity
             Identifier id = state.backpack.getId();
             MaidBackpackRenderData renderData = RENDER_DATA_CACHE.apply(id);
 
-            poseStack.mulPose(Axis.ZP.rotationDegrees(180.0F));
-            poseStack.mulPose(Axis.XP.rotationDegrees(180.0F));
+            poseStack.rotate(Axis.ZP.rotationDegrees(180.0F));
+            poseStack.rotate(Axis.XP.rotationDegrees(180.0F));
             poseStack.translate(0, 0.5, -0.25);
             renderData.offsetBackpackItem(poseStack);
             state.backItem.submit(poseStack, submitNode, state.lightCoords, OverlayTexture.NO_OVERLAY, state.outlineColor);

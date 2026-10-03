@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -67,7 +68,7 @@ public class MaidShearTask extends MaidCheckRateTask {
             // Fabric:
             ((Shearable) shearableEntity).shear(worldIn, SoundSource.BLOCKS, mainHandItem);
 
-            maid.swing(InteractionHand.MAIN_HAND);
+            maid.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, true);
             mainHandItem.hurtAndBreak(1, maid, EquipmentSlot.MAINHAND);
             shearableEntity = null;
         }

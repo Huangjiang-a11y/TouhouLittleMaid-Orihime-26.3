@@ -142,7 +142,7 @@ public class EntityChairRenderer extends LivingEntityRenderer<EntityChair, Entit
 
     @Override
     protected void setupRotations(EntityChairRenderState state, PoseStack poseStack, float bodyRot, float entityScale) {
-        poseStack.mulPose(Axis.YP.rotationDegrees(180 - bodyRot));
+        poseStack.rotate(Axis.YP.rotationDegrees(180 - bodyRot));
     }
 
     @Override
@@ -151,8 +151,8 @@ public class EntityChairRenderer extends LivingEntityRenderer<EntityChair, Entit
     }
 
     @Override
-    protected AABB getBoundingBoxForCulling(EntityChair chair) {
-        AABB aabb = super.getBoundingBoxForCulling(chair);
+    protected AABB getBoundingBoxForCulling(EntityChair chair, float partialTick) {
+        AABB aabb = super.getBoundingBoxForCulling(chair, partialTick);
         String modelId = chair.getModelId();
         return CustomPackLoader.CHAIR_MODELS.getModel(modelId).map(model -> {
             Vec3 position = chair.position();

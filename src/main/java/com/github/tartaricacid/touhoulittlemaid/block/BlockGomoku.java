@@ -80,7 +80,6 @@ public class BlockGomoku extends BlockJoy implements IBoardGameBlock, IBlockExpl
     public static final VoxelShape RIGHT_DOWN = Block.box(0, 0, 0, 8, 2, 8);
     public static final VoxelShape RIGHT_DOWN_WITH_BOX = Shapes.or(RIGHT_DOWN, Block.box(0, 0, 9, 5, 4, 14));
 
-    private static final MapCodec<BlockGomoku> CODEC = simpleCodec(BlockGomoku::new);
 
     public BlockGomoku(Identifier id) {
         super(BlockBehaviour.Properties.of()
@@ -462,10 +461,6 @@ public class BlockGomoku extends BlockJoy implements IBoardGameBlock, IBlockExpl
         return null;
     }
 
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {

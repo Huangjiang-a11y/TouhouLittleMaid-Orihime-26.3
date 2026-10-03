@@ -25,7 +25,6 @@ public class BlockComputer extends BlockJoy {
             Block.box(0, 12, 0, 16, 14, 16)
     );
 
-    private static final MapCodec<BlockComputer> CODEC = simpleCodec(BlockComputer::new);
 
     public BlockComputer(Properties properties) {
         super(properties);
@@ -66,8 +65,4 @@ public class BlockComputer extends BlockJoy {
         return SHAPE;
     }
 
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
 }

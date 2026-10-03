@@ -2,6 +2,7 @@ package com.github.tartaricacid.touhoulittlemaid.entity.ai.brain.task;
 
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.behavior.EntityTracker;
@@ -32,7 +33,7 @@ public class MaidMeleeAttack {
                 && context.get(nearestVisibleLivingEntities).contains(target)
             ) {
                 lookTarget.set(new EntityTracker(target, true));
-                maid.swing(InteractionHand.MAIN_HAND);
+                maid.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, true);
                 maid.doHurtTarget(level, target);
                 double attackSpeed = maid.getAttributeValue(Attributes.ATTACK_SPEED);
                 if (attackSpeed > 0) {

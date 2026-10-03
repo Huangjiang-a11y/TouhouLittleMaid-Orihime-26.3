@@ -114,7 +114,7 @@ public class GomokuRenderer implements BlockEntityRenderer<BlockEntityGomoku, Go
         poseStack.pushPose();
         poseStack.translate(-0.42, 0.25, -0.42);
         poseStack.translate(point.x * 0.1316, 0, point.y * 0.1316);
-        poseStack.mulPose(Axis.YN.rotationDegrees(180 + camera.yRot));
+        poseStack.rotate(Axis.YN.rotationDegrees(180 + camera.yRot));
         poseStack.scale(0.015625F, -0.015625F, 0.015625F);
 
         collector.submitText(
@@ -131,16 +131,20 @@ public class GomokuRenderer implements BlockEntityRenderer<BlockEntityGomoku, Go
 
         poseStack.pushPose();
         poseStack.translate(0.5, 1.5, 0.5);
-        poseStack.mulPose(Axis.ZN.rotationDegrees(180));
-        poseStack.mulPose(Axis.YN.rotationDegrees(facing.get2DDataValue() * 90));
+        poseStack.rotate(Axis.ZN.rotationDegrees(180));
+        poseStack.rotate(Axis.YN.rotationDegrees(facing.get2DDataValue() * 90));
         if (facing == Direction.SOUTH || facing == Direction.NORTH) {
-            poseStack.mulPose(Axis.YN.rotationDegrees(180));
+            poseStack.rotate(Axis.YN.rotationDegrees(180));
         }
 
         collector.submitModel(
-                this.boardModel, Unit.INSTANCE, poseStack, RenderTypes.entityCutout(TEXTURE),
-                state.lightCoords, OverlayTexture.NO_OVERLAY, 0, state.breakProgress
-        );
+                         this.boardModel, Unit.INSTANCE, poseStack, RenderTypes.entityCutout(TEXTURE),
+                         state.lightCoords, OverlayTexture.NO_OVERLAY, 0
+                 );
+                 if (state.breakProgress != null) {
+                     // 26.3：方块破坏进度改由独立的 submitCrumblingOverlay 提交
+                     collector.submitCrumblingOverlay(this.boardModel, Unit.INSTANCE, poseStack, RenderTypes.entityCutout(TEXTURE), state.lightCoords, OverlayTexture.NO_OVERLAY, 0, state.breakProgress);
+                 }
 
         poseStack.popPose();
     }
@@ -155,7 +159,7 @@ public class GomokuRenderer implements BlockEntityRenderer<BlockEntityGomoku, Go
         poseStack.pushPose();
 
         poseStack.translate(0.5, 1.5, 0.5);
-        poseStack.mulPose(Axis.ZN.rotationDegrees(180));
+        poseStack.rotate(Axis.ZN.rotationDegrees(180));
 
         poseStack.pushPose();
         poseStack.translate(0.92, -0.1, -1.055);
@@ -209,8 +213,8 @@ public class GomokuRenderer implements BlockEntityRenderer<BlockEntityGomoku, Go
 
         poseStack.pushPose();
         poseStack.translate(0.5, 0.75, 0.5);
-        poseStack.mulPose(Axis.YN.rotationDegrees(180 + camera.yRot));
-        poseStack.mulPose(Axis.XN.rotationDegrees(camera.xRot));
+        poseStack.rotate(Axis.YN.rotationDegrees(180 + camera.yRot));
+        poseStack.rotate(Axis.XN.rotationDegrees(camera.xRot));
         poseStack.scale(0.03F, -0.03F, 0.03F);
 
         collector.submitText(

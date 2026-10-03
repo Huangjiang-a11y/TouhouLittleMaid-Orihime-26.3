@@ -1,7 +1,9 @@
 package com.github.tartaricacid.touhoulittlemaid.client.gui.mod;
 
+import java.net.URI;
 import cn.sh1rocu.touhoulittlemaid.mixin.accessor.ScreenAccessor;
 import com.github.tartaricacid.touhoulittlemaid.util.migrate.ScreenUtil;
+import com.mojang.blaze3d.Blaze3D;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -78,10 +80,10 @@ public class OptifineScreen extends Screen {
         if (StringUtils.isNotBlank(url) && minecraft != null) {
             ScreenUtil.setScreen(new ConfirmLinkScreen(yes -> {
                 if (yes) {
-                    Util.getPlatform().openUri(url);
+                    Blaze3D.openUri(URI.create(url));
                 }
                 ScreenUtil.setScreen(this);
-            }, url, true));
+            }, URI.create(url), true));
         }
     }
 }

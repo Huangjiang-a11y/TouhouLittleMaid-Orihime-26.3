@@ -41,13 +41,13 @@ public class LayerMaidHeldItem extends RenderLayer<EntityMaidRenderState, Entity
         parentModel.translateToHand(handSide, poseStack);
         if (parentModel.hasArmPositioningModel(handSide)) {
             parentModel.translateToPositioningHand(handSide, poseStack);
-            poseStack.mulPose(Axis.XP.rotationDegrees(-90.0F));
-            poseStack.mulPose(Axis.YP.rotationDegrees(180.0F));
+            poseStack.rotate(Axis.XP.rotationDegrees(-90.0F));
+            poseStack.rotate(Axis.YP.rotationDegrees(180.0F));
             poseStack.translate(0, 0.125, -0.0625);
         } else {
             boolean isLeft = handSide == HumanoidArm.LEFT;
-            poseStack.mulPose(Axis.XP.rotationDegrees(-90.0F));
-            poseStack.mulPose(Axis.YP.rotationDegrees(180.0F));
+            poseStack.rotate(Axis.XP.rotationDegrees(-90.0F));
+            poseStack.rotate(Axis.YP.rotationDegrees(180.0F));
             poseStack.translate((isLeft ? -1 : 1) / 16.0, 0.125, -0.525);
         }
 

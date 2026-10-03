@@ -16,6 +16,7 @@ import com.github.tartaricacid.touhoulittlemaid.network.message.SetMaidSoundIdPa
 import com.github.tartaricacid.touhoulittlemaid.util.GuiTools;
 import com.github.tartaricacid.touhoulittlemaid.util.ParseI18n;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import com.mojang.blaze3d.Blaze3D;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.Screen;
@@ -28,6 +29,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Util;
 import org.apache.commons.lang3.StringUtils;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -126,10 +128,10 @@ public class MaidSoundPackGui extends Screen {
                 if (StringUtils.isNotBlank(url) && minecraft != null) {
                     ScreenUtil.setScreen(new ConfirmLinkScreen(yes -> {
                         if (yes) {
-                            Util.getPlatform().openUri(url);
+                            Blaze3D.openUri(URI.create(url));
                         }
                         ScreenUtil.setScreen(this);
-                    }, url, false));
+                    }, URI.create(url), false));
                 }
             }
         }).setTooltips("tooltips.touhou_little_maid.custom_sound.open_url"));

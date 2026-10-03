@@ -10,6 +10,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.behavior.Behavior;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
@@ -59,7 +60,7 @@ public class MaidTorchPlaceTask extends Behavior<EntityMaid> {
                 SoundType soundType = torchState.getSoundType();
                 world.playSound(null, pos, soundType.getPlaceSound(), SoundSource.BLOCKS,
                         (soundType.getVolume() + 1.0F) / 2.0F, soundType.getPitch() * 0.8F);
-                maid.swing(InteractionHand.MAIN_HAND);
+                maid.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, true);
                 maid.getBrain().eraseMemory(InitBrains.TARGET_POS);
                 maid.getBrain().eraseMemory(MemoryModuleType.WALK_TARGET);
             }

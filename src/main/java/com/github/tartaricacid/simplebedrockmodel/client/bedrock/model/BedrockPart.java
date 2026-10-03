@@ -72,7 +72,7 @@ public class BedrockPart extends ModelPart {
     public void translateAndRotate(PoseStack poseStack) {
         poseStack.translate((this.x / 16.0F) + this.offsetX, (this.y / 16.0F) + this.offsetY, (this.z / 16.0F) + this.offsetZ);
         if (this.xRot != 0.0F || this.yRot != 0.0F || this.zRot != 0.0F) {
-            poseStack.mulPose(new Quaternionf().rotationZYX(this.zRot, this.yRot, this.xRot));
+            poseStack.rotate(new Quaternionf().rotationZYX(this.zRot, this.yRot, this.xRot));
         }
 
         if (this.xScale != 1.0F || this.yScale != 1.0F || this.zScale != 1.0F) {

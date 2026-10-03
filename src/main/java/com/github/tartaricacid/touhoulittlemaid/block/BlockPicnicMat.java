@@ -13,6 +13,7 @@ import com.github.tartaricacid.touhoulittlemaid.init.InitItems;
 import com.github.tartaricacid.touhoulittlemaid.inventory.handler.PicnicBasketItemHandler;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.minecraft.util.Prediction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
@@ -179,7 +180,7 @@ public class BlockPicnicMat extends Block implements EntityBlock, IBlockExploded
                     }
 
                     ItemStack extract = resource.toStack(extractCount);
-                    playerIn.getInventory().placeItemBackInInventory(extract);
+                    playerIn.getInventory().placeItemBackInInventory(extract, Prediction.SERVER_ONLY);
 
                     tx.commit();
                     picnicMatCenter.refresh();

@@ -277,7 +277,9 @@ public class EntityMaidRenderState extends HumanoidRenderState {
     private static void extractBehaviorState(EntityMaid maid, EntityMaidRenderState state) {
         state.playerVehicle = maid.getVehicle() instanceof Player;
         state.sitting = maid.isMaidInSittingPose();
-        state.swingTime = maid.swingTime;
+        // 26.3：LivingEntity#swingTime 已移除，用挥动进度 × 时长还原 tick 数
+        state.swingTime = maid.isSwinging() && maid.getCurrentSwing() != null
+                ? Math.max(1, (int) (maid.getSwingAnimation(0f) * maid.getCurrentSwing().durationTicks())) : 0;
         state.sleeping = maid.isSleeping();
         state.begging = maid.isBegging();
         state.swingingArms = maid.isSwingingArms();

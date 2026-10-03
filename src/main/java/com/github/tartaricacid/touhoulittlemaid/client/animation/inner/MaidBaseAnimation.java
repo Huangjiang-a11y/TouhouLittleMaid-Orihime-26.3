@@ -177,9 +177,9 @@ public final class MaidBaseAnimation {
         return (state, models) -> {
             BedrockPart armLeft = models.get("armLeft");
             BedrockPart armRight = models.get("armRight");
-            double f1 = 1.0 - Math.pow(1.0 - state.attackTime, 4);
+            double f1 = 1.0 - Math.pow(1.0 - state.swingAnimation, 4);
             double f2 = Math.sin(f1 * Math.PI);
-            double f3 = Math.sin(state.attackTime * Math.PI) * -0.7 * 0.75;
+            double f3 = Math.sin(state.swingAnimation * Math.PI) * -0.7 * 0.75;
             float limbSwing = state.walkAnimationPos;
             float limbSwingAmount = state.walkAnimationSpeed;
             float ageInTicks = state.ageInTicks;
@@ -187,9 +187,9 @@ public final class MaidBaseAnimation {
             if (armLeft != null) {
                 armLeft.xRot = (float) (-Math.cos(limbSwing * 0.67) * 0.7 * limbSwingAmount);
                 armLeft.zRot = (float) (Math.cos(ageInTicks * 0.05) * 0.05 + armLeft.getInitRotZ());
-                if (state.attackTime > 0.0 && isSwingLeftHand(state)) {
+                if (state.swingAnimation > 0.0 && isSwingLeftHand(state)) {
                     armLeft.xRot = (float) (armLeft.xRot - (f2 * 1.2 + f3));
-                    armLeft.zRot = (float) (armLeft.zRot + Math.sin(state.attackTime * Math.PI) * -0.4);
+                    armLeft.zRot = (float) (armLeft.zRot + Math.sin(state.swingAnimation * Math.PI) * -0.4);
                 }
                 if (state.isUsingItem && state.useItemHand == InteractionHand.OFF_HAND) {
                     armLeft.xRot = armLeft.getInitRotX() - (float) Math.PI * 80 / 180.0f;
@@ -200,9 +200,9 @@ public final class MaidBaseAnimation {
             if (armRight != null) {
                 armRight.xRot = (float) (Math.cos(limbSwing * 0.67) * 0.7 * limbSwingAmount);
                 armRight.zRot = (float) (-Math.cos(ageInTicks * 0.05) * 0.05 + armRight.getInitRotZ());
-                if (state.attackTime > 0.0 && !isSwingLeftHand(state)) {
+                if (state.swingAnimation > 0.0 && !isSwingLeftHand(state)) {
                     armRight.xRot = (float) (armRight.xRot - (f2 * 1.2 + f3));
-                    armRight.zRot = (float) (armRight.zRot + Math.sin(state.attackTime * Math.PI) * -0.4);
+                    armRight.zRot = (float) (armRight.zRot + Math.sin(state.swingAnimation * Math.PI) * -0.4);
                 }
                 if (state.isUsingItem && state.useItemHand == InteractionHand.MAIN_HAND) {
                     armRight.xRot = armRight.getInitRotX() - (float) Math.PI * 80 / 180.0f;
@@ -401,6 +401,13 @@ public final class MaidBaseAnimation {
     }
 
     private static boolean isSwingLeftHand(EntityMaidRenderState state) {
-        return state.attackArm == HumanoidArm.LEFT;
+        // 26.3：渲染状态不再有 attackArm，用 currentSwing + mainArm 推导挥动手臂
+        if (state.currentSwing == null) {
+            return false;
+        }
+        HumanoidArm arm = state.currentSwing.hand() == InteractionHand.MAIN_HAND
+                ? state.mainArm
+                : (state.mainArm == HumanoidArm.LEFT ? HumanoidArm.RIGHT : HumanoidArm.LEFT);
+        return arm == HumanoidArm.LEFT;
     }
 }

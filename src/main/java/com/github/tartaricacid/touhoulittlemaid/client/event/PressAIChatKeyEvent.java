@@ -12,7 +12,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
+import com.mojang.blaze3d.platform.InputConstants;
 
 public class PressAIChatKeyEvent {
     public static void onOpenConfig(int action, KeyEvent event) {
@@ -30,7 +30,7 @@ public class PressAIChatKeyEvent {
     @SuppressWarnings("removal")
     private static boolean keyIsMatch(int action, KeyEvent event) {
         KeyMapping keyChat = Minecraft.getInstance().options.keyChat;
-        return action == GLFW.GLFW_PRESS
+        return action == InputConstants.PRESS
                 && keyChat.matches(event);
     }
 

@@ -52,8 +52,8 @@ public class SnackCabinetRenderer implements BlockEntityRenderer<BlockEntitySnac
                        SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
         poseStack.pushPose();
         poseStack.translate(0.5, 1.5, 0.5);
-        poseStack.mulPose(Axis.ZN.rotationDegrees(180));
-        poseStack.mulPose(Axis.YN.rotationDegrees(180 - state.facing.get2DDataValue() * 90));
+        poseStack.rotate(Axis.ZN.rotationDegrees(180));
+        poseStack.rotate(Axis.YN.rotationDegrees(180 - state.facing.get2DDataValue() * 90));
 
         submitNodeCollector.submitCustomGeometry(
                 poseStack, RenderTypes.entityCutout(TEXTURE),

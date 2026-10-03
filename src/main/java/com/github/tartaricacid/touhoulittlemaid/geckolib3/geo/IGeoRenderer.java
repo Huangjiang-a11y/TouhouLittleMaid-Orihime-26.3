@@ -38,7 +38,7 @@ public interface IGeoRenderer<TState extends EntityRenderState, TData extends Ge
     default void preSubmit(TState state, TData data, RenderContext ctx, PoseStack poseStack, SubmitNodeCollector submitNodeCollector) {
         if (getCurrentModelRenderCycle() == EModelRenderCycle.INITIAL) {
             if (data.transform != null) {
-                poseStack.mulPose(data.transform);
+                poseStack.last().pose().mul(data.transform);
             }
         }
     }

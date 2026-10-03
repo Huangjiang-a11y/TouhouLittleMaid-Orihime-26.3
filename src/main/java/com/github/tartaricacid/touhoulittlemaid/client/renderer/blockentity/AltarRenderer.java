@@ -64,11 +64,15 @@ public class AltarRenderer implements BlockEntityRenderer<BlockEntityAltar, Alta
         if (state.renderModel) {
             poseStack.pushPose();
             this.setTranslateAndPose(state.direction, poseStack);
-            poseStack.mulPose(Axis.ZN.rotationDegrees(180));
+            poseStack.rotate(Axis.ZN.rotationDegrees(180));
             collector.submitModel(
-                    this.model, Unit.INSTANCE, poseStack, RenderTypes.entityTranslucent(TEXTURE),
-                    state.lightCoords, OverlayTexture.NO_OVERLAY, 0, state.breakProgress
-            );
+                             this.model, Unit.INSTANCE, poseStack, RenderTypes.entityTranslucent(TEXTURE),
+                             state.lightCoords, OverlayTexture.NO_OVERLAY, 0
+                     );
+                     if (state.breakProgress != null) {
+                         // 26.3：方块破坏进度改由独立的 submitCrumblingOverlay 提交
+                         collector.submitCrumblingOverlay(this.model, Unit.INSTANCE, poseStack, RenderTypes.entityTranslucent(TEXTURE), state.lightCoords, OverlayTexture.NO_OVERLAY, 0, state.breakProgress);
+                     }
             poseStack.popPose();
         }
 
@@ -76,7 +80,7 @@ public class AltarRenderer implements BlockEntityRenderer<BlockEntityAltar, Alta
             poseStack.pushPose();
             double time = (System.currentTimeMillis() + state.blockPos.asLong()) % 3600;
             poseStack.translate(0.5, 1.25 + Math.sin(time / 1800 * Math.PI) * 0.1, 0.5);
-            poseStack.mulPose(Axis.YP.rotationDegrees((float) time / 10));
+            poseStack.rotate(Axis.YP.rotationDegrees((float) time / 10));
             state.itemRenderState.submit(poseStack, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
             poseStack.popPose();
         }
@@ -86,15 +90,15 @@ public class AltarRenderer implements BlockEntityRenderer<BlockEntityAltar, Alta
         switch (direction) {
             case SOUTH:
                 poseStack.translate(1, -1.5, -3);
-                poseStack.mulPose(Axis.YP.rotationDegrees(180));
+                poseStack.rotate(Axis.YP.rotationDegrees(180));
                 break;
             case EAST:
                 poseStack.translate(-3, -1.5, 0);
-                poseStack.mulPose(Axis.YP.rotationDegrees(270));
+                poseStack.rotate(Axis.YP.rotationDegrees(270));
                 break;
             case WEST:
                 poseStack.translate(4, -1.5, 1);
-                poseStack.mulPose(Axis.YP.rotationDegrees(90));
+                poseStack.rotate(Axis.YP.rotationDegrees(90));
                 break;
             case NORTH:
             default:

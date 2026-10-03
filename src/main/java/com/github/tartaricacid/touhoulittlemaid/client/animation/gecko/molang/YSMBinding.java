@@ -128,13 +128,14 @@ public class YSMBinding extends ContextBinding {
         livingEntityVar("offhand_charged_crossbow", ctx -> isChargedCrossbow(ctx, InteractionHand.OFF_HAND));
         maidEntityVar("is_fishing", YSMBinding::isFishing);
 
-        livingEntityVar("swinging", ctx -> ctx.entity().swinging);
-        livingEntityVar("swing_time", ctx -> ctx.entity().swingTime);
+        livingEntityVar("swinging", ctx -> ctx.entity().isSwinging());
+        livingEntityVar("swing_time", ctx -> ctx.entity().isSwinging() && ctx.entity().getCurrentSwing() != null
+                ? (int) (ctx.entity().getSwingAnimation(0f) * ctx.entity().getCurrentSwing().durationTicks()) : 0);
         livingEntityVar("swinging_arm", ctx -> {
-            InteractionHand hand = ctx.entity().swingingArm;
+            InteractionHand hand = ctx.entity().getCurrentSwing().hand();
             return hand == InteractionHand.MAIN_HAND ? 0 : 1;
         });
-        livingEntityVar("attack_time", ctx -> ctx.entity().getAttackAnim(ctx.animationEvent().getPartialTick()));
+        livingEntityVar("attack_time", ctx -> ctx.entity().getSwingAnimation(ctx.animationEvent().getPartialTick()));
 
         playerVar("texture_name", new TextureNameVariable());
         playerVar("first_person_mod_hide", new FirstPersonModHideVariable());

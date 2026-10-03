@@ -35,7 +35,6 @@ import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("deprecation")
 public class BlockSnackCabinet extends BaseEntityBlock {
-    public static final MapCodec<BlockSnackCabinet> CODEC = simpleCodec(BlockSnackCabinet::new);
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final IntegerProperty TYPE = IntegerProperty.create("type", 0, 2);
 
@@ -131,10 +130,6 @@ public class BlockSnackCabinet extends BaseEntityBlock {
         builder.add(FACING, TYPE);
     }
 
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
 
     @Override
     public BlockState rotate(BlockState state, Rotation rot) {

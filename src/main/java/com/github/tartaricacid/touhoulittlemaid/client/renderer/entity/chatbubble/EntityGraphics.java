@@ -36,7 +36,7 @@ public class EntityGraphics {
     }
 
     public void fill(int minX, int minY, int maxX, int maxY, int z, int color) {
-        this.fill(RenderTypes.textBackground(), minX, minY, maxX, maxY, z, color);
+        this.fill(RenderTypes.debugQuads(), minX, minY, maxX, maxY, z, color); // 26.3 移除了 textBackground；暂用无贴图四边形管线
     }
 
     public void fill(RenderType renderType, int minX, int minY, int maxX, int maxY, int color) {

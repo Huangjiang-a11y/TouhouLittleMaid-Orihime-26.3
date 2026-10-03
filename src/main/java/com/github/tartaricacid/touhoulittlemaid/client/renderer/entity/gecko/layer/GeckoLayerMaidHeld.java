@@ -28,7 +28,7 @@ public class GeckoLayerMaidHeld implements GeoLayerRenderer<EntityMaidRenderStat
 
     protected void renderArmWithItem(EntityMaidRenderState state, ItemStackRenderState itemRender, PoseStack poseStack, SubmitNodeCollector submitNode) {
         poseStack.translate(0, -0.0625, -0.1);
-        poseStack.mulPose(Axis.XP.rotationDegrees(-90.0F));
+        poseStack.rotate(Axis.XP.rotationDegrees(-90.0F));
         itemRender.submit(poseStack, submitNode, state.lightCoords, OverlayTexture.NO_OVERLAY, state.outlineColor);
     }
 }

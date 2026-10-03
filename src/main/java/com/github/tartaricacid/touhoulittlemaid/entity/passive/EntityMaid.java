@@ -250,7 +250,7 @@ public class EntityMaid extends MaidManagerHost implements IEntity, CrossbowAtta
     public void aiStep() {
         super.aiStep();
 
-        this.updateSwingTime();
+        // 26.3：挥动动画由 LivingEntity$SwingState 自行推进，updateSwingTime 已被移除
         this.getNavigationManager().tick();
 
         if (!level.isClientSide()) {
@@ -643,8 +643,10 @@ public class EntityMaid extends MaidManagerHost implements IEntity, CrossbowAtta
     }
 
     @Override
-    public void startSleeping(BlockPos pos) {
-        super.startSleeping(pos);
+    public boolean startSleeping(BlockPos pos) {
+        if (!super.startSleeping(pos)) {
+            return false;
+        }
 
         // 睡觉时自动满血，增加好感度，并触发睡觉成就
         this.setHealth(this.getMaxHealth());
@@ -652,6 +654,7 @@ public class EntityMaid extends MaidManagerHost implements IEntity, CrossbowAtta
         if (this.getOwner() instanceof ServerPlayer serverPlayer) {
             InitTrigger.MAID_EVENT.trigger(serverPlayer, TriggerType.MAID_SLEEP);
         }
+        return true;
     }
 
     public boolean isMaidInSittingPose() {
@@ -722,7 +725,7 @@ public class EntityMaid extends MaidManagerHost implements IEntity, CrossbowAtta
     }
 
     public void setSyncInvulnerable(boolean isInvulnerable) {
-        super.setInvulnerable(isInvulnerable);
+        super.setPermanentlyInvulnerable(isInvulnerable);
         this.entityData.set(DATA_SYNC_INVULNERABLE, isInvulnerable);
     }
 

@@ -83,8 +83,8 @@ public class EntityMaidRenderer extends MobRenderer<EntityMaid, EntityMaidRender
                 offsetY -= 0.25f;
             }
             poseStack.translate(state.bubbleOffset.x, offsetY, state.bubbleOffset.z);
-            poseStack.mulPose(camera.orientation);
-            poseStack.mulPose(Axis.YP.rotationDegrees(180));
+            poseStack.rotate(camera.orientation);
+            poseStack.rotate(Axis.YP.rotationDegrees(180));
             poseStack.scale(-0.025F, -0.025F, 0.025F);
 
             EntityGraphics graphics = new EntityGraphics(submitNodeCollector, poseStack, state, state.lightCoords, state.tlm$partialTick());
@@ -117,8 +117,8 @@ public class EntityMaidRenderer extends MobRenderer<EntityMaid, EntityMaidRender
         // 抱起女仆时的旋转
         if (state.playerVehicle && state.modelType != ModelType.GECKO) {
             poseStack.translate(-0.375, 0.8325, 0.375);
-            poseStack.mulPose(Axis.ZN.rotationDegrees(65));
-            poseStack.mulPose(Axis.YN.rotationDegrees(-80));
+            poseStack.rotate(Axis.ZN.rotationDegrees(65));
+            poseStack.rotate(Axis.YN.rotationDegrees(-80));
         }
     }
 

@@ -23,7 +23,7 @@ public class GeckoLayerMaidBackpack implements GeoLayerRenderer<EntityMaidRender
         }
         data.modelState.visitLocatorGroup(GeoLocatorType.BACKPACK, poseStack, locator -> {
             locator.translate(0, 1, 0.25);
-            locator.mulPose(Axis.ZP.rotationDegrees(180));
+            locator.rotate(Axis.ZP.rotationDegrees(180));
 
             Identifier id = state.backpack.getId();
             MaidBackpackRenderData renderData = RENDER_DATA_CACHE.apply(id);
@@ -32,8 +32,7 @@ public class GeckoLayerMaidBackpack implements GeoLayerRenderer<EntityMaidRender
             if (backpackModel != null && backpackTexture != null) {
                 submitNode.submitModel(
                         backpackModel, state, poseStack, RenderTypes.entityCutout(backpackTexture),
-                        state.lightCoords, OverlayTexture.NO_OVERLAY, state.outlineColor, null
-                );
+                        state.lightCoords, OverlayTexture.NO_OVERLAY, state.outlineColor);
             }
         });
     }

@@ -125,11 +125,15 @@ public class StatueRenderer implements BlockEntityRenderer<BlockEntityStatue, St
         // 渲染底座模型
         poseStack.pushPose();
         setBaseTranslateAndPose(state, poseStack);
-        poseStack.mulPose(Axis.ZN.rotationDegrees(180));
+        poseStack.rotate(Axis.ZN.rotationDegrees(180));
         collector.submitModel(
-                this.baseModel, Unit.INSTANCE, poseStack, RenderTypes.entityCutout(TEXTURE),
-                state.lightCoords, OverlayTexture.NO_OVERLAY, 0, state.breakProgress
-        );
+                         this.baseModel, Unit.INSTANCE, poseStack, RenderTypes.entityCutout(TEXTURE),
+                         state.lightCoords, OverlayTexture.NO_OVERLAY, 0
+                 );
+                 if (state.breakProgress != null) {
+                     // 26.3：方块破坏进度改由独立的 submitCrumblingOverlay 提交
+                     collector.submitCrumblingOverlay(this.baseModel, Unit.INSTANCE, poseStack, RenderTypes.entityCutout(TEXTURE), state.lightCoords, OverlayTexture.NO_OVERLAY, 0, state.breakProgress);
+                 }
         poseStack.popPose();
 
         // 渲染实体预览
@@ -156,16 +160,16 @@ public class StatueRenderer implements BlockEntityRenderer<BlockEntityStatue, St
         poseStack.translate(0.5 / size, 0.21328125, 0.5 / size);
         switch (state.facing) {
             case EAST:
-                poseStack.mulPose(Axis.YP.rotationDegrees(90));
+                poseStack.rotate(Axis.YP.rotationDegrees(90));
                 break;
             case WEST:
-                poseStack.mulPose(Axis.YP.rotationDegrees(270));
+                poseStack.rotate(Axis.YP.rotationDegrees(270));
                 break;
             case SOUTH:
                 break;
             case NORTH:
             default:
-                poseStack.mulPose(Axis.YP.rotationDegrees(180));
+                poseStack.rotate(Axis.YP.rotationDegrees(180));
                 break;
         }
         this.dispatcher.submit(state.entityRenderState, camera, offset, 0, -offset, poseStack, collector);

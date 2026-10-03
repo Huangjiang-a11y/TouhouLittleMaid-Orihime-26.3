@@ -20,6 +20,7 @@ import com.google.common.collect.Sets;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
+import com.mojang.blaze3d.Blaze3D;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
@@ -39,6 +40,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
+import java.net.URI;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -165,7 +167,7 @@ public class ModelDownloadGui extends Screen {
                         ClientPlayNetworking.send(new OpenMaidGuiPackage(this.maid.getId()));
                     }
                 }).setTooltips("gui.touhou_little_maid.skin.button.close"));
-        this.addRenderableWidget(Button.builder(Component.translatable("gui.touhou_little_maid.resources_download.open_folder"), b -> Util.getPlatform().openFile(CustomPackLoader.PACK_FOLDER.toFile()))
+        this.addRenderableWidget(Button.builder(Component.translatable("gui.touhou_little_maid.resources_download.open_folder"), b -> Blaze3D.openPath(CustomPackLoader.PACK_FOLDER))
                 .pos(x + 270, y + 218).size(150, 20).build());
     }
 
@@ -365,10 +367,10 @@ public class ModelDownloadGui extends Screen {
         if (StringUtils.isNotBlank(website)) {
             ScreenUtil.setScreen(new ConfirmLinkScreen(yes -> {
                 if (yes) {
-                    Util.getPlatform().openUri(website);
+                    Blaze3D.openUri(URI.create(website));
                 }
                 ScreenUtil.setScreen(this);
-            }, website, false));
+            }, URI.create(website), false));
         }
     }
 

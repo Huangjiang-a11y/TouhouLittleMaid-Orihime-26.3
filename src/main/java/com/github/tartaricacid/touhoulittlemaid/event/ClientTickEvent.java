@@ -8,7 +8,7 @@ public class ClientTickEvent {
 
     public static void onClientTick(Minecraft client) {
         tickCount++;
-        refreshRate = client.getWindow().getRefreshRate();
+        refreshRate = (int) client.getWindow().getActiveVideoMode().getRefreshRate();
     }
 
     public static int getTickCount() {

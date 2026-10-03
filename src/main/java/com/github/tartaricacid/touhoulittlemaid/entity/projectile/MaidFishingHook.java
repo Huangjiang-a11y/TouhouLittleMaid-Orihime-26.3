@@ -29,6 +29,7 @@ import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.projectile.Projectile;
@@ -354,7 +355,7 @@ public class MaidFishingHook extends Projectile {
             ItemStack rodItem = maid.getMainHandItem();
             int rodDamage = this.retrieve(rodItem);
             this.hurtRod(maid, rodItem, rodDamage);
-            maid.swing(InteractionHand.MAIN_HAND);
+            maid.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, true);
             level.playSound(
                     null, maid.getX(), maid.getY(), maid.getZ(),
                     SoundEvents.FISHING_BOBBER_RETRIEVE, SoundSource.NEUTRAL,

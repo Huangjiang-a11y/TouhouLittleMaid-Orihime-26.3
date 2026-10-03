@@ -17,7 +17,6 @@ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.Comparator;
 import java.util.List;
@@ -29,8 +28,8 @@ public class STTChatKey {
     public static final KeyMapping STT_CHAT_KEY = new KeyMapping("key.touhou_little_maid.stt_chat.desc",
 //            KeyConflictContext.IN_GAME,
 //            KeyModifier.NONE,
-            InputConstants.Type.KEYSYM,
-            GLFW.GLFW_KEY_X,
+            InputConstants.Type.KEYBOARD,
+            InputConstants.KEY_X,
             MAID_CATEGORY
     );
 
@@ -50,12 +49,12 @@ public class STTChatKey {
                 return;
             }
             STT_CHAT_KEY.consumeClick();
-            if (action == GLFW.GLFW_PRESS) {
+            if (action == InputConstants.PRESS) {
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(InitSounds.RECORDING_START, 1f));
                 getNearestMaid(player, STTChatKey::sttStart, true);
                 return;
             }
-            if (action == GLFW.GLFW_RELEASE) {
+            if (action == InputConstants.RELEASE) {
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(InitSounds.RECORDING_END, 1f));
                 getNearestMaid(player, STTChatKey::sttStop, false);
             }

@@ -58,7 +58,7 @@ public final class GeoModelState {
             var poseStateCache = new PoseStack.Pose();
             visit(renderBoneIndices, (bone, transform) -> {
                 poseStateCache.set(poseState);
-                poseStateCache.mulPose(transform);
+                poseStateCache.pose().mul(transform);
                 visitor.accept(bone, poseStateCache);
             });
         }
@@ -69,7 +69,7 @@ public final class GeoModelState {
         if (!group.isEmpty()) {
             visit(group, (bone, transform) -> {
                 poseStack.pushPose();
-                poseStack.mulPose(transform);
+                poseStack.last().pose().mul(transform);
                 var pivot = bone.pivot();
                 poseStack.translate(pivot.x / 16, pivot.y / 16, pivot.z / 16);
                 visitor.accept(poseStack);

@@ -40,7 +40,6 @@ import java.util.UUID;
 
 public class BlockModelSwitcher extends BaseEntityBlock implements IRedstoneConnect {
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
-    private static final MapCodec<BlockModelSwitcher> CODEC = simpleCodec(BlockModelSwitcher::new);
 
     public BlockModelSwitcher(Identifier id) {
         super(BlockBehaviour.Properties.of()
@@ -183,10 +182,6 @@ public class BlockModelSwitcher extends BaseEntityBlock implements IRedstoneConn
         }
     }
 
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
 
     @Override
     public BlockState rotate(BlockState state, Rotation rotation) {

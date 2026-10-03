@@ -61,8 +61,8 @@ public class PicnicMatRender implements BlockEntityRenderer<BlockEntityPicnicMat
 
         poseStack.pushPose();
         poseStack.translate(0.5, 1.5, 0.5);
-        poseStack.mulPose(Axis.ZN.rotationDegrees(180));
-        poseStack.mulPose(Axis.YN.rotationDegrees(180 - state.facing.get2DDataValue() * 90));
+        poseStack.rotate(Axis.ZN.rotationDegrees(180));
+        poseStack.rotate(Axis.YN.rotationDegrees(180 - state.facing.get2DDataValue() * 90));
 
         // 渲染食物物品
         renderFoodItem(state.slotItems[3], -0.6f, -1.5f, 1.4125f, poseStack, collector, state);
@@ -100,7 +100,7 @@ public class PicnicMatRender implements BlockEntityRenderer<BlockEntityPicnicMat
         Level level = Minecraft.getInstance().level;
 
         poseStack.pushPose();
-        poseStack.mulPose(Axis.XN.rotationDegrees(90));
+        poseStack.rotate(Axis.XN.rotationDegrees(90));
         poseStack.translate(x, y, z);
         poseStack.scale(0.4f, 0.4f, 0.4f);
 
@@ -112,7 +112,7 @@ public class PicnicMatRender implements BlockEntityRenderer<BlockEntityPicnicMat
             int stackCount = count / 10;
             for (int i = 0; i < stackCount; i++) {
                 poseStack.translate(Math.sin(i) * 0.05, Math.cos(i) * 0.03, -0.07);
-                poseStack.mulPose(Axis.ZN.rotationDegrees((float) Math.cos(i) * 60));
+                poseStack.rotate(Axis.ZN.rotationDegrees((float) Math.cos(i) * 60));
 
                 ItemStackRenderState stackedRenderState = new ItemStackRenderState();
                 resolver.updateForTopItem(stackedRenderState, storageItem, ItemDisplayContext.FIXED, level, null, 0);

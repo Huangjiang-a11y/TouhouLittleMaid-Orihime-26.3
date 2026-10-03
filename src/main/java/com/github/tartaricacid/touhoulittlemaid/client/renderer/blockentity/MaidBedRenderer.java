@@ -67,9 +67,13 @@ public class MaidBedRenderer implements BlockEntityRenderer<BlockEntityMaidBed, 
         poseStack.scale(-1, -1, 1);
 
         collector.submitModel(
-                model, Unit.INSTANCE, poseStack, getRenderType(dyeColor, texture),
-                state.lightCoords, OverlayTexture.NO_OVERLAY, 0, state.breakProgress
-        );
+                         model, Unit.INSTANCE, poseStack, getRenderType(dyeColor, texture),
+                         state.lightCoords, OverlayTexture.NO_OVERLAY, 0
+                 );
+                 if (state.breakProgress != null) {
+                     // 26.3：方块破坏进度改由独立的 submitCrumblingOverlay 提交
+                     collector.submitCrumblingOverlay(model, Unit.INSTANCE, poseStack, getRenderType(dyeColor, texture), state.lightCoords, OverlayTexture.NO_OVERLAY, 0, state.breakProgress);
+                 }
 
         poseStack.popPose();
     }

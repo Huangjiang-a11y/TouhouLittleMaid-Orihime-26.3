@@ -32,7 +32,6 @@ import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
-import net.minecraft.world.entity.animal.FlyingAnimal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.RangedAttackMob;
 import net.minecraft.world.entity.player.Player;
@@ -47,7 +46,7 @@ import static com.github.tartaricacid.touhoulittlemaid.init.InitPoi.SCARECROW;
 import static net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADD_MULTIPLIED_BASE;
 import static net.minecraft.world.entity.ai.village.poi.PoiManager.Occupancy.ANY;
 
-public class EntityFairy extends Monster implements RangedAttackMob, FlyingAnimal, IHasPowerPoint {
+public class EntityFairy extends Monster implements RangedAttackMob, IHasPowerPoint {
     public static final Identifier ENTITY_ID = IdentifierUtil.modLoc("fairy");
     public static final ResourceKey<EntityType<?>> ENTITY_KEY = ResourceKey.create(Registries.ENTITY_TYPE, ENTITY_ID);
     public static final EntityType<EntityFairy> TYPE = EntityType.Builder
@@ -217,7 +216,7 @@ public class EntityFairy extends Monster implements RangedAttackMob, FlyingAnima
         this.entityData.set(DATA_FAIRY_TYPE, ordinal);
     }
 
-    @Override
+    /** 26.3 移除了 FlyingAnimal/Entity#isFlying，这里保留为普通方法供内部判断。 */
     public boolean isFlying() {
         return !this.onGround();
     }

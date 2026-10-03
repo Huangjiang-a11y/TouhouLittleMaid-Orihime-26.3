@@ -32,7 +32,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
+import com.mojang.blaze3d.platform.InputConstants;
 
 import java.util.List;
 import java.util.Map;
@@ -507,7 +507,7 @@ public class AIChatScreen extends Screen {
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
         if (this.openPopup != null) {
             // 执行正常下拉框按钮点击
-            if (event.button() == GLFW.GLFW_MOUSE_BUTTON_LEFT && this.tryClickPopup(event.x(), event.y())) {
+            if (event.button() == InputConstants.MOUSE_BUTTON_LEFT && this.tryClickPopup(event.x(), event.y())) {
                 return true;
             }
 
@@ -559,14 +559,14 @@ public class AIChatScreen extends Screen {
 
     @Override
     public boolean keyPressed(KeyEvent event) {
-        if (event.key() == GLFW.GLFW_KEY_ENTER) {
+        if (event.key() == InputConstants.KEY_RETURN) {
             this.sendDoneMessage();
             return true;
         }
-        if (event.key() == GLFW.GLFW_KEY_UP) {
+        if (event.key() == InputConstants.KEY_UP) {
             return this.recallHistory(-1);
         }
-        if (event.key() == GLFW.GLFW_KEY_DOWN) {
+        if (event.key() == InputConstants.KEY_DOWN) {
             return this.recallHistory(1);
         }
         return super.keyPressed(event);

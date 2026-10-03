@@ -7,6 +7,7 @@ import com.github.tartaricacid.touhoulittlemaid.init.InitSounds;
 import com.github.tartaricacid.touhoulittlemaid.init.InitTrigger;
 import com.github.tartaricacid.touhoulittlemaid.util.MaidItemStorageHelper;
 import com.github.tartaricacid.touhoulittlemaid.util.MaidRayTraceHelper;
+import net.minecraft.util.Prediction;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -55,7 +56,7 @@ public class ItemCamera extends Item {
         if (maid.isAlive() && maid.isOwnedBy(playerIn) && !maid.isSleeping()) {
             ItemStack photo = InitItems.PHOTO.getDefaultInstance();
             MaidItemStorageHelper.saveMaid(photo, maid, Consumers.nop());
-            playerIn.getInventory().placeItemBackInInventory(photo);
+            playerIn.getInventory().placeItemBackInInventory(photo, Prediction.SERVER_ONLY);
 
             maid.spawnExplosionParticle();
             maid.discard();

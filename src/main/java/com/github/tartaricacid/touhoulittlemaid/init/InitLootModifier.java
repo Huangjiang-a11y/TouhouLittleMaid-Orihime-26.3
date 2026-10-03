@@ -31,42 +31,42 @@ public class InitLootModifier {
         LootTableEvents.MODIFY.register((key, builder, source, provider) -> {
                     // all chests
                     if (key.identifier().toString().startsWith("minecraft:chests"))
-                        builder.withPool(LootPool.lootPool().add(NestedLootTable.lootTableReference(LootTableGenerator.CHEST_POWER_POINT)));
+                        builder.withPool(LootPool.lootPool().add(NestedLootTable.lootTableReference(provider.getOrThrow(LootTableGenerator.CHEST_POWER_POINT))));
 
                     if (key.equals(BuiltInLootTables.SPAWN_BONUS_CHEST))
-                        builder.withPool(LootPool.lootPool().add(NestedLootTable.lootTableReference(LootTableGenerator.SPAWN_BONUS)));
+                        builder.withPool(LootPool.lootPool().add(NestedLootTable.lootTableReference(provider.getOrThrow(LootTableGenerator.SPAWN_BONUS))));
                     else if (key.equals(BuiltInLootTables.VILLAGE_TEMPLE))
-                        builder.withPool(LootPool.lootPool().add(NestedLootTable.lootTableReference(LootTableGenerator.NORMAL_BAUBLE)));
+                        builder.withPool(LootPool.lootPool().add(NestedLootTable.lootTableReference(provider.getOrThrow(LootTableGenerator.NORMAL_BAUBLE))));
                     else if (key.equals(BuiltInLootTables.DESERT_PYRAMID))
-                        builder.withPool(LootPool.lootPool().add(NestedLootTable.lootTableReference(LootTableGenerator.RARE_BAUBLE)));
+                        builder.withPool(LootPool.lootPool().add(NestedLootTable.lootTableReference(provider.getOrThrow(LootTableGenerator.RARE_BAUBLE))));
                     else if (key.equals(BuiltInLootTables.JUNGLE_TEMPLE))
-                        builder.withPool(LootPool.lootPool().add(NestedLootTable.lootTableReference(LootTableGenerator.RARE_BAUBLE)));
+                        builder.withPool(LootPool.lootPool().add(NestedLootTable.lootTableReference(provider.getOrThrow(LootTableGenerator.RARE_BAUBLE))));
                     else if (key.equals(BuiltInLootTables.WOODLAND_MANSION))
                         builder.withPool(LootPool.lootPool()
-                                .add(NestedLootTable.lootTableReference(LootTableGenerator.VERY_RARE_BAUBLE))
-                                .add(NestedLootTable.lootTableReference(LootTableGenerator.STRUCTURE_SPAWN_MAID_GIFT))
+                                .add(NestedLootTable.lootTableReference(provider.getOrThrow(LootTableGenerator.VERY_RARE_BAUBLE)))
+                                .add(NestedLootTable.lootTableReference(provider.getOrThrow(LootTableGenerator.STRUCTURE_SPAWN_MAID_GIFT)))
                         );
                     else if (key.equals(BuiltInLootTables.ABANDONED_MINESHAFT))
-                        builder.withPool(LootPool.lootPool().add(NestedLootTable.lootTableReference(LootTableGenerator.NORMAL_BACKPACK)));
+                        builder.withPool(LootPool.lootPool().add(NestedLootTable.lootTableReference(provider.getOrThrow(LootTableGenerator.NORMAL_BACKPACK))));
                     else if (key.equals(BuiltInLootTables.STRONGHOLD_LIBRARY))
                         builder.withPool(LootPool.lootPool()
-                                .add(NestedLootTable.lootTableReference(LootTableGenerator.SHRINE_LESS))
+                                .add(NestedLootTable.lootTableReference(provider.getOrThrow(LootTableGenerator.SHRINE_LESS)))
                         );
                     else if (key.equals(BuiltInLootTables.ANCIENT_CITY))
-                        builder.withPool(LootPool.lootPool().add(NestedLootTable.lootTableReference(LootTableGenerator.SHRINE_LESS)));
+                        builder.withPool(LootPool.lootPool().add(NestedLootTable.lootTableReference(provider.getOrThrow(LootTableGenerator.SHRINE_LESS))));
                     else if (key.equals(BuiltInLootTables.BASTION_TREASURE))
-                        builder.withPool(LootPool.lootPool().add(NestedLootTable.lootTableReference(LootTableGenerator.SHRINE_LESS)));
+                        builder.withPool(LootPool.lootPool().add(NestedLootTable.lootTableReference(provider.getOrThrow(LootTableGenerator.SHRINE_LESS))));
                     else if (key.equals(BuiltInLootTables.END_CITY_TREASURE))
-                        builder.withPool(LootPool.lootPool().add(NestedLootTable.lootTableReference(LootTableGenerator.SHRINE_MORE)));
+                        builder.withPool(LootPool.lootPool().add(NestedLootTable.lootTableReference(provider.getOrThrow(LootTableGenerator.SHRINE_MORE))));
 
                     else if (key.equals(BuiltInLootTables.BURIED_TREASURE))
-                        builder.withPool(LootPool.lootPool().add(NestedLootTable.lootTableReference(LootTableGenerator.MAID_BURIED_TREASURE)));
+                        builder.withPool(LootPool.lootPool().add(NestedLootTable.lootTableReference(provider.getOrThrow(LootTableGenerator.MAID_BURIED_TREASURE))));
 
                     else if (key.equals(BuiltInLootTables.PILLAGER_OUTPOST))
-                        builder.withPool(LootPool.lootPool().add(NestedLootTable.lootTableReference(LootTableGenerator.STRUCTURE_SPAWN_MAID_GIFT)));
+                        builder.withPool(LootPool.lootPool().add(NestedLootTable.lootTableReference(provider.getOrThrow(LootTableGenerator.STRUCTURE_SPAWN_MAID_GIFT))));
 
                     else if (key.equals(BuiltInLootTables.FISHING_JUNK))
-                        builder.withPool(LootPool.lootPool().add(NestedLootTable.lootTableReference(LootTableGenerator.FISHING_POWER_POINT)));
+                        builder.withPool(LootPool.lootPool().add(NestedLootTable.lootTableReference(provider.getOrThrow(LootTableGenerator.FISHING_POWER_POINT))));
                 }
         );
     }

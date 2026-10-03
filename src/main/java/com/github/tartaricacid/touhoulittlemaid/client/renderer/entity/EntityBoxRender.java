@@ -53,7 +53,7 @@ public class EntityBoxRender extends EntityRenderer<EntityBox, EntityBoxRenderSt
         Identifier texture = texturesGroup.get(state.textureIndex);
         RenderType renderType = RenderTypes.entityCutout(texture);
         submitNodeCollector.submitModel(boxModel, state, poseStack, renderType, state.lightCoords,
-                OverlayTexture.NO_OVERLAY, state.outlineColor, null);
+                OverlayTexture.NO_OVERLAY, state.outlineColor);
         poseStack.popPose();
     }
 

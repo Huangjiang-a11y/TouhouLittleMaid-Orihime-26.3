@@ -26,7 +26,7 @@ import org.anti_ad.mc.ipn.api.IPNButton;
 import org.anti_ad.mc.ipn.api.IPNGuiHint;
 import org.anti_ad.mc.ipn.api.IPNPlayerSideOnly;
 import org.apache.commons.lang3.StringUtils;
-import org.lwjgl.glfw.GLFW;
+import com.mojang.blaze3d.platform.InputConstants;
 
 import java.util.List;
 import java.util.Map;
@@ -162,7 +162,7 @@ public class AttackTaskConfigGui extends MaidTaskConfigGui<TaskConfigContainer> 
 
     @Override
     public boolean keyPressed(KeyEvent event) {
-        if (event.key() == GLFW.GLFW_KEY_ESCAPE && Screens.getMinecraft(this).player != null) {
+        if (event.key() == InputConstants.KEY_ESCAPE && Screens.getMinecraft(this).player != null) {
             Screens.getMinecraft(this).player.closeContainer();
         }
         return this.inputField.keyPressed(event) || this.inputField.canConsumeInput() || super.keyPressed(event);

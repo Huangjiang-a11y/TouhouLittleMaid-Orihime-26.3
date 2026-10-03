@@ -123,7 +123,7 @@ public class GarageKitItemRenderer implements SpecialModelRenderer<GarageKitRend
         poseStack.pushPose();
         poseStack.scale(0.5f, 0.5f, 0.5f);
         poseStack.translate(1, 1.5, 1);
-        poseStack.mulPose(Axis.ZN.rotationDegrees(180));
+        poseStack.rotate(Axis.ZN.rotationDegrees(180));
         collector.submitCustomGeometry(poseStack, RenderTypes.entityCutout(TEXTURE), (pose, buffer) -> {
             poseStack.pushPose();
             poseStack.last().set(pose);
@@ -145,7 +145,7 @@ public class GarageKitItemRenderer implements SpecialModelRenderer<GarageKitRend
         poseStack.pushPose();
         poseStack.scale(0.5f, 0.5f, 0.5f);
         poseStack.translate(1, 0.21328125, 1);
-        poseStack.mulPose(Axis.YP.rotationDegrees(180));
+        poseStack.rotate(Axis.YP.rotationDegrees(180));
 
         EntityRenderDispatcher dispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
         CameraRenderState camera = new CameraRenderState();

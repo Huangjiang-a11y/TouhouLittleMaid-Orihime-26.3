@@ -55,7 +55,7 @@ public class EntityBabyFairyRenderer extends MobRenderer<EntityFairy, EntityFair
     protected void setupRotations(EntityFairyRenderState state, PoseStack poseStack, float bodyRot, float scale) {
         super.setupRotations(state, poseStack, bodyRot, scale);
         if (!state.isOnGround) {
-            poseStack.mulPose(Axis.XN.rotation(8 * (float) Math.PI / 180.0f));
+            poseStack.rotate(Axis.XN.rotation(8 * (float) Math.PI / 180.0f));
         }
     }
 }

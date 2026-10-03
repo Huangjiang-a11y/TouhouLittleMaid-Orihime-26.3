@@ -4,6 +4,7 @@ import cn.sh1rocu.touhoulittlemaid.api.event.PotentialSpawnsEvent;
 import com.github.tartaricacid.touhoulittlemaid.config.subconfig.MiscConfig;
 import com.github.tartaricacid.touhoulittlemaid.init.InitEntities;
 import com.github.tartaricacid.touhoulittlemaid.util.migrate.EntityTypeUtil;
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.random.Weighted;
@@ -29,7 +30,7 @@ public final class MobSpawnInfoRegistry {
                 List<Weighted<MobSpawnSettings.SpawnerData>> spawnerData = event.getSpawnerDataList();
                 boolean canZombieSpawn = spawnerData.stream().anyMatch(data -> data.value().type().equals(EntityTypeUtil.zombie()));
                 if (SPAWNER_DATA == null || SPAWNER_DATA.weight() != spawnProbability) {
-                    var data = new MobSpawnSettings.SpawnerData(InitEntities.FAIRY, 2, 4);
+                    var data = new MobSpawnSettings.SpawnerData(InitEntities.FAIRY, UniformInt.of(2, 4));
                     SPAWNER_DATA = new Weighted<>(data, spawnProbability);
                 }
                 if (canZombieSpawn) {

@@ -2,6 +2,7 @@ package com.github.tartaricacid.touhoulittlemaid.entity.passive;
 
 import cn.sh1rocu.touhoulittlemaid.util.neoforge.CommonHooks;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.PositionPath;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
@@ -52,7 +53,7 @@ public class MaidClimbManager {
             if (vec3.x() % 1 != 0.5D || vec3.z() % 1 != 0.5) {
                 BlockPos currentPosition = maid.blockPosition().mutable();
                 Vec3 centerPos = Vec3.atBottomCenterOf(currentPosition);
-                maid.moveOrInterpolateTo(new Vec3(centerPos.x, vec3.y(), centerPos.z));
+                maid.moveOrInterpolateTo(PositionPath.of(new Vec3(centerPos.x, vec3.y(), centerPos.z)));
             }
             oriDelta = new Vec3(0, oriDelta.y, 0);
         }

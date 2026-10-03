@@ -46,7 +46,6 @@ public class BlockMaidBed extends HorizontalDirectionalBlock implements EntityBl
     public static final BooleanProperty OCCUPIED = BlockStateProperties.OCCUPIED;
 
     private static final VoxelShape BASE = Block.box(0.0, 0.0, 0.0, 16.0, 9.0, 16.0);
-    private static final MapCodec<BlockMaidBed> CODEC = simpleCodec(p -> new BlockMaidBed(p, DyeColor.PINK));
 
     private final DyeColor color;
 
@@ -58,7 +57,7 @@ public class BlockMaidBed extends HorizontalDirectionalBlock implements EntityBl
                 .strength(0.2F)
                 .bounceRestitution(0.75F)
                 .noOcclusion()
-                .pushReaction(PushReaction.DESTROY));
+                .pushReaction(PushReaction.POPPED));
         this.registerDefaultState(this.stateDefinition.any()
                 .setValue(PART, BedPart.FOOT)
                 .setValue(OCCUPIED, false));
@@ -178,10 +177,6 @@ public class BlockMaidBed extends HorizontalDirectionalBlock implements EntityBl
         return part == BedPart.FOOT ? direction : direction.getOpposite();
     }
 
-    @Override
-    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
-        return CODEC;
-    }
 
     @Override
     @Nullable

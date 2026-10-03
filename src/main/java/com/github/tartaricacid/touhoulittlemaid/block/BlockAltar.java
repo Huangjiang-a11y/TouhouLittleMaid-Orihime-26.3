@@ -17,6 +17,7 @@ import com.github.tartaricacid.touhoulittlemaid.util.PosListData;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.minecraft.util.Prediction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
@@ -167,7 +168,7 @@ public class BlockAltar extends Block implements EntityBlock, IBlockExploded, Ha
     private void takeOutItem(Level world, BlockEntityAltar altar, Player player) {
         if (altar.isCanPlaceItem() && !ItemUtil.getStack(altar.handler, 0).isEmpty()) {
             ItemStack extractItem = ItemsUtil.extractItem(altar.handler, 0, 1, false, null);
-            player.getInventory().placeItemBackInInventory(extractItem);
+            player.getInventory().placeItemBackInInventory(extractItem, Prediction.SERVER_ONLY);
             world.playSound(null, altar.getBlockPos(), ITEM_FRAME_REMOVE_ITEM, PLAYERS, 1, 1);
             altarCraft(world, altar, player);
         }

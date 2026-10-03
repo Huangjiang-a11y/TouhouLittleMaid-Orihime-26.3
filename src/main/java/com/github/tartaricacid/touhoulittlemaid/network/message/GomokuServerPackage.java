@@ -16,6 +16,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.level.Level;
 
 import static com.github.tartaricacid.touhoulittlemaid.util.IdentifierUtil.modLoc;
@@ -47,7 +48,7 @@ public record GomokuServerPackage(BlockPos pos, Point point) implements CustomPa
                 gomoku.setStatue(MaidGomokuAI.getStatue(gomoku.getChessData(), aiPoint));
                 statue = gomoku.getStatue();
                 if (level instanceof ServerLevel serverLevel && serverLevel.getEntity(gomoku.getSitId()) instanceof EntitySit sit && sit.getFirstPassenger() instanceof EntityMaid maid) {
-                    maid.swing(InteractionHand.MAIN_HAND);
+                    maid.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, true);
                     if (statue == Statue.WIN) {
                         maid.getGameManager().markStatue(true);
                     }

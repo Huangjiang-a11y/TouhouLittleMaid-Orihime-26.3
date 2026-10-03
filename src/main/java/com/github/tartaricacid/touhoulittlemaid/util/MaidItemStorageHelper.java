@@ -8,6 +8,7 @@ import com.github.tartaricacid.touhoulittlemaid.init.InitDataComponent;
 import com.github.tartaricacid.touhoulittlemaid.init.InitItems;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget;
 import net.fabricmc.fabric.impl.attachment.AttachmentSerializingImpl;
+import net.minecraft.util.Prediction;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.ProblemReporter;
@@ -67,7 +68,7 @@ public final class MaidItemStorageHelper {
         }
 
         MaidItemStorageHelper.saveMaid(photo, maid, Consumers.nop());
-        playerIn.getInventory().placeItemBackInInventory(photo);
+        playerIn.getInventory().placeItemBackInInventory(photo, Prediction.SERVER_ONLY);
     }
 
     /**

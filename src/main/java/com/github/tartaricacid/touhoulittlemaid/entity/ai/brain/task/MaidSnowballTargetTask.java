@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.behavior.Behavior;
 import net.minecraft.world.entity.ai.behavior.BehaviorUtils;
@@ -65,9 +66,9 @@ public class MaidSnowballTargetTask extends Behavior<EntityMaid> {
             if (canThrow && canSee) {
                 canThrow = false;
                 if (owner.getMainHandItem().getItem() instanceof SnowballItem) {
-                    owner.swing(InteractionHand.MAIN_HAND);
+                    owner.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, true);
                 } else {
-                    owner.swing(InteractionHand.OFF_HAND);
+                    owner.swing(InteractionHand.OFF_HAND, SwingAnimation.DEFAULT, true);
                 }
                 BehaviorUtils.lookAtEntity(owner, target);
                 performRangedAttack(owner, target);

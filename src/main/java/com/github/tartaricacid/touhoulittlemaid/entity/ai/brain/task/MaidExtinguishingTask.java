@@ -6,6 +6,7 @@ import com.github.tartaricacid.touhoulittlemaid.init.InitItems;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -48,7 +49,7 @@ public class MaidExtinguishingTask extends MaidCheckRateTask {
                 brain.eraseMemory(MemoryModuleType.WALK_TARGET);
                 world.addFreshEntity(new EntityExtinguishingAgent(worldIn, owner.position()));
                 mainhandItem.hurtAndBreak(1, maid, EquipmentSlot.MAINHAND);
-                maid.swing(InteractionHand.MAIN_HAND);
+                maid.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, true);
             } else {
                 BehaviorUtils.setWalkAndLookTargetMemories(maid, owner, speed, 2);
             }
@@ -57,14 +58,14 @@ public class MaidExtinguishingTask extends MaidCheckRateTask {
         if (maid.isOnFire() && isExtinguisher(mainhandItem)) {
             world.addFreshEntity(new EntityExtinguishingAgent(worldIn, maid.position()));
             mainhandItem.hurtAndBreak(1, maid, EquipmentSlot.MAINHAND);
-            maid.swing(InteractionHand.MAIN_HAND);
+            maid.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, true);
         }
 
         List<TamableAnimal> tameableEntities = world.getEntitiesOfClass(TamableAnimal.class, maid.getBoundingBox().inflate(2, 1, 2), Entity::isOnFire);
         if (!tameableEntities.isEmpty() && isExtinguisher(mainhandItem)) {
             world.addFreshEntity(new EntityExtinguishingAgent(worldIn, maid.position()));
             mainhandItem.hurtAndBreak(1, maid, EquipmentSlot.MAINHAND);
-            maid.swing(InteractionHand.MAIN_HAND);
+            maid.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, true);
         }
     }
 

@@ -65,18 +65,22 @@ public class ShrineRenderer implements BlockEntityRenderer<BlockEntityShrine, Sh
 
         poseStack.pushPose();
         poseStack.translate(0.5, 1.5, 0.5);
-        poseStack.mulPose(Axis.ZN.rotationDegrees(180));
-        poseStack.mulPose(Axis.YN.rotationDegrees(180 - facing.get2DDataValue() * 90));
+        poseStack.rotate(Axis.ZN.rotationDegrees(180));
+        poseStack.rotate(Axis.YN.rotationDegrees(180 - facing.get2DDataValue() * 90));
         collector.submitModel(
-                model, Unit.INSTANCE, poseStack, RenderTypes.entityCutout(TEXTURE),
-                state.lightCoords, OverlayTexture.NO_OVERLAY, 0, state.breakProgress
-        );
+                         model, Unit.INSTANCE, poseStack, RenderTypes.entityCutout(TEXTURE),
+                         state.lightCoords, OverlayTexture.NO_OVERLAY, 0
+                 );
+                 if (state.breakProgress != null) {
+                     // 26.3：方块破坏进度改由独立的 submitCrumblingOverlay 提交
+                     collector.submitCrumblingOverlay(model, Unit.INSTANCE, poseStack, RenderTypes.entityCutout(TEXTURE), state.lightCoords, OverlayTexture.NO_OVERLAY, 0, state.breakProgress);
+                 }
         poseStack.popPose();
 
         if (state.hasItem) {
             poseStack.pushPose();
             poseStack.translate(0.5, 1.625, 0.5);
-            poseStack.mulPose(Axis.YN.rotationDegrees(state.itemRotation));
+            poseStack.rotate(Axis.YN.rotationDegrees(state.itemRotation));
             state.itemRenderState.submit(poseStack, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
             poseStack.popPose();
         }

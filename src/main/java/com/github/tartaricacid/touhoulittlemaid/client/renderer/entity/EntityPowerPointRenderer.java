@@ -16,7 +16,7 @@ import net.minecraft.resources.Identifier;
 
 public class EntityPowerPointRenderer extends EntityRenderer<EntityPowerPoint, EntityPowerPointRenderState> {
     private static final Identifier POWER_POINT_TEXTURES = IdentifierUtil.modLoc("textures/entity/power_point.png");
-    private static final RenderType RENDER_TYPE = RenderTypes.entityTranslucentCullItemTarget(POWER_POINT_TEXTURES);
+    private static final RenderType RENDER_TYPE = RenderTypes.entityTranslucentCull(POWER_POINT_TEXTURES);
 
     public EntityPowerPointRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager);
@@ -45,7 +45,7 @@ public class EntityPowerPointRenderer extends EntityRenderer<EntityPowerPoint, E
 
         poseStack.pushPose();
         poseStack.translate(0, 0.1, 0);
-        poseStack.mulPose(camera.orientation);
+        poseStack.rotate(camera.orientation);
         poseStack.scale(0.3F, 0.3F, 0.3F);
 
         submitNodeCollector.submitCustomGeometry(poseStack, RENDER_TYPE, (pose, buffer) -> {
