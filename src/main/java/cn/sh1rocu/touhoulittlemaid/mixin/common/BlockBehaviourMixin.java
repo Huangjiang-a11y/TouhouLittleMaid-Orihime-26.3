@@ -30,16 +30,17 @@ public class BlockBehaviourMixin {
         }
     }
 
+    // 26.3：原版 onExplosionHit 里写回空气的调用由 setBlock(pos, state, flags) 改为 setBlockAndUpdate(pos, state)
     @WrapOperation(
             method = "onExplosionHit",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/server/level/ServerLevel;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"
+                    target = "Lnet/minecraft/server/level/ServerLevel;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z"
             )
     )
-    private boolean tlm$dontJust2Air(ServerLevel instance, BlockPos pos, BlockState airState, int i, Operation<Boolean> original, @Local(argsOnly = true) BlockState state) {
+    private boolean tlm$dontJust2Air(ServerLevel instance, BlockPos pos, BlockState airState, Operation<Boolean> original, @Local(argsOnly = true) BlockState state) {
         if (!(state.getBlock() instanceof IBlockExploded)) {
-            return original.call(instance, pos, airState, i);
+            return original.call(instance, pos, airState);
         } else {
             return false;
         }

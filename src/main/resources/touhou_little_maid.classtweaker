@@ -37,7 +37,6 @@ accessible method net/minecraft/util/thread/BlockableEventLoop submitAsync (Ljav
 
 accessible field net/minecraft/world/level/pathfinder/PathFinder openSet Lnet/minecraft/world/level/pathfinder/BinaryHeap;
 mutable field net/minecraft/world/level/pathfinder/PathFinder openSet Lnet/minecraft/world/level/pathfinder/BinaryHeap;
-accessible method net/minecraft/world/level/pathfinder/Path setDebug ([Lnet/minecraft/world/level/pathfinder/Node;[Lnet/minecraft/world/level/pathfinder/Node;Ljava/util/Set;)V
 
 accessible class net/minecraft/world/entity/ai/behavior/CrossbowAttack$CrossbowState
 accessible field net/minecraft/world/entity/ai/behavior/CrossbowAttack attackDelay I
@@ -47,7 +46,6 @@ extendable method net/minecraft/world/entity/ai/behavior/CrossbowAttack crossbow
 
 accessible field net/minecraft/world/entity/EquipmentSlot countLimit I
 
-accessible method net/minecraft/client/gui/GuiGraphicsExtractor blitTiledSprite (Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;IIIIIIIIIII)V
 
 accessible method net/minecraft/world/entity/LivingEntity handleRelativeFrictionAndCalculateMovement (Lnet/minecraft/world/phys/Vec3;F)Lnet/minecraft/world/phys/Vec3;
 extendable method net/minecraft/world/entity/LivingEntity handleRelativeFrictionAndCalculateMovement (Lnet/minecraft/world/phys/Vec3;F)Lnet/minecraft/world/phys/Vec3;

@@ -40,7 +40,8 @@ public abstract class ClientLevelMixin extends Level {
     }
 
     @WrapOperation(
-            method = "addBreakingBlockEffect",
+            // 26.3：addBreakingBlockEffect -> addBreakingBlockEffects(BlockPos, Direction, boolean)
+            method = "addBreakingBlockEffects",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;shouldSpawnTerrainParticles()Z")
     )
     private boolean tlm$addHitEffects(BlockState instance, Operation<Boolean> original) {

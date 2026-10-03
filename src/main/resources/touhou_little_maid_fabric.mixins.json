@@ -10,7 +10,6 @@
     "accessor.EntityAccessor",
     "accessor.ExperienceOrbAccessor",
     "accessor.LivingEntityAccessor",
-    "accessor.LootContextParamSetsAccessor",
     "accessor.MobAccessor",
     "accessor.NonNullListAccessor",
     "accessor.ParticleAccessor",
@@ -33,13 +32,12 @@
     "common.ParrotMixin",
     "common.PersistentEntitySectionManagerMixin",
     "common.PlayerMixin",
-    "common.RedStoneWireBlockMixin",
+    "common.RedstoneWireBlockMixin",
     "common.ServerEntityMixin",
     "common.ServerLevelMixin",
     "common.ServerLevelMixin$EntityCallbacksMixin",
     "common.ShulkerBulletMixin",
-    "common.ThrowableProjectileMixin",
-    "compat.improvedmobs.EventHandlerMixin"
+    "common.ThrowableProjectileMixin"
   ],
   "client": [
     "accessor.AbstractContainerScreenAccessor",

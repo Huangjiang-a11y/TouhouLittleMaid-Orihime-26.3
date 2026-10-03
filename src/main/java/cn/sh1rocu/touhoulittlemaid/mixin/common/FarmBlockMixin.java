@@ -14,8 +14,9 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(FarmlandBlock.class)
 public class FarmBlockMixin {
-    @WrapWithCondition(method = "fallOn", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/FarmlandBlock;turnToDirt(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)V"))
-    private boolean tlm$onFarmlandTrample(Entity entity, BlockState state, Level level, BlockPos pos, @Local(argsOnly = true) double fallDistance) {
+    // 26.3：turnToDirt 改名 turnToBaseBlock（并且从静态方法变成实例方法，故 handler 需要接收者参数）
+    @WrapWithCondition(method = "fallOn", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/FarmlandBlock;turnToBaseBlock(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)V"))
+    private boolean tlm$onFarmlandTrample(FarmlandBlock instance, Entity entity, BlockState state, Level level, BlockPos pos, @Local(argsOnly = true) double fallDistance) {
         return CommonHooks.onFarmlandTrample(level, pos, Blocks.DIRT.defaultBlockState(), fallDistance, entity);
     }
 }
