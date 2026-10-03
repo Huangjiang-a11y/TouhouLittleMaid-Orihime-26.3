@@ -6,15 +6,18 @@ import com.github.tartaricacid.touhoulittlemaid.datagen.LootTableGenerator;
 import com.github.tartaricacid.touhoulittlemaid.init.InitEntities;
 import com.github.tartaricacid.touhoulittlemaid.init.InitItems;
 import com.github.tartaricacid.touhoulittlemaid.util.IdentifierUtil;
+import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.*;
 import net.minecraft.advancements.predicates.entity.EntityPredicate;
 import net.minecraft.advancements.triggers.KilledTrigger;
 import net.minecraft.advancements.triggers.RecipeCraftedTrigger;
 import net.minecraft.core.HolderGetter;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;
@@ -22,42 +25,35 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Recipe;
+import java.util.List;
 import net.minecraft.world.level.ItemLike;
 
-import java.util.function.Consumer;
 
+
+import static com.github.tartaricacid.touhoulittlemaid.datagen.advancement.AdvancementHelper.displayInfo;
+import static com.github.tartaricacid.touhoulittlemaid.datagen.advancement.AdvancementHelper.recipeSet;
 
 public class BaseAdvancement {
-    public static void generate(HolderLookup.Provider registries, Consumer<AdvancementHolder> saver) {
-        AdvancementHolder root = make(InitItems.HAKUREI_GOHEI, "craft_gohei")
-                .requirements(AdvancementRequirements.Strategy.OR)
-                .addCriterion("craft_hakurei_gohei", RecipeCraftedTrigger.TriggerInstance.craftedItem(recipeKey("hakurei_gohei")))
-                .addCriterion("craft_sanae_gohei", RecipeCraftedTrigger.TriggerInstance.craftedItem(recipeKey("sanae_gohei")))
-                .rewards(AdvancementRewards.Builder.experience(50))
-                .save(saver, id("base/craft_gohei").toString());
+    public static void generate(HolderLookup.Provider registries, BootstrapContext<Advancement> saver) {
+        // craft_gohei / craft_chair / build_altar 需要引用配方或战利品表的 holder，
+        // 而 Fabric datagen 的注册表集合只含 bootstrap 注册表（数据包注册表不在内），
+        // 因此这几条改为静态 JSON：src/main/resources/data/touhou_little_maid/advancement/
+        generateAltar(registries, saver);
 
-        generateAltar(registries, saver, root);
-
-        generateMaid(saver, root);
-
-        generateChair(saver, root);
+        generateChair(saver);
     }
 
-    private static void generateChair(Consumer<AdvancementHolder> saver, AdvancementHolder root) {
-        AdvancementHolder chair = make(InitItems.CHAIR, "craft_chair").parent(root)
-                .addCriterion("craft_chair", RecipeCraftedTrigger.TriggerInstance.craftedItem(recipeKey("chair")))
-                .save(saver, id("base/craft_chair").toString());
-
-        make(InitItems.CHANGE_CHAIR_MODEL, "change_chair_model").parent(chair)
+    private static void generateChair(BootstrapContext<Advancement> saver) {
+        make(InitItems.CHANGE_CHAIR_MODEL, "change_chair_model").parent(id("base/craft_chair"))
                 .addCriterion("maid_event", MaidEventTrigger.create(TriggerType.CHANGE_CHAIR_MODEL))
                 .save(saver, id("base/change_chair_model").toString());
     }
 
-    private static void generateMaid(Consumer<AdvancementHolder> saver, AdvancementHolder root) {
+    private static void generateMaid(BootstrapContext<Advancement> saver, AdvancementHolder root) {
 //        ItemStack stack = ItemEntityPlaceholder.setRecipeId(new ItemStack(InitItems.ENTITY_PLACEHOLDER), "spawn_box");
 //        AdvancementHolder spawnMaid = make(stack, "spawn_maid").parent(root)
 //                .addCriterion("altar_craft", AltarCraftTrigger.Instance.recipe(id("altar_recipe/spawn_box")))
-//                .rewards(AdvancementRewards.Builder.loot(LootTableGenerator.CAKE))
+//                .rewards(AdvancementRewards.Builder.loot(lootTable(registries, LootTableGenerator.CAKE)))
 //                .save(saver, id("base/spawn_maid").toString());
 //
 //        makeGoal(Items.CAKE, "tamed_maid").parent(spawnMaid)
@@ -73,20 +69,15 @@ public class BaseAdvancement {
 //                .save(saver, id("base/change_maid_sound").toString());
     }
 
-    private static void generateAltar(HolderLookup.Provider registries, Consumer<AdvancementHolder> saver, AdvancementHolder root) {
+    private static void generateAltar(HolderLookup.Provider registries, BootstrapContext<Advancement> saver) {
         HolderGetter<EntityType<?>> entityTypes = registries.lookupOrThrow(Registries.ENTITY_TYPE);
 
-        AdvancementHolder altar = make(Items.WOOL.red(), "build_altar").parent(root)
-                .addCriterion("maid_event", MaidEventTrigger.create(TriggerType.BUILD_ALTAR))
-                .rewards(AdvancementRewards.Builder.loot(LootTableGenerator.ADVANCEMENT_POWER_POINT))
-                .save(saver, id("base/build_altar").toString());
-
         EntityPredicate.Builder predicate = EntityPredicate.Builder.entity().of(entityTypes, InitEntities.FAIRY);
-        make(InitItems.FAIRY_SPAWN_EGG, "kill_maid_fairy").parent(altar)
+        make(InitItems.FAIRY_SPAWN_EGG, "kill_maid_fairy").parent(id("base/build_altar"))
                 .addCriterion("killed_entity", KilledTrigger.TriggerInstance.playerKilledEntity(predicate))
                 .save(saver, id("base/kill_maid_fairy").toString());
 
-        make(InitItems.POWER_POINT, "pickup_power_point").parent(altar)
+        make(InitItems.POWER_POINT, "pickup_power_point").parent(id("base/build_altar"))
                 .addCriterion("maid_event", MaidEventTrigger.create(TriggerType.PICKUP_POWER_POINT))
                 .save(saver, id("base/pickup_power_point").toString());
     }
@@ -95,27 +86,36 @@ public class BaseAdvancement {
         MutableComponent title = Component.translatable(String.format("advancements.touhou_little_maid.base.%s.title", key));
         MutableComponent desc = Component.translatable(String.format("advancements.touhou_little_maid.base.%s.description", key));
 
-        return Advancement.Builder.advancement().display(item, title, desc,
+        return Advancement.Builder.advancement().display(displayInfo(item, title, desc,
+                null,
+                AdvancementType.TASK, true, true, false));
+    }
+
+    private static Advancement.Builder makeRoot(ItemLike item, String key) {
+        MutableComponent title = Component.translatable(String.format("advancements.touhou_little_maid.base.%s.title", key));
+        MutableComponent desc = Component.translatable(String.format("advancements.touhou_little_maid.base.%s.description", key));
+
+        return Advancement.Builder.advancement().display(displayInfo(item, title, desc,
                 IdentifierUtil.modLoc("advancements/backgrounds/stone"),
-                AdvancementType.TASK, true, true, false);
+                AdvancementType.TASK, true, true, false));
     }
 
     private static Advancement.Builder make(ItemStack item, String key) {
         MutableComponent title = Component.translatable(String.format("advancements.touhou_little_maid.base.%s.title", key));
         MutableComponent desc = Component.translatable(String.format("advancements.touhou_little_maid.base.%s.description", key));
 
-        return Advancement.Builder.advancement().display(ItemStackTemplate.fromNonEmptyStack(item), title, desc,
-                IdentifierUtil.modLoc("advancements/backgrounds/stone"),
-                AdvancementType.TASK, true, true, false);
+        return Advancement.Builder.advancement().display(displayInfo(ItemStackTemplate.fromNonEmptyStack(item), title, desc,
+                null,
+                AdvancementType.TASK, true, true, false));
     }
 
     private static Advancement.Builder makeGoal(ItemLike item, String key) {
         MutableComponent title = Component.translatable(String.format("advancements.touhou_little_maid.base.%s.title", key));
         MutableComponent desc = Component.translatable(String.format("advancements.touhou_little_maid.base.%s.description", key));
 
-        return Advancement.Builder.advancement().display(item, title, desc,
-                IdentifierUtil.modLoc("advancements/backgrounds/stone"),
-                AdvancementType.GOAL, true, true, false);
+        return Advancement.Builder.advancement().display(displayInfo(item, title, desc,
+                null,
+                AdvancementType.GOAL, true, true, false));
     }
 
     private static Identifier id(String id) {

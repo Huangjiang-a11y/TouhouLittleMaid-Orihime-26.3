@@ -5,15 +5,13 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "functions": [
-            {
-              "function": "touhou_little_maid:set_init_maid_owner"
-            }
-          ],
+          "modifier": {
+            "type": "touhou_little_maid:set_init_maid_owner"
+          },
           "name": "touhou_little_maid:smart_slab_init"
         }
       ],
-      "rolls": 1.0
+      "rolls": 1
     }
   ]
 }

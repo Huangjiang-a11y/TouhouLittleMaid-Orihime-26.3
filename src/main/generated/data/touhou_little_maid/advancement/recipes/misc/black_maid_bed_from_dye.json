@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "touhou_little_maid:black_maid_bed_from_dye"
+        "recipes": "touhou_little_maid:black_maid_bed_from_dye"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

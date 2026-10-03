@@ -10,28 +10,26 @@
       ],
       "rolls": {
         "type": "minecraft:uniform",
-        "max": 2.0,
-        "min": 1.0
+        "max": 2,
+        "min": 1
       }
     },
     {
       "entries": [
         {
           "type": "minecraft:item",
-          "functions": [
-            {
-              "damage": {
-                "type": "minecraft:uniform",
-                "max": 0.1,
-                "min": 0.06
-              },
-              "function": "minecraft:set_damage"
+          "modifier": {
+            "type": "minecraft:set_damage",
+            "damage": {
+              "type": "minecraft:uniform",
+              "max": 0.1,
+              "min": 0.06
             }
-          ],
+          },
           "name": "touhou_little_maid:camera"
         }
       ],
-      "rolls": 1.0
+      "rolls": 1
     }
   ]
 }

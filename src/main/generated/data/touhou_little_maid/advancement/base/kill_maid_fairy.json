@@ -3,21 +3,18 @@
   "criteria": {
     "killed_entity": {
       "conditions": {
-        "entity": [
-          {
-            "condition": "minecraft:entity_properties",
-            "entity": "this",
-            "predicate": {
-              "minecraft:entity_type": "touhou_little_maid:fairy"
-            }
+        "entity": {
+          "type": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "minecraft:entity_type": "touhou_little_maid:fairy"
           }
-        ]
+        }
       },
       "trigger": "minecraft:player_killed_entity"
     }
   },
   "display": {
-    "background": "touhou_little_maid:advancements/backgrounds/stone",
     "description": {
       "translate": "advancements.touhou_little_maid.base.kill_maid_fairy.description"
     },

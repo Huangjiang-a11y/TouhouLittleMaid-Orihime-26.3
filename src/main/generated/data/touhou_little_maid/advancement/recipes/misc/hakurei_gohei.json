@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "touhou_little_maid:hakurei_gohei"
+        "recipes": "touhou_little_maid:hakurei_gohei"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

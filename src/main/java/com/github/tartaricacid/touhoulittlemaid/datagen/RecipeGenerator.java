@@ -10,10 +10,13 @@ import com.github.tartaricacid.touhoulittlemaid.util.migrate.EntityTypeUtil;
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
+import net.minecraft.advancements.Advancement;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.EntityType;
@@ -22,15 +25,18 @@ import net.minecraft.world.item.Items;
 import java.util.concurrent.CompletableFuture;
 
 public class RecipeGenerator extends RecipeProvider {
-    public RecipeGenerator(HolderLookup.Provider registries, RecipeOutput output) {
-        super(registries, output);
+    private final BootstrapContext<Recipe<?>> recipes;
+
+    public RecipeGenerator(BootstrapContext<Recipe<?>> recipes, BootstrapContext<Advancement> advancements) {
+        super(recipes, advancements);
+        this.recipes = recipes;
     }
 
     @SuppressWarnings("all")
     @Override
     public void buildRecipes() {
         RecipeOutput recipeOutput = this.output;
-        var items = registries.lookupOrThrow(Registries.ITEM);
+        var items = this.recipes.lookup(Registries.ITEM);
         AltarRecipeBuilder.shapeless(items, InitItems.BOOKSHELF)
                 .power(0.1F)
                 .requires(4, ItemTags.PLANKS)
@@ -465,8 +471,10 @@ public class RecipeGenerator extends RecipeProvider {
         }
 
         @Override
-        protected RecipeProvider createRecipeProvider(HolderLookup.Provider registries, RecipeOutput output) {
-            return new RecipeGenerator(registries, output);
+        protected RecipeProvider createRecipeProvider(HolderLookup.Provider registries,
+                                                      BootstrapContext<Recipe<?>> recipes,
+                                                      BootstrapContext<Advancement> advancements) {
+            return new RecipeGenerator(recipes, advancements);
         }
 
         @Override

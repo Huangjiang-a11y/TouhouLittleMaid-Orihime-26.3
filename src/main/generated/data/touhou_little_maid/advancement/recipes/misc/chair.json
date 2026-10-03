@@ -3,7 +3,7 @@
   "criteria": {
     "has_the_recipe": {
       "conditions": {
-        "recipe": "touhou_little_maid:chair"
+        "recipes": "touhou_little_maid:chair"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

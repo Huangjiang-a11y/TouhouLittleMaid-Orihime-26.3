@@ -4,8 +4,8 @@ import com.github.tartaricacid.touhoulittlemaid.config.subconfig.MiscConfig;
 import com.github.tartaricacid.touhoulittlemaid.init.InitTrigger;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.advancements.predicates.ContextAwarePredicate;
-import net.minecraft.advancements.predicates.entity.EntityPredicate;
+import net.minecraft.core.Holder;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.advancements.triggers.Criterion;
 import net.minecraft.advancements.triggers.SimpleCriterionTrigger;
 import net.minecraft.server.level.ServerPlayer;
@@ -27,9 +27,9 @@ public class GiveSmartSlabConfigTrigger extends SimpleCriterionTrigger<GiveSmart
         return Instance.CODEC;
     }
 
-    public record Instance(Optional<ContextAwarePredicate> player) implements SimpleInstance {
+    public record Instance(Optional<Holder<LootItemCondition>> player) implements SimpleInstance {
         public static final Codec<GiveSmartSlabConfigTrigger.Instance> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                        EntityPredicate.ADVANCEMENT_CODEC.optionalFieldOf("player").forGetter(GiveSmartSlabConfigTrigger.Instance::player))
+                        LootItemCondition.CODEC.optionalFieldOf("player").forGetter(GiveSmartSlabConfigTrigger.Instance::player))
                 .apply(instance, GiveSmartSlabConfigTrigger.Instance::new));
     }
 }

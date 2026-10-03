@@ -1,6 +1,8 @@
 package com.github.tartaricacid.touhoulittlemaid.datagen;
 
 import com.github.tartaricacid.touhoulittlemaid.advancements.rewards.GiveSmartSlabConfigTrigger;
+import com.github.tartaricacid.touhoulittlemaid.datagen.advancement.AdvancementHelper;
+import com.github.tartaricacid.touhoulittlemaid.datagen.advancement.AdvancementSaverContext;
 import com.github.tartaricacid.touhoulittlemaid.datagen.advancement.BaseAdvancement;
 import com.github.tartaricacid.touhoulittlemaid.datagen.advancement.ChallengeAdvancement;
 import com.github.tartaricacid.touhoulittlemaid.datagen.advancement.FavorabilityAdvancement;
@@ -12,6 +14,7 @@ import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementRewards;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.data.worldgen.BootstrapContext;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -23,18 +26,13 @@ public class AdvancementDataGen extends FabricAdvancementProvider {
 
     @Override
     public void generateAdvancement(HolderLookup.Provider provider, Consumer<AdvancementHolder> saver) {
-        genGiveSmartSlabAdvancement(saver);
-        genMainAdvancement(provider, saver);
+        // 26.3: Advancement.Builder#save 需要 BootstrapContext，这里用适配器桥接 Fabric 的 Consumer
+        BootstrapContext<Advancement> context = new AdvancementSaverContext(saver);
+        // give_smart_slab 需要战利品表 holder，改为静态 JSON（src/main/resources/.../advancement/give_smart_slab.json）
+        genMainAdvancement(provider, context);
     }
 
-    private static void genGiveSmartSlabAdvancement(Consumer<AdvancementHolder> saver) {
-        Advancement.Builder.advancement()
-                .addCriterion("tick", GiveSmartSlabConfigTrigger.create())
-                .rewards(AdvancementRewards.Builder.loot(LootTableGenerator.GIVE_SMART_SLAB))
-                .save(saver, IdentifierUtil.modLoc("give_smart_slab"));
-    }
-
-    private static void genMainAdvancement(HolderLookup.Provider registries, Consumer<AdvancementHolder> saver) {
+    private static void genMainAdvancement(HolderLookup.Provider registries, BootstrapContext<Advancement> saver) {
         BaseAdvancement.generate(registries, saver);
         MaidBaseAdvancement.generate(registries, saver);
         FavorabilityAdvancement.generate(saver);

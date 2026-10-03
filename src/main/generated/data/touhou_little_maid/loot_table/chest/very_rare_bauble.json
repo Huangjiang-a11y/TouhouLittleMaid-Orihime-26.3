@@ -5,12 +5,10 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "functions": [
-            {
-              "function": "minecraft:enchant_randomly",
-              "options": "#minecraft:on_random_loot"
-            }
-          ],
+          "modifier": {
+            "type": "minecraft:enchant_randomly",
+            "options": "#minecraft:on_random_loot"
+          },
           "name": "touhou_little_maid:ultramarine_orb_elixir"
         },
         {
@@ -23,7 +21,7 @@
           "weight": 4
         }
       ],
-      "rolls": 1.0
+      "rolls": 1
     }
   ]
 }

@@ -11,7 +11,6 @@
     }
   },
   "display": {
-    "background": "touhou_little_maid:advancements/backgrounds/stone",
     "description": {
       "translate": "advancements.touhou_little_maid.maid_base.pickup_garage_kit.description"
     },

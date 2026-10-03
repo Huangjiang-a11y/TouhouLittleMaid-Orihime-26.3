@@ -3,8 +3,8 @@ package com.github.tartaricacid.touhoulittlemaid.advancements.maid;
 import com.github.tartaricacid.touhoulittlemaid.init.InitTrigger;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.advancements.predicates.ContextAwarePredicate;
-import net.minecraft.advancements.predicates.entity.EntityPredicate;
+import net.minecraft.core.Holder;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.advancements.triggers.Criterion;
 import net.minecraft.advancements.triggers.SimpleCriterionTrigger;
 import net.minecraft.server.level.ServerPlayer;
@@ -26,9 +26,9 @@ public class MaidEventTrigger extends SimpleCriterionTrigger<MaidEventTrigger.In
         return MaidEventTrigger.Instance.CODEC;
     }
 
-    public record Instance(Optional<ContextAwarePredicate> player, String eventName) implements SimpleInstance {
+    public record Instance(Optional<Holder<LootItemCondition>> player, String eventName) implements SimpleInstance {
         public static final Codec<MaidEventTrigger.Instance> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                        EntityPredicate.ADVANCEMENT_CODEC.optionalFieldOf("player").forGetter(MaidEventTrigger.Instance::player),
+                        LootItemCondition.CODEC.optionalFieldOf("player").forGetter(MaidEventTrigger.Instance::player),
                         Codec.STRING.fieldOf("event").forGetter(MaidEventTrigger.Instance::eventName))
                 .apply(instance, MaidEventTrigger.Instance::new));
 

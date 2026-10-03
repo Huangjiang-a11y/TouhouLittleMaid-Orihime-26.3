@@ -13,6 +13,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -21,12 +22,14 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 
 import java.util.Optional;
-import java.util.function.Consumer;
 
+
+import static com.github.tartaricacid.touhoulittlemaid.datagen.advancement.AdvancementHelper.displayInfo;
+import static com.github.tartaricacid.touhoulittlemaid.datagen.advancement.AdvancementHelper.lootTable;
 
 public class MaidBaseAdvancement {
-    public static void generate(HolderLookup.Provider registries, Consumer<AdvancementHolder> saver) {
-        AdvancementHolder root = make(Items.FEATHER, "switch_task")
+    public static void generate(HolderLookup.Provider registries, BootstrapContext<Advancement> saver) {
+        AdvancementHolder root = makeRoot(Items.FEATHER, "switch_task")
                 .addCriterion("maid_event", MaidEventTrigger.create(TriggerType.SWITCH_TASK))
                 .save(saver, id("maid_base/switch_task").toString());
 
@@ -43,7 +46,7 @@ public class MaidBaseAdvancement {
         generateReborn(root, saver);
     }
 
-    private static void generateFind(Consumer<AdvancementHolder> saver, AdvancementHolder root) {
+    private static void generateFind(BootstrapContext<Advancement> saver, AdvancementHolder root) {
         AdvancementHolder base = make(InitItems.SERVANT_BELL, "use_servant_bell").parent(root)
                 .addCriterion("maid_event", MaidEventTrigger.create(TriggerType.USE_SERVANT_BELL))
                 .save(saver, id("maid_base/use_servant_bell").toString());
@@ -61,7 +64,7 @@ public class MaidBaseAdvancement {
                 .save(saver, id("maid_base/use_white_fox_scroll").toString());
     }
 
-    private static void generateOther(Consumer<AdvancementHolder> saver, AdvancementHolder root) {
+    private static void generateOther(BootstrapContext<Advancement> saver, AdvancementHolder root) {
         AdvancementHolder base = make(Items.SADDLE, "pickup_maid").parent(root)
                 .addCriterion("maid_event", MaidEventTrigger.create(TriggerType.PICKUP_MAID))
                 .save(saver, id("maid_base/pickup_maid").toString());
@@ -75,7 +78,7 @@ public class MaidBaseAdvancement {
                 .save(saver, id("maid_base/clear_maid_effects").toString());
     }
 
-    private static void generateTask(AdvancementHolder root, Consumer<AdvancementHolder> saver) {
+    private static void generateTask(AdvancementHolder root, BootstrapContext<Advancement> saver) {
         AdvancementHolder taskRoot = make(Items.CLOCK, "switch_schedule").parent(root)
                 .addCriterion("maid_event", MaidEventTrigger.create(TriggerType.SWITCH_SCHEDULE))
                 .save(saver, id("maid_base/switch_schedule").toString());
@@ -105,7 +108,7 @@ public class MaidBaseAdvancement {
                 .save(saver, id("maid_base/maid_feed_player").toString());
     }
 
-    private static void generateBauble(AdvancementHolder root, Consumer<AdvancementHolder> saver) {
+    private static void generateBauble(AdvancementHolder root, BootstrapContext<Advancement> saver) {
         AdvancementHolder baubleRoot = make(InitItems.FIRE_PROTECT_BAUBLE, "use_protect_bauble").parent(root)
                 .addCriterion("maid_event", MaidEventTrigger.create(TriggerType.USE_PROTECT_BAUBLE))
                 .save(saver, id("maid_base/use_protect_bauble").toString());
@@ -127,7 +130,7 @@ public class MaidBaseAdvancement {
                 .save(saver, id("maid_base/use_wireless_io").toString());
     }
 
-    private static void generatePhoto(HolderLookup.Provider registries, AdvancementHolder root, Consumer<AdvancementHolder> saver) {
+    private static void generatePhoto(HolderLookup.Provider registries, AdvancementHolder root, BootstrapContext<Advancement> saver) {
         HolderLookup<Item> items = registries.lookupOrThrow(Registries.ITEM);
 
         AdvancementHolder photoRoot = make(InitItems.CAMERA, "photo_maid").parent(root)
@@ -146,7 +149,7 @@ public class MaidBaseAdvancement {
                 .save(saver, id("maid_base/pickup_garage_kit").toString());
     }
 
-    private static void generateReborn(AdvancementHolder root, Consumer<AdvancementHolder> saver) {
+    private static void generateReborn(AdvancementHolder root, BootstrapContext<Advancement> saver) {
 //        ItemStack stack = ItemEntityPlaceholder.setRecipeId(new ItemStack(InitItems.ENTITY_PLACEHOLDER), "reborn_maid");
 //        AdvancementHolder rebornRoot = make(stack, "reborn_maid").parent(root)
 //                .addCriterion("altar_craft", AltarCraftTrigger.Instance.recipe(id("altar_recipe/reborn_maid")))
@@ -161,27 +164,36 @@ public class MaidBaseAdvancement {
         MutableComponent title = Component.translatable(String.format("advancements.touhou_little_maid.maid_base.%s.title", key));
         MutableComponent desc = Component.translatable(String.format("advancements.touhou_little_maid.maid_base.%s.description", key));
 
-        return Advancement.Builder.advancement().display(item, title, desc,
+        return Advancement.Builder.advancement().display(displayInfo(item, title, desc,
+                null,
+                AdvancementType.TASK, true, true, false));
+    }
+
+    private static Advancement.Builder makeRoot(ItemLike item, String key) {
+        MutableComponent title = Component.translatable(String.format("advancements.touhou_little_maid.maid_base.%s.title", key));
+        MutableComponent desc = Component.translatable(String.format("advancements.touhou_little_maid.maid_base.%s.description", key));
+
+        return Advancement.Builder.advancement().display(displayInfo(item, title, desc,
                 IdentifierUtil.modLoc("advancements/backgrounds/stone"),
-                AdvancementType.TASK, true, true, false);
+                AdvancementType.TASK, true, true, false));
     }
 
     private static Advancement.Builder make(ItemStack item, String key) {
         MutableComponent title = Component.translatable(String.format("advancements.touhou_little_maid.maid_base.%s.title", key));
         MutableComponent desc = Component.translatable(String.format("advancements.touhou_little_maid.maid_base.%s.description", key));
 
-        return Advancement.Builder.advancement().display(ItemStackTemplate.fromNonEmptyStack(item), title, desc,
-                IdentifierUtil.modLoc("advancements/backgrounds/stone"),
-                AdvancementType.TASK, true, true, false);
+        return Advancement.Builder.advancement().display(displayInfo(ItemStackTemplate.fromNonEmptyStack(item), title, desc,
+                null,
+                AdvancementType.TASK, true, true, false));
     }
 
     private static Advancement.Builder makeGoal(ItemLike item, String key) {
         MutableComponent title = Component.translatable(String.format("advancements.touhou_little_maid.maid_base.%s.title", key));
         MutableComponent desc = Component.translatable(String.format("advancements.touhou_little_maid.maid_base.%s.description", key));
 
-        return Advancement.Builder.advancement().display(item, title, desc,
-                IdentifierUtil.modLoc("advancements/backgrounds/stone"),
-                AdvancementType.GOAL, true, true, false);
+        return Advancement.Builder.advancement().display(displayInfo(item, title, desc,
+                null,
+                AdvancementType.GOAL, true, true, false));
     }
 
     private static Identifier id(String id) {

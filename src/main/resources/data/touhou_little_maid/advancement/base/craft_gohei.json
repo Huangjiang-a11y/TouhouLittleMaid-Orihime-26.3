@@ -1,0 +1,46 @@
+{
+  "display": {
+    "background": "touhou_little_maid:advancements/backgrounds/stone",
+    "icon": {
+      "id": "touhou_little_maid:hakurei_gohei"
+    },
+    "title": {
+      "translate": "advancements.touhou_little_maid.base.craft_gohei.title"
+    },
+    "description": {
+      "translate": "advancements.touhou_little_maid.base.craft_gohei.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "craft_hakurei_gohei": {
+      "trigger": "minecraft:recipe_crafted",
+      "conditions": {
+        "recipes": [
+          "touhou_little_maid:hakurei_gohei"
+        ]
+      }
+    },
+    "craft_sanae_gohei": {
+      "trigger": "minecraft:recipe_crafted",
+      "conditions": {
+        "recipes": [
+          "touhou_little_maid:sanae_gohei"
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "craft_hakurei_gohei",
+      "craft_sanae_gohei"
+    ]
+  ],
+  "rewards": {
+    "experience": 50
+  },
+  "sends_telemetry_event": true
+}

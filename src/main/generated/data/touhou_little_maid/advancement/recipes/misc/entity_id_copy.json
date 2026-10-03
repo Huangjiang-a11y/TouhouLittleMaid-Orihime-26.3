@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "touhou_little_maid:entity_id_copy"
+        "recipes": "touhou_little_maid:entity_id_copy"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

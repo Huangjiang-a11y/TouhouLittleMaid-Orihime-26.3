@@ -3,8 +3,8 @@ package com.github.tartaricacid.touhoulittlemaid.advancements.altar;
 import com.github.tartaricacid.touhoulittlemaid.init.InitTrigger;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.advancements.predicates.ContextAwarePredicate;
-import net.minecraft.advancements.predicates.entity.EntityPredicate;
+import net.minecraft.core.Holder;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.advancements.triggers.Criterion;
 import net.minecraft.advancements.triggers.SimpleCriterionTrigger;
 import net.minecraft.resources.Identifier;
@@ -27,9 +27,9 @@ public class AltarCraftTrigger extends SimpleCriterionTrigger<AltarCraftTrigger.
         return AltarCraftTrigger.Instance.CODEC;
     }
 
-    public record Instance(Optional<ContextAwarePredicate> player, Identifier recipeId) implements SimpleInstance {
+    public record Instance(Optional<Holder<LootItemCondition>> player, Identifier recipeId) implements SimpleInstance {
         public static final Codec<AltarCraftTrigger.Instance> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                        EntityPredicate.ADVANCEMENT_CODEC.optionalFieldOf("player").forGetter(AltarCraftTrigger.Instance::player),
+                        LootItemCondition.CODEC.optionalFieldOf("player").forGetter(AltarCraftTrigger.Instance::player),
                         Identifier.CODEC.fieldOf("recipe_id").forGetter(AltarCraftTrigger.Instance::recipeId))
                 .apply(instance, AltarCraftTrigger.Instance::new));
 

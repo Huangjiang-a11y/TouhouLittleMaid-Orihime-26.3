@@ -1,23 +1,26 @@
 {
   "parent": "touhou_little_maid:base/craft_gohei",
-  "criteria": {
-    "maid_event": {
-      "conditions": {
-        "event": "build_altar"
-      },
-      "trigger": "touhou_little_maid:maid_event"
-    }
-  },
   "display": {
-    "background": "touhou_little_maid:advancements/backgrounds/stone",
-    "description": {
-      "translate": "advancements.touhou_little_maid.base.build_altar.description"
-    },
     "icon": {
       "id": "minecraft:red_wool"
     },
     "title": {
       "translate": "advancements.touhou_little_maid.base.build_altar.title"
+    },
+    "description": {
+      "translate": "advancements.touhou_little_maid.base.build_altar.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "maid_event": {
+      "trigger": "touhou_little_maid:maid_event",
+      "conditions": {
+        "event": "build_altar"
+      }
     }
   },
   "requirements": [

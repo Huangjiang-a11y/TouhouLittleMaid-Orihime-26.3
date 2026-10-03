@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "touhou_little_maid:chair_show"
+        "recipes": "touhou_little_maid:chair_show"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

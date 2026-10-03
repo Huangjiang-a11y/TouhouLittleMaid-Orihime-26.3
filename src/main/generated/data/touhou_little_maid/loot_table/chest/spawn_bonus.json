@@ -19,26 +19,24 @@
           "weight": 4
         }
       ],
-      "rolls": 1.0
+      "rolls": 1
     },
     {
       "entries": [
         {
           "type": "minecraft:item",
-          "functions": [
-            {
-              "count": {
-                "type": "minecraft:uniform",
-                "max": 9.0,
-                "min": 3.0
-              },
-              "function": "minecraft:set_count"
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 9,
+              "min": 3
             }
-          ],
+          },
           "name": "touhou_little_maid:power_point"
         }
       ],
-      "rolls": 1.0
+      "rolls": 1
     }
   ]
 }

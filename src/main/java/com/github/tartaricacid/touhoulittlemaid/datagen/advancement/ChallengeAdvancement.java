@@ -10,18 +10,21 @@ import net.minecraft.advancements.AdvancementRewards;
 import net.minecraft.advancements.AdvancementType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 
-import java.util.function.Consumer;
 
+
+import static com.github.tartaricacid.touhoulittlemaid.datagen.advancement.AdvancementHelper.displayInfo;
+import static com.github.tartaricacid.touhoulittlemaid.datagen.advancement.AdvancementHelper.lootTable;
 
 public class ChallengeAdvancement {
-    public static void generate(Consumer<AdvancementHolder> saver) {
-        AdvancementHolder root = make(Items.IRON_HELMET, "any_equipment")
+    public static void generate(BootstrapContext<Advancement> saver) {
+        AdvancementHolder root = makeRoot(Items.IRON_HELMET, "any_equipment")
                 .addCriterion("maid_event", MaidEventTrigger.create(TriggerType.ANY_EQUIPMENT))
                 .save(saver, id("challenge/any_equipment").toString());
 
@@ -30,7 +33,7 @@ public class ChallengeAdvancement {
         generateKill(root, saver);
     }
 
-    private static void generateProtect(AdvancementHolder root, Consumer<AdvancementHolder> saver) {
+    private static void generateProtect(AdvancementHolder root, BootstrapContext<Advancement> saver) {
         AdvancementHolder protect = make(Items.ENCHANTED_GOLDEN_APPLE, "eat_enchanted_golden_apple").parent(root)
                 .addCriterion("maid_event", MaidEventTrigger.create(TriggerType.EAT_ENCHANTED_GOLDEN_APPLE))
                 .save(saver, id("challenge/eat_enchanted_golden_apple").toString());
@@ -50,7 +53,7 @@ public class ChallengeAdvancement {
 //                .save(saver, id("challenge/maid_100_healthy").toString());
     }
 
-    private static void generateKill(AdvancementHolder root, Consumer<AdvancementHolder> saver) {
+    private static void generateKill(AdvancementHolder root, BootstrapContext<Advancement> saver) {
         AdvancementHolder kill = makeGoal(InitItems.KILL_100, "kill_100").parent(root)
                 .addCriterion("maid_event", MaidEventTrigger.create(TriggerType.KILL_100))
                 .rewards(AdvancementRewards.Builder.experience(50))
@@ -70,7 +73,7 @@ public class ChallengeAdvancement {
                 .save(saver, id("challenge/kill_dragon").toString());
     }
 
-    private static void generateOther(AdvancementHolder root, Consumer<AdvancementHolder> saver) {
+    private static void generateOther(AdvancementHolder root, BootstrapContext<Advancement> saver) {
         makeGoal(Items.ENCHANTED_BOOK, "maid_fishing_enchanted_book").parent(root)
                 .addCriterion("maid_event", MaidEventTrigger.create(TriggerType.MAID_FISHING_ENCHANTED_BOOK))
                 .save(saver, id("challenge/maid_fishing_enchanted_book").toString());
@@ -84,36 +87,45 @@ public class ChallengeAdvancement {
         MutableComponent title = Component.translatable(String.format("advancements.touhou_little_maid.challenge.%s.title", key));
         MutableComponent desc = Component.translatable(String.format("advancements.touhou_little_maid.challenge.%s.description", key));
 
-        return Advancement.Builder.advancement().display(item, title, desc,
+        return Advancement.Builder.advancement().display(displayInfo(item, title, desc,
+                null,
+                AdvancementType.TASK, true, true, false));
+    }
+
+    private static Advancement.Builder makeRoot(ItemLike item, String key) {
+        MutableComponent title = Component.translatable(String.format("advancements.touhou_little_maid.challenge.%s.title", key));
+        MutableComponent desc = Component.translatable(String.format("advancements.touhou_little_maid.challenge.%s.description", key));
+
+        return Advancement.Builder.advancement().display(displayInfo(item, title, desc,
                 IdentifierUtil.modLoc("advancements/backgrounds/stone"),
-                AdvancementType.TASK, true, true, false);
+                AdvancementType.TASK, true, true, false));
     }
 
     private static Advancement.Builder make(ItemStack item, String key) {
         MutableComponent title = Component.translatable(String.format("advancements.touhou_little_maid.challenge.%s.title", key));
         MutableComponent desc = Component.translatable(String.format("advancements.touhou_little_maid.challenge.%s.description", key));
 
-        return Advancement.Builder.advancement().display(ItemStackTemplate.fromNonEmptyStack(item), title, desc,
-                IdentifierUtil.modLoc("advancements/backgrounds/stone"),
-                AdvancementType.TASK, true, true, false);
+        return Advancement.Builder.advancement().display(displayInfo(ItemStackTemplate.fromNonEmptyStack(item), title, desc,
+                null,
+                AdvancementType.TASK, true, true, false));
     }
 
     private static Advancement.Builder makeGoal(ItemLike item, String key) {
         MutableComponent title = Component.translatable(String.format("advancements.touhou_little_maid.challenge.%s.title", key));
         MutableComponent desc = Component.translatable(String.format("advancements.touhou_little_maid.challenge.%s.description", key));
 
-        return Advancement.Builder.advancement().display(item, title, desc,
-                IdentifierUtil.modLoc("advancements/backgrounds/stone"),
-                AdvancementType.GOAL, true, true, false);
+        return Advancement.Builder.advancement().display(displayInfo(item, title, desc,
+                null,
+                AdvancementType.GOAL, true, true, false));
     }
 
     private static Advancement.Builder makeChallenge(ItemLike item, String key) {
         MutableComponent title = Component.translatable(String.format("advancements.touhou_little_maid.challenge.%s.title", key));
         MutableComponent desc = Component.translatable(String.format("advancements.touhou_little_maid.challenge.%s.description", key));
 
-        return Advancement.Builder.advancement().display(item, title, desc,
-                IdentifierUtil.modLoc("advancements/backgrounds/stone"),
-                AdvancementType.CHALLENGE, true, true, false);
+        return Advancement.Builder.advancement().display(displayInfo(item, title, desc,
+                null,
+                AdvancementType.CHALLENGE, true, true, false));
     }
 
     private static Identifier id(String id) {

@@ -10,15 +10,18 @@ import net.minecraft.advancements.AdvancementRewards;
 import net.minecraft.advancements.AdvancementType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.ItemLike;
 
-import java.util.function.Consumer;
 
+
+import static com.github.tartaricacid.touhoulittlemaid.datagen.advancement.AdvancementHelper.displayInfo;
+import static com.github.tartaricacid.touhoulittlemaid.datagen.advancement.AdvancementHelper.lootTable;
 
 public class FavorabilityAdvancement {
-    public static void generate(Consumer<AdvancementHolder> saver) {
-        AdvancementHolder root = make(InitItems.BOOKSHELF, "maid_sit_joy")
+    public static void generate(BootstrapContext<Advancement> saver) {
+        AdvancementHolder root = makeRoot(InitItems.BOOKSHELF, "maid_sit_joy")
                 .addCriterion("maid_event", MaidEventTrigger.create(TriggerType.MAID_SIT_JOY))
                 .rewards(AdvancementRewards.Builder.experience(50))
                 .save(saver, id("favorability/maid_sit_joy").toString());
@@ -28,7 +31,7 @@ public class FavorabilityAdvancement {
         generateJoy(saver, root);
     }
 
-    private static void generateJoy(Consumer<AdvancementHolder> saver, AdvancementHolder root) {
+    private static void generateJoy(BootstrapContext<Advancement> saver, AdvancementHolder root) {
         AdvancementHolder joy = make(InitItems.PICNIC_BASKET, "maid_picnic_eat").parent(root)
                 .addCriterion("maid_event", MaidEventTrigger.create(TriggerType.MAID_PICNIC_EAT))
                 .save(saver, id("favorability/maid_picnic_eat").toString());
@@ -50,7 +53,7 @@ public class FavorabilityAdvancement {
                 .save(saver, id("favorability/maid_sleep").toString());
     }
 
-    private static void generateFavorability(Consumer<AdvancementHolder> saver, AdvancementHolder root) {
+    private static void generateFavorability(BootstrapContext<Advancement> saver, AdvancementHolder root) {
         AdvancementHolder increased = make(InitItems.FAVORABILITY_TOOL_ADD, "favorability_increased").parent(root)
                 .addCriterion("maid_event", MaidEventTrigger.create(TriggerType.FAVORABILITY_INCREASED))
                 .save(saver, id("favorability/favorability_increased").toString());
@@ -64,18 +67,27 @@ public class FavorabilityAdvancement {
         MutableComponent title = Component.translatable(String.format("advancements.touhou_little_maid.favorability.%s.title", key));
         MutableComponent desc = Component.translatable(String.format("advancements.touhou_little_maid.favorability.%s.description", key));
 
-        return Advancement.Builder.advancement().display(item, title, desc,
+        return Advancement.Builder.advancement().display(displayInfo(item, title, desc,
+                null,
+                AdvancementType.TASK, true, true, false));
+    }
+
+    private static Advancement.Builder makeRoot(ItemLike item, String key) {
+        MutableComponent title = Component.translatable(String.format("advancements.touhou_little_maid.favorability.%s.title", key));
+        MutableComponent desc = Component.translatable(String.format("advancements.touhou_little_maid.favorability.%s.description", key));
+
+        return Advancement.Builder.advancement().display(displayInfo(item, title, desc,
                 IdentifierUtil.modLoc("advancements/backgrounds/stone"),
-                AdvancementType.TASK, true, true, false);
+                AdvancementType.TASK, true, true, false));
     }
 
     private static Advancement.Builder makeGoal(ItemLike item, String key) {
         MutableComponent title = Component.translatable(String.format("advancements.touhou_little_maid.favorability.%s.title", key));
         MutableComponent desc = Component.translatable(String.format("advancements.touhou_little_maid.favorability.%s.description", key));
 
-        return Advancement.Builder.advancement().display(item, title, desc,
-                IdentifierUtil.modLoc("advancements/backgrounds/stone"),
-                AdvancementType.GOAL, true, true, false);
+        return Advancement.Builder.advancement().display(displayInfo(item, title, desc,
+                null,
+                AdvancementType.GOAL, true, true, false));
     }
 
     private static Identifier id(String id) {
