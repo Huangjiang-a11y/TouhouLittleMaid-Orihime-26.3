@@ -82,14 +82,7 @@ public class FavorabilityManager {
     }
 
     public void apply(Type type) {
-        if (this.canAdd(type.getTypeName())) {
-            if (type.isReduce()) {
-                this.reduce(type.getPoint());
-            } else {
-                this.add(type.getPoint());
-            }
-            this.addCooldown(type.getTypeName(), type.getCooldown());
-        }
+        this.apply(type, type.getPoint());
     }
 
     public void apply(Type type, int point) {

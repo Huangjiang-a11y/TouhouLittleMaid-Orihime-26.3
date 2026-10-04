@@ -14,8 +14,6 @@ import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.ItemStack;
 
 public class DefaultMaidWorkMeal implements IMaidMeal {
-    private static final int MAX_PROBABILITY = 100;
-
     public static boolean isWorkMeal(ItemStack stack) {
         return stack.has(DataComponents.FOOD)
                 && !IMaidMeal.isBlockList(stack, MaidConfig.MAID_WORK_MEALS_BLOCK_LIST.get())
@@ -42,7 +40,9 @@ public class DefaultMaidWorkMeal implements IMaidMeal {
             float saturationModifier = foodProperties.saturation();
             float total = nutrition + nutrition * saturationModifier * 2;
             // 原版的熟牛肉之类的一般在 20 左右（除了迷之炖菜为 34.2）
-            int point = maid.getRandom().nextInt(MAX_PROBABILITY) < total ? 0 : 1;
+            // 修正：原 `nextInt(100) < total ? 0 : 1` 三元写反，实际只有 (100-total)% 概率给分，
+            // 高饱食度食物（total≈92）几乎拿不到好感度；故固定 100% 给 1 点。
+            int point = 1;
             maid.getFavorabilityManager().apply(Type.WORK_MEAL, point);
             if (point == 1) {
                 NetworkHandler.sendToNearby(maid, new SpawnParticlePackage(maid.getId(), SpawnParticlePackage.Type.HEART, stack.getUseDuration(maid)));

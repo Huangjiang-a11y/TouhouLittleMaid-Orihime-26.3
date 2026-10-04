@@ -7,7 +7,25 @@ plugins {
     id "org.openrewrite.rewrite" version "7.35.0"
 }
 
-version = project.mod_version
+// 构建标识（参考 LavaFlow-Fabric-a11y）：版本号本身无法区分构建，
+// 因此在版本后缀上短 commit；工作区有未提交改动时再跟 -dirty。
+def gitOutput = { List<String> args ->
+    try {
+        def proc = new ProcessBuilder(['git'] + args).directory(rootDir).redirectErrorStream(true).start()
+        def text = proc.inputStream.text.trim()
+        proc.waitFor()
+        return (proc.exitValue() == 0 && !text.isEmpty()) ? text : null
+    } catch (Exception ignored) {
+        return null
+    }
+}
+def buildCommit = gitOutput(['rev-parse', '--short', 'HEAD'])
+def buildDirty = gitOutput(['status', '--porcelain']) != null
+if (buildCommit != null) {
+    version = "${project.mod_version}-${buildCommit}${buildDirty ? '-dirty' : ''}"
+} else {
+    version = project.mod_version
+}
 group = project.maven_group
 
 base {
