@@ -20,7 +20,7 @@ def gitOutput = { List<String> args ->
     }
 }
 def buildCommit = gitOutput(['rev-parse', '--short', 'HEAD'])
-def buildDirty = gitOutput(['status', '--porcelain']) != null
+def buildDirty = gitOutput(['status', '--porcelain', '--untracked-files=no']) != null
 if (buildCommit != null) {
     version = "${project.mod_version}-${buildCommit}${buildDirty ? '-dirty' : ''}"
 } else {
