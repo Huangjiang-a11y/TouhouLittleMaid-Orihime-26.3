@@ -1,5 +1,6 @@
 package com.github.tartaricacid.touhoulittlemaid.geckolib3.core;
 
+import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.client.animation.gecko.GeckoUpdateManager;
 import com.github.tartaricacid.touhoulittlemaid.client.animation.gecko.molang.MolangEventWrapper;
 import com.github.tartaricacid.touhoulittlemaid.client.animation.gecko.molang.PhysicsManager;
@@ -618,7 +619,9 @@ public abstract class AnimatableEntity<TEntity extends Entity> {
             try {
                 lastUpdateTask.getResult();
             } catch (Throwable e) {
-                e.printStackTrace();
+                // 原来只 printStackTrace：stderr 不会进启动器日志，Gecko 渲染失败时等于"零报错"。
+                // 这里连 Throwable（含 Error）一起接住，至少让失败出现在日志里，不再静默。
+                TouhouLittleMaid.LOGGER.error("Gecko 渲染任务执行失败(waitForAsyncUpdate)", e);
             }
         }
     }
