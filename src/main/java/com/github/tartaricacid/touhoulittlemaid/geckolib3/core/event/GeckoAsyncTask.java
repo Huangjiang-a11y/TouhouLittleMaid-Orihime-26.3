@@ -1,5 +1,6 @@
 package com.github.tartaricacid.touhoulittlemaid.geckolib3.core.event;
 
+import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.geckolib3.geo.GeckoRenderData;
 import com.github.tartaricacid.touhoulittlemaid.util.ThreadTools;
 import org.jetbrains.annotations.Nullable;
@@ -67,6 +68,8 @@ public class GeckoAsyncTask<TData extends GeckoRenderData> extends GeckoUpdateTa
             VarHandle.acquireFence();
             return result;
         } catch (Exception e) {
+            // 同上：日志里要能看见，否则 Gecko 模型只会"静默消失"
+            TouhouLittleMaid.LOGGER.error("Gecko 异步渲染任务执行失败", e);
             e.printStackTrace();
             return null;
         }

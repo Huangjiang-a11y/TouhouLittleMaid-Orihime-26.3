@@ -50,6 +50,14 @@ final class ChairPackLoader {
 
     private static void loadGeckoChairModelElement(ResourceAccessor accessor, ChairModelInfo info) throws IOException {
         CustomPackBedrockModelParser.loadGeckoModelElement(accessor, info, GeckoContainer.Type.CHAIR);
-        CustomPackLoader.CHAIR_MODELS.putInfo(info.getModelId().toString(), info);
+        // 同 MaidPackLoader：Gecko 容器/动画拿不到时，用同一份 .geo.json 的基岩静态姿势兜底，
+        // 否则椅子在预览框/图标/世界里都是整块透明。
+        String id = info.getModelId().toString();
+        EntityChairModel fallbackModel = CustomPackBedrockModelParser.loadChairModel(accessor, info.getModel());
+        if (fallbackModel != null) {
+            CustomPackLoader.CHAIR_MODELS.putModel(id, fallbackModel);
+            CustomPackLoader.CHAIR_MODELS.putAnimation(id, PackLoaderHelper.<EntityChairRenderState>resolveAnimations(info));
+        }
+        CustomPackLoader.CHAIR_MODELS.putInfo(id, info);
     }
 }

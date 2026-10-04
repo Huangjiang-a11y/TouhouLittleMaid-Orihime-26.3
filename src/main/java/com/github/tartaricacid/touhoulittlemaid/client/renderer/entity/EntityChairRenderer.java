@@ -1,5 +1,6 @@
 package com.github.tartaricacid.touhoulittlemaid.client.renderer.entity;
 
+import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.client.entity.GeckoChairEntity;
 import com.github.tartaricacid.touhoulittlemaid.client.model.bedrock.EntityChairModel;
 import com.github.tartaricacid.touhoulittlemaid.client.renderer.entity.gecko.GeckoEntityChairRenderer;
@@ -110,19 +111,43 @@ public class EntityChairRenderer extends LivingEntityRenderer<EntityChair, Entit
     private void submitChair(EntityChairRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
         // GeckoLib 接管渲染
         if (state.modelType == ModelType.GECKO) {
-            this.geckoEntityChairRenderer.submit(state, poseStack, submitNodeCollector, camera);
+            if (this.geckoEntityChairRenderer.getGeckoRenderData(state) != null) {
+                this.geckoEntityChairRenderer.submit(state, poseStack, submitNodeCollector, camera);
+                return;
+            }
+            // Gecko 渲染数据为空时原来直接 return -> 椅子整块消失（预览/图标/世界都一样）。
+            // 加载期已为 Gecko 模型准备了基岩静态版本，这里退回它（无动画）。
+            warnGeckoFallback(state);
+            submitBedrockModel(state, poseStack, submitNodeCollector, camera);
             return;
         }
 
         if (state.modelType == ModelType.SIMPLE_BEDROCK) {
-            if (state.bedrockModel == null) {
-                return;
-            }
-            this.model = state.bedrockModel;
-            // 模型动画设置
-            this.model.setAnimations(state.chairAnimations);
-            this.model.setupAnim(state);
-            super.submit(state, poseStack, submitNodeCollector, camera);
+            submitBedrockModel(state, poseStack, submitNodeCollector, camera);
+        }
+    }
+
+    private void submitBedrockModel(EntityChairRenderState state, PoseStack poseStack,
+                                    SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
+        if (state.bedrockModel == null) {
+            return;
+        }
+        this.model = state.bedrockModel;
+        // 模型动画设置
+        this.model.setAnimations(state.chairAnimations);
+        this.model.setupAnim(state);
+        super.submit(state, poseStack, submitNodeCollector, camera);
+    }
+
+    /**
+     * Gecko 渲染数据为空只提示一次，避免每帧刷屏。
+     */
+    private static final java.util.Set<String> GECKO_FALLBACK_LOGGED = java.util.concurrent.ConcurrentHashMap.newKeySet();
+
+    private static void warnGeckoFallback(EntityChairRenderState state) {
+        String id = String.valueOf(state.chairInfo == null ? null : state.chairInfo.getModelId());
+        if (GECKO_FALLBACK_LOGGED.add(id)) {
+            TouhouLittleMaid.LOGGER.warn("[maid-gecko] Gecko 渲染数据为空，已退回基岩静态姿势渲染(椅子): {}", id);
         }
     }
 

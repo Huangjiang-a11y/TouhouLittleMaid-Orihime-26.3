@@ -2,6 +2,7 @@ package com.github.tartaricacid.touhoulittlemaid.client.renderer.entity;
 
 import com.github.tartaricacid.touhoulittlemaid.api.event.client.AddMaidLayerEvent;
 import com.github.tartaricacid.touhoulittlemaid.client.entity.GeckoMaidEntity;
+import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.client.model.bedrock.EntityMaidModel;
 import com.github.tartaricacid.touhoulittlemaid.client.renderer.entity.chatbubble.ChatBubbleRenderer;
 import com.github.tartaricacid.touhoulittlemaid.client.renderer.entity.chatbubble.EntityGraphics;
@@ -95,18 +96,43 @@ public class EntityMaidRenderer extends MobRenderer<EntityMaid, EntityMaidRender
 
         // GeckoLib 接管渲染
         if (state.modelType == ModelType.GECKO) {
-            this.geckoRenderer.submit(state, poseStack, submitNodeCollector, camera);
+            if (this.geckoRenderer.getGeckoRenderData(state) != null) {
+                this.geckoRenderer.submit(state, poseStack, submitNodeCollector, camera);
+                return;
+            }
+            // Gecko 容器/动画任务没给出渲染数据时，原来会直接 return -> 模型整个消失
+            // （预览框、物品图标、世界中都一样是透明）。这里退回同一份几何的基岩静态姿势渲染。
+            warnGeckoFallback(state);
+            submitBedrockModel(state, poseStack, submitNodeCollector, camera);
             return;
         }
 
         // 普通模型渲染
         if (state.modelType == ModelType.SIMPLE_BEDROCK) {
-            if (state.bedrockModel == null) {
-                return;
-            }
-            this.model = state.bedrockModel;
-            this.model.setAnimations(state.animations);
-            super.submit(state, poseStack, submitNodeCollector, camera);
+            submitBedrockModel(state, poseStack, submitNodeCollector, camera);
+        }
+    }
+
+    private void submitBedrockModel(EntityMaidRenderState state, PoseStack poseStack,
+                                    SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
+        if (state.bedrockModel == null) {
+            return;
+        }
+        this.model = state.bedrockModel;
+        this.model.setAnimations(state.animations);
+        super.submit(state, poseStack, submitNodeCollector, camera);
+    }
+
+    /**
+     * Gecko 渲染数据为空只提示一次，避免每帧刷屏。
+     * 出现这条说明实时 Gecko 渲染没成功，已改用基岩静态姿势兜底。
+     */
+    private static final java.util.Set<String> GECKO_FALLBACK_LOGGED = java.util.concurrent.ConcurrentHashMap.newKeySet();
+
+    private static void warnGeckoFallback(EntityMaidRenderState state) {
+        String id = String.valueOf(state.modelId);
+        if (GECKO_FALLBACK_LOGGED.add(id)) {
+            TouhouLittleMaid.LOGGER.warn("[maid-gecko] Gecko 渲染数据为空，已退回基岩静态姿势渲染: {}", id);
         }
     }
 

@@ -57,8 +57,14 @@ final class MaidPackLoader {
 
     private static void loadGeckoMaidModelElement(ResourceAccessor accessor, MaidModelInfo info) throws IOException {
         CustomPackBedrockModelParser.loadGeckoModelElement(accessor, info, GeckoContainer.Type.MAID);
+        // 酒狐这类 Gecko 模型的 .geo.json 本身就是标准基岩几何格式，这里额外用基岩解析器再读一份，
+        // 作为"Gecko 实时渲染拿不到数据"时的静态姿势兜底（见 EntityMaidRenderer.submit），
+        // 免得模型整个消失（预览框/图标/实体全透明）。
+        EntityMaidModel fallbackModel = CustomPackBedrockModelParser.loadMaidModel(accessor, info.getModel());
         if (info.getEasterEgg() != null && StringUtils.isNotBlank(info.getEasterEgg().getTag())) {
-            putEasterEggData(info, null);
+            putEasterEggData(info, fallbackModel);
+        } else if (fallbackModel != null) {
+            putModelData(info, fallbackModel);
         } else {
             CustomPackLoader.MAID_MODELS.putInfo(info.getModelId().toString(), info);
         }
