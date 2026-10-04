@@ -23,6 +23,9 @@ import com.github.tartaricacid.touhoulittlemaid.geckolib3.resource.GeckoLibCache
 import com.github.tartaricacid.touhoulittlemaid.geckolib3.util.json.JsonAnimationUtils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.github.tartaricacid.touhoulittlemaid.geckolib3.sound.data.SoundData;
+import com.github.tartaricacid.touhoulittlemaid.geckolib3.sound.data.SoundFormat;
+import it.unimi.dsi.fastutil.objects.Object2ReferenceMap;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceMaps;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import net.minecraft.client.Minecraft;
@@ -34,8 +37,10 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.EnumMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -70,7 +75,8 @@ public class GeckoContainerBuilder {
                                                   InputStreamGetter<T> animStreamGetter,
                                                   List<T> animationFileIds,
                                                   Identifier texture,
-                                                  GeckoContainer.Type type) throws IOException {
+                                                  GeckoContainer.Type type,
+                                                  @Nullable InputStreamGetter<String> customSoundGetter) throws IOException {
         GeoModel geo;
         try (InputStream geoStream = geoStreamGetter.get()) {
             geo = GeckoContainerBuilder.registerGeo(geoStream);
@@ -101,8 +107,36 @@ public class GeckoContainerBuilder {
                 MaidControllerCollection.build(controllerResource) :
                 ChairControllerCollection.build(controllerResource);
 
-        // TODO: 控制器、音频、molang 函数读取
-        var asset = new GeckoAsset(Object2ReferenceMaps.emptyMap(), Object2ReferenceMaps.emptyMap(), Object2ReferenceMaps.emptyMap());
+        // 音频：收集动画 sound_effects 中“不带冒号”的名字（带冒号的在 SoundInstanceManager#playSound 里直接当原版
+        // SoundEvent 播放，无需在此处理），按“名字即 ogg 文件名”的约定从模型包取同名文件填入 sounds 表。
+        Object2ReferenceMap<String, SoundData> sounds = Object2ReferenceMaps.emptyMap();
+        if (customSoundGetter != null) {
+            var effectNames = new LinkedHashSet<String>();
+            for (var animation : animationData.animations().values()) {
+                for (var keyFrame : animation.soundKeyFrames()) {
+                    String effect = keyFrame.getEventData();
+                    if (effect != null && !effect.isEmpty() && !effect.contains(":")) {
+                        effectNames.add(effect);
+                    }
+                }
+            }
+            if (!effectNames.isEmpty()) {
+                var loaded = new Object2ReferenceOpenHashMap<String, SoundData>();
+                for (String effect : effectNames) {
+                    try (InputStream soundStream = customSoundGetter.get(effect)) {
+                        if (soundStream != null) {
+                            loaded.put(effect, new SoundData(ByteBuffer.wrap(soundStream.readAllBytes()), SoundFormat.VORBIS));
+                        }
+                    } catch (IOException e) {
+                        TouhouLittleMaid.LOGGER.error("Failed to load custom sound {} for model {}: {}", effect, id, e.getMessage());
+                    }
+                }
+                sounds = loaded;
+            }
+        }
+        // 说明：userFunctions 与 eventHandlers 在 Fabric 移植版中“没有数据源”——既无读取实现，现有模型包也不含
+        // `user_functions` 或 `<category>_ctrl_<name>` 键，故保持空表，不再按 TODO 处理。
+        var asset = new GeckoAsset(sounds, Object2ReferenceMaps.emptyMap(), Object2ReferenceMaps.emptyMap());
         GeckoLibCache.getInstance().getModels().put(id,
                 new GeckoContainer(geo, animationData, controllerFactory, Object2ReferenceMaps.emptyMap(), manager, texture, asset, type));
     }

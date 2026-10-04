@@ -7,6 +7,8 @@ import com.github.tartaricacid.touhoulittlemaid.client.model.bedrock.EntityMaidM
 import com.github.tartaricacid.touhoulittlemaid.client.resource.accessor.ResourceAccessor;
 import com.github.tartaricacid.touhoulittlemaid.client.resource.loader.CustomPackLoader;
 import com.github.tartaricacid.touhoulittlemaid.client.resource.pojo.IModelInfo;
+import com.github.tartaricacid.touhoulittlemaid.client.resource.pojo.MaidModelInfo;
+import com.github.tartaricacid.touhoulittlemaid.util.IdentifierUtil;
 import com.github.tartaricacid.touhoulittlemaid.geckolib3.resource.GeckoContainer;
 import net.minecraft.resources.Identifier;
 import org.apache.logging.log4j.Marker;
@@ -17,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -98,8 +101,35 @@ public final class CustomPackBedrockModelParser {
                 },
                 animation,
                 info.getTexture(),
-                type
+                type,
+                soundName -> openCustomAnimationSound(accessor, uid, info, soundName)
         );
+    }
+
+    /**
+     * 按“无冒号的名字 = ogg 文件名”的约定，在模型包内查找动画自定义音效（见 SoundInstanceManager#playSound）。
+     * 依次尝试：模型自身命名空间、模型的音效包（use_sound_pack_id）、模组默认命名空间，各自再按
+     * sounds/maid/other、sounds/maid、sounds 三级目录查找。找不到返回 null（该音效静默，不影响原版音效）。
+     */
+    @Nullable
+    private static InputStream openCustomAnimationSound(ResourceAccessor accessor, Identifier modelId,
+                                                        IModelInfo info, String soundName) throws IOException {
+        var namespaces = new LinkedHashSet<String>();
+        namespaces.add(modelId.getNamespace());
+        if (info instanceof MaidModelInfo maid && maid.getUseSoundPackId() != null) {
+            namespaces.add(maid.getUseSoundPackId());
+        }
+        namespaces.add(IdentifierUtil.modLoc("dummy").getNamespace());
+        for (String namespace : namespaces) {
+            for (String folder : new String[]{"sounds/maid/other/", "sounds/maid/", "sounds/"}) {
+                String path = CustomPackLoader.assetPath(namespace, folder + soundName + ".ogg");
+                if (accessor.exists(path)) {
+                    return accessor.open(path);
+                }
+            }
+        }
+        LOGGER.debug(MARKER, "Animation sound {} for model {} not found, skipped", soundName, modelId);
+        return null;
     }
 
     @FunctionalInterface
