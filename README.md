@@ -61,7 +61,7 @@
 
 - **tartaric_acid** —— 官方 [TouhouLittleMaid](https://github.com/TartaricAcid/TouhouLittleMaid) 作者（代码 MIT / 素材 CC BY-NC-SA 4.0）
 - **Sh1roCu** —— [Fabric 移植](https://github.com/Sh1roCu/TouhouLittleMaid-Orihime) 作者，本分支的直接基线
-- **26.3 移植所用 AI 编码助手**：DeepSeek、GLM（智谱）、StepFun（阶跃星辰）、Kimi（月之暗面）、GPT（OpenAI）
+- **26.3 移植所用 AI 编码助手**：DeepSeek、GLM（智谱）、Kimi（月之暗面）、GPT（OpenAI）、Meta（Llama）
 - 以及 Sodium、Iris、Trinkets、Cloth Config、Forge Config API Port、Mod Menu、Inventory Profiles Next 等依赖的作者
 
 ---

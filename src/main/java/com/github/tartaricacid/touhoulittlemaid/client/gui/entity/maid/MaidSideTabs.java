@@ -2,6 +2,7 @@ package com.github.tartaricacid.touhoulittlemaid.client.gui.entity.maid;
 
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.api.event.client.OpenPatchouliBookEvent;
+import com.github.tartaricacid.touhoulittlemaid.client.book.SelfBookOpen;
 import com.github.tartaricacid.touhoulittlemaid.client.gui.mod.PatchouliWarningScreen;
 import com.github.tartaricacid.touhoulittlemaid.client.gui.widget.button.MaidSideTabButton;
 import com.github.tartaricacid.touhoulittlemaid.compat.cloth.ClothConfigCompat;
@@ -42,7 +43,8 @@ public class MaidSideTabs<T extends AbstractMaidContainer> {
                     OpenPatchouliBookEvent.CALLBACK.invoker().post(new OpenPatchouliBookEvent(maid, maid.getTask()));
                 }
             } else {
-                PatchouliWarningScreen.open();
+                // 没装 Patchouli：走自包含书壳
+                SelfBookOpen.openDefault();
             }
         });
 

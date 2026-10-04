@@ -158,6 +158,9 @@ public interface InitItems {
                     .overrideDescription("block.touhou_little_maid.shrine"))
     );
 
+    // 自包含手册（没装 Patchouli 时用它打开内置书）
+    Item MEMORIZABLE_GENSOKYO_MANUAL = register("memorizable_gensokyo_manual", ItemGuideBook::new);
+
     private static Item register(String id, Item item) {
         return Registry.register(BuiltInRegistries.ITEM, Identifier.fromNamespaceAndPath(TouhouLittleMaid.MOD_ID, id), item);
     }
