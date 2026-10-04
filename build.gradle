@@ -206,6 +206,9 @@ dependencies {
     // implementation(include("libs:simplebedrockmodel:1.3.0-fabric+mc1.21.1"))
 
     // JEI
+    implementation "maven.modrinth:jei:${jei_version}"
+    // Jade
+    implementation "maven.modrinth:jade:${jade_version}"
     // REI
 //    compileOnly "maven.modrinth:architectury-api:${architectury_api_version}"
 //    compileOnly "me.shedaniel:RoughlyEnoughItems-fabric:${rei_version}"
