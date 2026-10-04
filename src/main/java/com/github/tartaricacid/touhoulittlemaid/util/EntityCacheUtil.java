@@ -47,8 +47,23 @@ public final class EntityCacheUtil {
             .expireAfterAccess(2, TimeUnit.MINUTES).maximumSize(256).build();
     private static ResourceKey<Level> dimAt;
 
+    /**
+     * 创建一个"预览用"女仆：必须显式分配 ID。
+     * <p>
+     * 26.3 里 {@code Entity.getId()} 在未分配 ID 时会抛
+     * {@code IllegalStateException: Tried to access entity ID before ID assignment}，
+     * 而 {@code LivingEntityRenderer.extractRenderState} → {@code ItemModelResolver.updateForLiving}
+     * 会去读实体 ID。所以任何"直接 new 出来、没有 add 进世界"的预览实体都必须自己塞一个 ID，
+     * 否则渲染那一下就会炸（手办图标/雕像/GUI 预览都会中招）。
+     */
+    public static EntityMaid createPreviewMaid(Level level) {
+        EntityMaid maid = new EntityMaid(level);
+        maid.setId(PREVIEW_ENTITY_ID.getAndDecrement());
+        return maid;
+    }
+
     public static EntityMaid getMaid(Level level, EntitySpawnReason reason) {
-        return getEntity(EntityMaid.TYPE, (l, _) -> new EntityMaid(l), level, reason);
+        return getEntity(EntityMaid.TYPE, (l, _) -> createPreviewMaid(l), level, reason);
     }
 
     public static EntityChair getChair(Level level, EntitySpawnReason reason) {
@@ -73,11 +88,7 @@ public final class EntityCacheUtil {
     }
 
     public static EntityMaid getMaidInStatue(long key, Level level) throws ExecutionException {
-        return STATUE_CACHE.get(key, () -> {
-            EntityMaid entity = new EntityMaid(level);
-            entity.setId(PREVIEW_ENTITY_ID.getAndDecrement());
-            return entity;
-        });
+        return STATUE_CACHE.get(key, () -> createPreviewMaid(level));
     }
 
     public static void clearMaidDataResidue(EntityMaid maid, boolean clearEquipmentData) {

@@ -135,7 +135,9 @@ public class GarageKitItemRenderer implements SpecialModelRenderer<GarageKitRend
         if (type.equals(InitEntities.MAID)) {
             // GARAGE_KIT_CACHE 本来就是"一手办一预览实体"用的（注释里写了共用一个实体会导致
             // GeckoLib 动画渲染错误），26.3 移植里被漏掉了，这里用回去。
-            entity = EntityCacheUtil.GARAGE_KIT_CACHE.get(stack.copy(), () -> new EntityMaid(world));
+            // 注意：缓存里的实体必须是"带 ID 的预览实体"，否则 extractEntity 时
+            // Entity.getId() 会抛异常，手办图标渲染直接崩（创造栏一画到手办就炸）
+            entity = EntityCacheUtil.GARAGE_KIT_CACHE.get(stack.copy(), () -> EntityCacheUtil.createPreviewMaid(world));
         } else {
             entity = EntityCacheUtil.getEntity((EntityType) type, (l, e) ->
                     new EntityMaid(l), world, EntitySpawnReason.LOAD);
