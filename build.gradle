@@ -21,10 +21,11 @@ def gitOutput = { List<String> args ->
 }
 def buildCommit = gitOutput(['rev-parse', '--short', 'HEAD'])
 def buildDirty = gitOutput(['status', '--porcelain', '--untracked-files=no']) != null
+// 版本形如 1.0.0-26.3-<短commit>：模组版本 + 游戏版本 + 构建标识
 if (buildCommit != null) {
-    version = "${project.mod_version}-${buildCommit}${buildDirty ? '-dirty' : ''}"
+    version = "${project.mod_version}-${project.minecraft_version}-${buildCommit}${buildDirty ? '-dirty' : ''}"
 } else {
-    version = project.mod_version
+    version = "${project.mod_version}-${project.minecraft_version}"
 }
 group = project.maven_group
 
