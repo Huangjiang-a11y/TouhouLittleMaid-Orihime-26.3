@@ -1,12 +1,4 @@
 {
-  "fabric:load_conditions": [
-    {
-      "condition": "fabric:all_mods_loaded",
-      "values": [
-        "patchouli"
-      ]
-    }
-  ],
   "type": "minecraft:advancement_reward",
   "pools": [
     {
@@ -14,15 +6,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "functions": [
-            {
-              "components": {
-                "patchouli:book": "touhou_little_maid:memorizable_gensokyo"
-              },
-              "function": "minecraft:set_components"
-            }
-          ],
-          "name": "patchouli:guide_book"
+          "name": "touhou_little_maid:memorizable_gensokyo_manual"
         }
       ],
       "rolls": 1.0
