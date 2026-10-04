@@ -29,16 +29,22 @@ public final class EntityCacheUtil {
     /**
      * 实体缓存，在客户端会大量运用实体渲染，这个缓存可以减少重复创建实体带来的性能问题
      */
-    public static final Cache<EntityType<?>, Entity> ENTITY_CACHE = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES).build();
+    public static final Cache<EntityType<?>, Entity> ENTITY_CACHE = CacheBuilder.newBuilder()
+            .expireAfterAccess(5, TimeUnit.MINUTES).maximumSize(512).build();
 
     /**
-     * 女仆实体缓存，用于雕像，因为雕像如果共用一个实体，会导致 GeckoLib 动画渲染错误
+     * 女仆实体缓存，用于雕像，因为雕像如果共用一个实体，会导致 GeckoLib 动画渲染错误。
+     * 过期时间原为 10 秒，会导致雕像/GUI 预览实体被频繁销毁重建（卡顿 + 动画跳变），
+     * 现放宽到 2 分钟并用 maximumSize 兜住内存上限。
      */
-    public static final Cache<Long, EntityMaid> STATUE_CACHE = CacheBuilder.newBuilder().expireAfterAccess(10, TimeUnit.SECONDS).build();
+    public static final Cache<Long, EntityMaid> STATUE_CACHE = CacheBuilder.newBuilder()
+            .expireAfterAccess(2, TimeUnit.MINUTES).maximumSize(256).build();
     /**
-     * 女仆实体缓存，用于物品形态的手办，因为如果共用一个实体，会导致 GeckoLib 动画渲染错误
+     * 女仆实体缓存，用于物品形态的手办，因为如果共用一个实体，会导致 GeckoLib 动画渲染错误。
+     * 同上：10 秒过期太短，容易被反复销毁重建。
      */
-    public static final Cache<ItemStack, EntityMaid> GARAGE_KIT_CACHE = CacheBuilder.newBuilder().expireAfterAccess(10, TimeUnit.SECONDS).build();
+    public static final Cache<ItemStack, EntityMaid> GARAGE_KIT_CACHE = CacheBuilder.newBuilder()
+            .expireAfterAccess(2, TimeUnit.MINUTES).maximumSize(256).build();
     private static ResourceKey<Level> dimAt;
 
     public static EntityMaid getMaid(Level level, EntitySpawnReason reason) {

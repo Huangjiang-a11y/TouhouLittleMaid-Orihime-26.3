@@ -12,7 +12,6 @@
     "accessor.LivingEntityAccessor",
     "accessor.MobAccessor",
     "accessor.NonNullListAccessor",
-    "accessor.ParticleAccessor",
     "accessor.ReloadableResourceManagerAccessor",
     "accessor.SnapshotParticipantAccessor",
     "accessor.TagValueOutputAccessor",
@@ -42,6 +41,7 @@
   "client": [
     "accessor.AbstractContainerScreenAccessor",
     "accessor.LevelRendererAccessor",
+    "accessor.ParticleAccessor",
     "accessor.ScreenAccessor",
     "accessor.SingleQuadParticleAccessor",
     "client.ChannelAccessHandleMixin",

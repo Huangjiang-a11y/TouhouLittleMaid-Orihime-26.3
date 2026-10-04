@@ -30,7 +30,8 @@ public final class WorldContexts {
 
         @Override
         public String getValue(EntityMaid maid) {
-            long time = maid.level.getGameTime() % 24000;
+            // 与世界时钟保持一致，否则 AI 告诉玩家的时间会和世界时间对不上
+            long time = maid.level.getOverworldClockTime() % 24000;
             long hours = (time / 1000 + 6) % 24;
             long minutes = (time % 1000) / (50 / 3);
             return TIME_FORMAT.formatted(hours, minutes);

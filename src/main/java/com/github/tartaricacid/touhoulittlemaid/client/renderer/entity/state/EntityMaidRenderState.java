@@ -1,5 +1,6 @@
 package com.github.tartaricacid.touhoulittlemaid.client.renderer.entity.state;
 
+import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.api.animation.IAnimation;
 import cn.sh1rocu.touhoulittlemaid.util.neoforge.ClientHooks;
 import com.github.tartaricacid.touhoulittlemaid.api.backpack.IMaidBackpack;
@@ -260,7 +261,10 @@ public class EntityMaidRenderState extends HumanoidRenderState {
 
     @SuppressWarnings("all")
     private static void extractEnvironmentState(EntityMaid maid, EntityMaidRenderState state) {
-        state.gameTime = maid.level().getGameTime();
+        // 26.x 起作息/昼夜一律以世界时钟为准（timeline 绑定的是 minecraft:overworld 时钟）。
+        // 不能用 getGameTime()：它是世界创建以来的总刻数，睡觉跳夜与 /time set 只推进时钟，
+        // 会导致模型的昼夜件（dayShow/nightShow）与钟表指针和世界时间永久错位。
+        state.gameTime = maid.level().getOverworldClockTime();
         state.dimension = maid.level().dimension();
         state.raining = maid.level().isRaining();
         state.thundering = maid.level().isThundering();
@@ -310,6 +314,26 @@ public class EntityMaidRenderState extends HumanoidRenderState {
         if (state.animations.isEmpty()) {
             MAID_MODELS.getAnimation(DEFAULT_MODEL_ID).ifPresent(animations -> state.animations = animations);
         }
+
+        // 模型解析出来是空的（例如模型包用了读不出来的格式：老版 1.10.0 的 geometry.model、
+        // 或资源/贴图缺失）会让女仆"整个消失"，只留下阴影，非常难排查。
+        // 这里兜底成默认模型，并在日志里点名是哪个模型坏了。
+        if (isEmptyModel(state.bedrockModel)) {
+            TouhouLittleMaid.LOGGER.warn(
+                    "Maid model [{}] is empty (no bones/cubes), fallback to default model [{}]. "
+                            + "Check the model pack: unsupported format_version or missing model/texture file.",
+                    state.modelId, DEFAULT_MODEL_ID);
+            MAID_MODELS.getModel(DEFAULT_MODEL_ID).ifPresent(model -> state.bedrockModel = model);
+            MAID_MODELS.getInfo(DEFAULT_MODEL_ID).ifPresent(info -> state.modelInfo = info);
+            MAID_MODELS.getAnimation(DEFAULT_MODEL_ID).ifPresent(animations -> state.animations = animations);
+        }
+    }
+
+    /**
+     * 空模型 = 只有根节点（甚至根节点都没有），渲染出来就是透明的
+     */
+    private static boolean isEmptyModel(@Nullable EntityMaidModel model) {
+        return model != null && model.getModelMap().size() <= 1;
     }
 
     private static void extractBackDecorationState(EntityMaid maid, EntityMaidRenderState state, BlockModelResolver blockModelResolver) {

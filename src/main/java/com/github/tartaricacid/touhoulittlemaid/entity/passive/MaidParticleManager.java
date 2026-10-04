@@ -1,6 +1,8 @@
 package com.github.tartaricacid.touhoulittlemaid.entity.passive;
 
+import com.github.tartaricacid.touhoulittlemaid.client.resource.pojo.MaidModelInfo;
 import com.github.tartaricacid.touhoulittlemaid.config.subconfig.MiscConfig;
+import com.github.tartaricacid.touhoulittlemaid.entity.info.ServerCustomPackLoader;
 import com.github.tartaricacid.touhoulittlemaid.util.migrate.ScreenUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.particles.ColorParticleOption;
@@ -155,7 +157,7 @@ public class MaidParticleManager {
 
             pos = pos.xRot(-maid.getXRot() * Mth.DEG_TO_RAD);
             pos = pos.yRot(-maid.getYRot() * Mth.DEG_TO_RAD);
-            pos = pos.add(maid.getX(), maid.getEyeY(), maid.getZ());
+            pos = pos.add(maid.getX(), mouthY(), maid.getZ());
 
             ItemParticleOption option = new ItemParticleOption(ParticleTypes.ITEM, stack.getItem());
             if (level instanceof ServerLevel serverLevel) {
@@ -170,6 +172,25 @@ public class MaidParticleManager {
                 );
             }
         }
+    }
+
+    /**
+     * 女仆模型可能带非 1 的渲染缩放（render_entity_scale），而 getEyeY() 只按实体碰撞箱计算，
+     * 于是吃东西粒子会偏离模型实际嘴部位置。这里按模型缩放修正高度。
+     * 服务端也能拿到模型信息（ServerCustomPackLoader），所以两边表现一致。
+     */
+    private double mouthY() {
+        float modelScale = 1.0F;
+        String modelId = maid.getModelId();
+        if (modelId != null) {
+            modelScale = ServerCustomPackLoader.SERVER_MAID_MODELS.getInfo(modelId)
+                    .map(MaidModelInfo::getRenderEntityScale)
+                    .orElse(1.0F);
+        }
+        if (modelScale <= 0) {
+            modelScale = 1.0F;
+        }
+        return maid.getY() + maid.getEyeHeight() * modelScale;
     }
 
     private boolean isClient() {

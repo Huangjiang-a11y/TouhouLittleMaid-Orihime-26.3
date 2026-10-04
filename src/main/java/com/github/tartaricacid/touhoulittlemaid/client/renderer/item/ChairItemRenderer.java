@@ -17,7 +17,11 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import org.joml.Vector3fc;
+import java.util.HashMap;
+import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 import java.util.function.Consumer;
 
@@ -34,6 +38,25 @@ public class ChairItemRenderer implements SpecialModelRenderer<ChairRenderRender
      * 默认兜底模型 ID，与 {@code EntityChairRenderer.DEFAULT_CHAIR_ID} 保持一致
      */
     private static final String DEFAULT_CHAIR_ID = "touhou_little_maid:cushion";
+    /**
+     * 物品缩略图缓存，按模型 ID 缓存。
+     * <p>
+     * 原来 extractArgument 每帧都会 setModelId（走 entityData.set，触发数据同步 + 模型重解析）并重新
+     * 提取渲染状态。这里按"模型 ID + 当前 Level"缓存，同一模型只提取一次，图标成为静态缩略图。
+     * 不能用 ItemChair.Data 做键：{@code ItemChair.getData} 每帧都会 new 一个 Data。
+     */
+    private static final Map<String, IconEntry> ICON_CACHE = new HashMap<>();
+    private static final int ICON_CACHE_LIMIT = 64;
+
+    private record IconEntry(Level level, float renderItemScale, EntityRenderState entityRenderState) {
+    }
+
+    /**
+     * 模型包/资源包重载后必须调用，否则缩略图会停在旧模型上
+     */
+    public static void clearIconCache() {
+        ICON_CACHE.clear();
+    }
 
     public ChairItemRenderer() {
     }
@@ -52,20 +75,35 @@ public class ChairItemRenderer implements SpecialModelRenderer<ChairRenderRender
         String modelId = data.modelId();
         state.modelId = modelId;
 
-        CustomPackLoader.CHAIR_MODELS.getInfo(modelId).ifPresent(
-                info -> state.renderItemScale = info.getRenderItemScale()
-        );
-
         Level level = Minecraft.getInstance().level;
         if (level == null) {
             return state;
         }
+
+        // 同一模型只提取一次，之后复用快照
+        IconEntry cached = ICON_CACHE.get(modelId);
+        if (cached != null && cached.level() == level) {
+            state.renderItemScale = cached.renderItemScale();
+            state.entityRenderState = cached.entityRenderState();
+            return state;
+        }
+
+        CustomPackLoader.CHAIR_MODELS.getInfo(modelId).ifPresent(
+                info -> state.renderItemScale = info.getRenderItemScale()
+        );
 
         EntityChair chair = EntityCacheUtil.getChair(level, EntitySpawnReason.LOAD);
         chair.setModelId(modelId);
 
         EntityRenderDispatcher dispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
         state.entityRenderState = dispatcher.extractEntity(chair, 0);
+
+        if (state.entityRenderState != null) {
+            if (ICON_CACHE.size() >= ICON_CACHE_LIMIT) {
+                ICON_CACHE.clear();
+            }
+            ICON_CACHE.put(modelId, new IconEntry(level, state.renderItemScale, state.entityRenderState));
+        }
 
         return state;
     }

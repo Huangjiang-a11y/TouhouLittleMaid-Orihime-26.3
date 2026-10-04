@@ -19,7 +19,9 @@ public final class SoundUtil {
         Level world = maid.level();
         RandomSource rand = maid.getRandom();
         BlockPos pos = maid.blockPosition();
-        long dayTime = world.getDefaultClockTime();
+        // 与 maid_schedule timeline 绑定的时钟保持一致（minecraft:overworld）。
+        // 原来的 getDefaultClockTime() 取维度默认时钟：下界维度类型没有 default_clock，会恒为 0。
+        long dayTime = world.getOverworldClockTime();
         Biome biome = world.getBiome(pos).value();
         int seaLevel = world.getSeaLevel();
 

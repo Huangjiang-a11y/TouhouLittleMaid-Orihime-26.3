@@ -2,6 +2,8 @@ package com.github.tartaricacid.touhoulittlemaid.client.resource.loader;
 
 import com.github.tartaricacid.simplebedrockmodel.client.bedrock.pojo.CubesItem;
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
+import com.github.tartaricacid.touhoulittlemaid.client.renderer.item.ChairItemRenderer;
+import com.github.tartaricacid.touhoulittlemaid.client.renderer.item.GarageKitItemRenderer;
 import com.github.tartaricacid.touhoulittlemaid.client.resource.accessor.ResourceAccessor;
 import com.github.tartaricacid.touhoulittlemaid.client.resource.models.ChairModels;
 import com.github.tartaricacid.touhoulittlemaid.client.resource.models.MaidModels;
@@ -55,6 +57,10 @@ public class CustomPackLoader {
         MAID_MODELS.sortPackList();
         CHAIR_MODELS.sortPackList();
         CustomSoundLoader.sortSoundPack();
+
+        // 模型/贴图换了，物品缩略图缓存必须一起失效
+        GarageKitItemRenderer.clearIconCache();
+        ChairItemRenderer.clearIconCache();
     }
 
     private static void freezeRegistry() {

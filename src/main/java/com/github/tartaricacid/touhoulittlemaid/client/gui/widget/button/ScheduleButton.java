@@ -51,7 +51,8 @@ public class ScheduleButton<T extends AbstractMaidContainer> extends Button {
     }
 
     public List<Component> getTooltips() {
-        int time = (int) (maid.level().getGameTime() % 24000L);
+        // 用世界时钟，别用 getGameTime()（睡觉/时间指令会让两者错位）
+        int time = (int) (maid.level().getOverworldClockTime() % 24000L);
         int hour = (time / 1000 + 6) % 24;
         int minute = (time % 1000) * 60 / 1000;
         Activity activity = maid.getScheduleDetail();
