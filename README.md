@@ -6,7 +6,7 @@
 > 本仓库是 [Sh1roCu/TouhouLittleMaid-Orihime](https://github.com/Sh1roCu/TouhouLittleMaid-Orihime)（官方 [TartaricAcid/TouhouLittleMaid](https://github.com/TartaricAcid/TouhouLittleMaid) 的非官方 Fabric 移植）的 **26.3 社区移植分支**，与官方团队及原作者**没有任何关系**。
 >
 > - **请勿把本分支的问题反馈到上游。** 本分支不提供任何担保，可能出现崩溃、渲染异常或**存档损坏**。
-> - 本分支的移植改动（版本与依赖升级、第三方兼容剥离、编译期修复）由 **AI 在人类指导下**完成，请视为实验性实现：依赖前请先审计代码，并在你自己的环境中实测。
+> - 本分支的移植改动（版本与依赖升级、第三方兼容先剥离、后续再重新加回、编译期修复）由 **AI 在人类指导下**完成，请视为实验性实现：依赖前请先审计代码，并在你自己的环境中实测。
 > - **禁止商业使用**：素材采用 CC BY-NC-SA 4.0（见"许可"一节）。
 
 > [!NOTE]
@@ -36,9 +36,9 @@
 | Inventory Profiles Next（+ libipn） | `fabric-26.3-2.3.8` / `fabric-26.3-6.9.0` |
 | Patchouli | `26.1-94-beta` ⚠️ 上游未发布 26.2/26.3 版本，本分支仅以 `compileOnly` 占位，运行时由 `isModLoaded` 自动降级（手册入口不显示，不会崩溃） |
 
-## 已剥离的第三方兼容
+## 第三方兼容：先剥离，后续重新加回
 
-本分支**不再提供**以下兼容（共 21 个包 / 47 个文件）：
+本分支**暂时移除**以下兼容（共 21 个包 / 47 个文件），计划在后续版本重新加回：
 
 `JEI`、`Jade`、`Aquaculture`、`Kaleidoscope`、`Farmer's Delight`、`Simple Hats`、`Oculus`、`Embeddium`、`Ponder`、`PatPat`、`JMC`、`TACZ / 卓越前线`（gun）、`Travelers' Backpack`、`Immersive Melodies`、`Sophisticated Backpacks`、`SlashBlade`、`Improved Mobs` mixin。
 
