@@ -121,7 +121,7 @@ public final class CustomPackBedrockModelParser {
         }
         namespaces.add(IdentifierUtil.modLoc("dummy").getNamespace());
         for (String namespace : namespaces) {
-            for (String folder : new String[]{"sounds/maid/other/", "sounds/maid/", "sounds/"}) {
+            for (String folder : new String[]{"sounds/" + modelId.getPath() + "/", "sounds/maid/other/", "sounds/maid/", "sounds/"}) {
                 String path = CustomPackLoader.assetPath(namespace, folder + soundName + ".ogg");
                 if (accessor.exists(path)) {
                     return accessor.open(path);
