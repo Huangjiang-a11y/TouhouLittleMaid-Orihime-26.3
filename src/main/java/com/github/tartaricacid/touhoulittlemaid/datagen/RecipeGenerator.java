@@ -380,15 +380,13 @@ public class RecipeGenerator extends RecipeProvider {
                 .unlockedBy(getHasName(Items.DIAMOND), has(ConventionalItemTags.DIAMOND_GEMS))
                 .save(recipeOutput);
 
-//        ModLoadedCondition modLoadedCondition = new ModLoadedCondition(CompatRegistry.PATCHOULI);
-//        ItemStack patchouliBook = new ItemStack(PatchouliItems.BOOK);
-//        patchouliBook.set(PatchouliDataComponents.BOOK, InitItems.MEMORIZABLE_GENSOKYO_LOCATION);
-//        this.shapeless(RecipeCategory.MISC, patchouliBook)
-//                .requires(ConventionalItemTags.WHITE_DYES)
-//                .requires(ConventionalItemTags.RED_DYES)
-//                .requires(Items.BOOK)
-//                .unlockedBy(getHasName(Items.BOOK), has(Items.BOOK))
-//                .save(recipeOutput.withConditions(modLoadedCondition), InitItems.MEMORIZABLE_GENSOKYO_LOCATION);
+        // 手册（自包含书壳版）：原版为 白色染料 + 红色染料 + 书 → Patchouli 手册（依赖 Patchouli，移植版剥离后改为产出自研手册）
+        this.shapeless(RecipeCategory.MISC, InitItems.MEMORIZABLE_GENSOKYO_MANUAL)
+                .requires(ConventionalItemTags.WHITE_DYES)
+                .requires(ConventionalItemTags.RED_DYES)
+                .requires(Items.BOOK)
+                .unlockedBy(getHasName(Items.BOOK), has(Items.BOOK))
+                .save(recipeOutput);
 
         this.shaped(RecipeCategory.MISC, InitItems.CHAIR)
                 .pattern("   ")
