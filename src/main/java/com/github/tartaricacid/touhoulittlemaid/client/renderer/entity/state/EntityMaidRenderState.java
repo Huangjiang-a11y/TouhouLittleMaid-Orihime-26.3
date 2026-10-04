@@ -430,5 +430,32 @@ public class EntityMaidRenderState extends HumanoidRenderState {
         if (state.modelType == ModelType.NONE) {
             state.modelType = ModelType.SIMPLE_BEDROCK;
         }
+
+        logModelOnce(state);
+    }
+
+    /**
+     * 诊断用：每个"模型 id + 贴图"只打一次，把客户端真正解析到的结果摊开，
+     * 用于定位"模型看不见"到底是模型为空、贴图为空、还是被判定成了 gecko。
+     * 排查完可以删掉这一段（不影响功能）。
+     */
+    private static final java.util.Set<String> DEBUG_LOGGED_MODELS = java.util.concurrent.ConcurrentHashMap.newKeySet();
+
+    private static void logModelOnce(EntityMaidRenderState state) {
+        String texture = state.modelInfo == null ? "-" : String.valueOf(state.modelInfo.getTexture());
+        String key = state.modelId + "|" + texture;
+        if (!DEBUG_LOGGED_MODELS.add(key)) {
+            return;
+        }
+        TouhouLittleMaid.LOGGER.info(
+                "[maid-model] id={} modelType={} infoClass={} gecko={} texture={} entityScale={} bedrockModel={} parts={}",
+                state.modelId, state.modelType,
+                state.modelInfo == null ? "null" : state.modelInfo.getClass().getSimpleName(),
+                state.modelInfo != null && state.modelInfo.isGeckoModel(),
+                texture,
+                state.modelInfo == null ? -1F : state.modelInfo.getRenderEntityScale(),
+                state.bedrockModel == null ? "null" : state.bedrockModel.getClass().getSimpleName(),
+                state.bedrockModel == null ? -1 : state.bedrockModel.getModelMap().size()
+        );
     }
 }
