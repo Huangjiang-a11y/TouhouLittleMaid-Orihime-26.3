@@ -29,41 +29,20 @@ public final class EntityCacheUtil {
     /**
      * 实体缓存，在客户端会大量运用实体渲染，这个缓存可以减少重复创建实体带来的性能问题
      */
-    public static final Cache<EntityType<?>, Entity> ENTITY_CACHE = CacheBuilder.newBuilder()
-            .expireAfterAccess(5, TimeUnit.MINUTES).maximumSize(512).build();
+    public static final Cache<EntityType<?>, Entity> ENTITY_CACHE = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES).build();
 
     /**
-     * 女仆实体缓存，用于雕像，因为雕像如果共用一个实体，会导致 GeckoLib 动画渲染错误。
-     * 过期时间原为 10 秒，会导致雕像/GUI 预览实体被频繁销毁重建（卡顿 + 动画跳变），
-     * 现放宽到 2 分钟并用 maximumSize 兜住内存上限。
+     * 女仆实体缓存，用于雕像，因为雕像如果共用一个实体，会导致 GeckoLib 动画渲染错误
      */
-    public static final Cache<Long, EntityMaid> STATUE_CACHE = CacheBuilder.newBuilder()
-            .expireAfterAccess(2, TimeUnit.MINUTES).maximumSize(256).build();
+    public static final Cache<Long, EntityMaid> STATUE_CACHE = CacheBuilder.newBuilder().expireAfterAccess(10, TimeUnit.SECONDS).build();
     /**
-     * 女仆实体缓存，用于物品形态的手办，因为如果共用一个实体，会导致 GeckoLib 动画渲染错误。
-     * 同上：10 秒过期太短，容易被反复销毁重建。
+     * 女仆实体缓存，用于物品形态的手办，因为如果共用一个实体，会导致 GeckoLib 动画渲染错误
      */
-    public static final Cache<ItemStack, EntityMaid> GARAGE_KIT_CACHE = CacheBuilder.newBuilder()
-            .expireAfterAccess(2, TimeUnit.MINUTES).maximumSize(256).build();
+    public static final Cache<ItemStack, EntityMaid> GARAGE_KIT_CACHE = CacheBuilder.newBuilder().expireAfterAccess(10, TimeUnit.SECONDS).build();
     private static ResourceKey<Level> dimAt;
 
-    /**
-     * 创建一个"预览用"女仆：必须显式分配 ID。
-     * <p>
-     * 26.3 里 {@code Entity.getId()} 在未分配 ID 时会抛
-     * {@code IllegalStateException: Tried to access entity ID before ID assignment}，
-     * 而 {@code LivingEntityRenderer.extractRenderState} → {@code ItemModelResolver.updateForLiving}
-     * 会去读实体 ID。所以任何"直接 new 出来、没有 add 进世界"的预览实体都必须自己塞一个 ID，
-     * 否则渲染那一下就会炸（手办图标/雕像/GUI 预览都会中招）。
-     */
-    public static EntityMaid createPreviewMaid(Level level) {
-        EntityMaid maid = new EntityMaid(level);
-        maid.setId(PREVIEW_ENTITY_ID.getAndDecrement());
-        return maid;
-    }
-
     public static EntityMaid getMaid(Level level, EntitySpawnReason reason) {
-        return getEntity(EntityMaid.TYPE, (l, _) -> createPreviewMaid(l), level, reason);
+        return getEntity(EntityMaid.TYPE, (l, _) -> new EntityMaid(l), level, reason);
     }
 
     public static EntityChair getChair(Level level, EntitySpawnReason reason) {
@@ -88,7 +67,11 @@ public final class EntityCacheUtil {
     }
 
     public static EntityMaid getMaidInStatue(long key, Level level) throws ExecutionException {
-        return STATUE_CACHE.get(key, () -> createPreviewMaid(level));
+        return STATUE_CACHE.get(key, () -> {
+            EntityMaid entity = new EntityMaid(level);
+            entity.setId(PREVIEW_ENTITY_ID.getAndDecrement());
+            return entity;
+        });
     }
 
     public static void clearMaidDataResidue(EntityMaid maid, boolean clearEquipmentData) {
