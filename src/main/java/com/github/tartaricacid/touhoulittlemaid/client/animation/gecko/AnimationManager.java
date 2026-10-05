@@ -94,6 +94,20 @@ public final class AnimationManager {
         return PlayState.STOP;
     }
 
+    /**
+     * 轮盘动画：播放女仆当前的 rouletteAnim（YSM 模型里的任意动画名）。
+     * <p>
+     * 用 PLAY_ONCE + setAnimation 的同名去重（见 AnimationPlayer#setAnimation 文档），
+     * 所以一轮播完不会重播；要重播下次触发即可（STOP 路径会 indicateReload）。
+     */
+    public static PlayState predicateRoulette(AnimationEvent<GeckoMaidEntity<?>> event) {
+        EntityMaid maid = event.getAnimatableEntity().getMaid();
+        if (!maid.rouletteAnimPlaying || "empty".equals(maid.rouletteAnim)) {
+            return PlayState.STOP;
+        }
+        return playAnimation(event, maid.rouletteAnim, LoopType.PLAY_ONCE);
+    }
+
     public static PlayState predicateOffhandHold(AnimationEvent<GeckoMaidEntity<?>> event) {
         EntityMaid maid = event.getAnimatableEntity().getMaid();
         Mob entity = maid;

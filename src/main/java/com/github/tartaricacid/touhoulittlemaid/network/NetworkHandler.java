@@ -33,6 +33,7 @@ public class NetworkHandler {
     }
 
     public static void registerClientReceivers() {
+        ClientPlayNetworking.registerGlobalReceiver(SyncYsmMaidDataPackage.TYPE, SyncYsmMaidDataPackage::handle);
         ClientPlayNetworking.registerGlobalReceiver(OpenChairGuiPackage.TYPE, OpenChairGuiPackage::handle);
         ClientPlayNetworking.registerGlobalReceiver(ItemBreakPackage.TYPE, ItemBreakPackage::handle);
         ClientPlayNetworking.registerGlobalReceiver(SpawnParticlePackage.TYPE, SpawnParticlePackage::handle);
@@ -64,6 +65,7 @@ public class NetworkHandler {
     }
 
     public static void registerS2CPackets() {
+        registerS2CPacket(SyncYsmMaidDataPackage.TYPE, SyncYsmMaidDataPackage.STREAM_CODEC);
         registerS2CPacket(OpenChairGuiPackage.TYPE, OpenChairGuiPackage.STREAM_CODEC);
         registerS2CPacket(ItemBreakPackage.TYPE, ItemBreakPackage.STREAM_CODEC);
         registerS2CPacket(SpawnParticlePackage.TYPE, SpawnParticlePackage.STREAM_CODEC);

@@ -21,6 +21,8 @@ import com.github.tartaricacid.touhoulittlemaid.entity.favorability.Type;
 import com.github.tartaricacid.touhoulittlemaid.entity.projectile.MaidFishingHook;
 import com.github.tartaricacid.touhoulittlemaid.entity.task.TaskManager;
 import com.github.tartaricacid.touhoulittlemaid.init.InitTrigger;
+import com.github.tartaricacid.touhoulittlemaid.network.message.SyncYsmMaidDataPackage;
+import cn.sh1rocu.touhoulittlemaid.util.PacketDistributor;
 import com.github.tartaricacid.touhoulittlemaid.network.message.SendEffectPackage;
 import com.github.tartaricacid.touhoulittlemaid.util.IdentifierUtil;
 import com.github.tartaricacid.touhoulittlemaid.util.migrate.EntityTypeUtil;
@@ -414,9 +416,24 @@ public class EntityMaid extends MaidManagerHost implements IEntity, CrossbowAtta
         return super.canAttack(target);
     }
 
+    // ===== YSM 轮盘动画（对应 1.21.1 的 rouletteAnim）=====
+    public static final String YSM_ROULETTE_ANIM_TAG = "YsmRouletteAnim";
+    public static final String YSM_ROULETTE_ANIM_PLAYING_TAG = "YsmRouletteAnimPlaying";
+    /**
+     * 当前轮盘动画名（模型里的动画名），"empty" 表示没有
+     */
+    public String rouletteAnim = "empty";
+    /**
+     * 是否正在播放轮盘动画
+     */
+    public boolean rouletteAnimPlaying = false;
+
     @Override
     public void addAdditionalSaveData(ValueOutput output) {
         super.addAdditionalSaveData(output);
+
+        output.putString(YSM_ROULETTE_ANIM_TAG, this.rouletteAnim);
+        output.putBoolean(YSM_ROULETTE_ANIM_PLAYING_TAG, this.rouletteAnimPlaying);
 
         this.statsManager.save(output);
         this.itemManager.save(output);
@@ -429,6 +446,9 @@ public class EntityMaid extends MaidManagerHost implements IEntity, CrossbowAtta
     @Override
     public void readAdditionalSaveData(ValueInput input) {
         super.readAdditionalSaveData(input);
+
+        this.rouletteAnim = input.getStringOr(YSM_ROULETTE_ANIM_TAG, "empty");
+        this.rouletteAnimPlaying = input.getBooleanOr(YSM_ROULETTE_ANIM_PLAYING_TAG, false);
 
         this.statsManager.read(input);
         this.itemManager.read(input);
@@ -443,6 +463,27 @@ public class EntityMaid extends MaidManagerHost implements IEntity, CrossbowAtta
         // 背包内的装饰栏有特殊渲染效果，需要手动同步到客户端
         ItemStack backpackItem = ItemUtil.getStack(itemManager.getMaidInv(), BACKPACK_ITEM_SLOT);
         this.setBackpackShowItem(backpackItem);
+    }
+
+    /**
+     * 播放 YSM 模型里的指定动画（轮盘动画）。服务端调用后会同步给所有追踪该女仆的玩家。
+     * <p>
+     * 传给 "empty" 等同于 {@link #stopRouletteAnim()}。
+     */
+    public void playRouletteAnim(String animationName) {
+        this.rouletteAnim = animationName == null ? "empty" : animationName;
+        this.rouletteAnimPlaying = !"empty".equals(this.rouletteAnim);
+        if (!this.level().isClientSide()) {
+            PacketDistributor.sendToPlayersTrackingEntity(this,
+                    new SyncYsmMaidDataPackage(this.getId(), this.rouletteAnim, this.rouletteAnimPlaying));
+        }
+    }
+
+    /**
+     * 停止轮盘动画
+     */
+    public void stopRouletteAnim() {
+        this.playRouletteAnim("empty");
     }
 
     @Override
