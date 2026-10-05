@@ -19,26 +19,36 @@ import java.util.List;
 public class ClientRecipeEvent {
     public static List<RecipeHolder<AltarRecipe>> ALTAR_RECIPES = Collections.emptyList();
 
+    /** Fabric 同步过来的配方（含祭坛配方 + 原版合成配方，见 DatapackSyncEvent）。 */
+    private static volatile SynchronizedRecipes syncedRecipes;
+
     public static void onRecipeReceived(Minecraft client, SynchronizedRecipes recipes) {
         ALTAR_RECIPES = Lists.newArrayList(recipes.getAllOfType(InitRecipes.ALTAR_RECIPE));
+        syncedRecipes = recipes;
     }
 
     /**
-     * 按 id 查完整配方。
+     * 按 id 查完整配方（单机 / 多人通用）。
      * <p>
-     * 注意：Fabric 的配方同步是按 RecipeSerializer 逐项 opt-in 的（本模组只同步了祭坛配方），
-     * 而 26.3 的原版客户端也只收到「可合成物品集合」，拿不到完整配方表，
-     * 所以这里只能向集成服务端（单机）要；多人游戏下返回 null。
+     * 26.3 的原版客户端只从 {@code ClientboundUpdateRecipesPacket} 收到「可合成物品集合」，
+     * 拿不到完整配方表，所以走 Fabric 按序列化器同步下来的 {@link SynchronizedRecipes}
+     * （见 {@code DatapackSyncEvent} 里 opt-in 的序列化器）。
+     * 万一同步里没有（例如服务端未装/版本不符），单机再退回集成服务端查询。
      */
     public static RecipeHolder<?> findRecipe(Identifier id) {
-        if (id == null || !Minecraft.getInstance().hasSingleplayerServer()) {
-            return null;
-        }
-        MinecraftServer server = Minecraft.getInstance().getSingleplayerServer();
-        if (server == null) {
+        if (id == null) {
             return null;
         }
         ResourceKey<Recipe<?>> key = ResourceKey.create(Registries.RECIPE, id);
-        return server.getRecipeManager().byKey(key).orElse(null);
+        SynchronizedRecipes recipes = syncedRecipes;
+        if (recipes != null) {
+            RecipeHolder<?> holder = recipes.get(key);
+            if (holder != null) {
+                return holder;
+            }
+        }
+        MinecraftServer server = Minecraft.getInstance().hasSingleplayerServer()
+                ? Minecraft.getInstance().getSingleplayerServer() : null;
+        return server == null ? null : server.getRecipeManager().byKey(key).orElse(null);
     }
 }
