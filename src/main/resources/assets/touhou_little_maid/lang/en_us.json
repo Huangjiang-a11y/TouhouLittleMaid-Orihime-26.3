@@ -1143,5 +1143,19 @@
   "patchouli.touhou_little_maid.book.entries.overview.vanilla_change.pages.0.text": "We modified the slime model to the yukkuri.",
   "patchouli.touhou_little_maid.book.entries.overview.vanilla_change.pages.1.text": "We also changed the textures of Experience Orbs, Bottle 'O Enchanting, and Totem of Undying. $(br2)These can all be turned off in the configuration file.",
   "patchouli.touhou_little_maid.book.entries.overview.favorability.name": "Favorability",
-  "patchouli.touhou_little_maid.book.entries.overview.favorability.pages.0.text": "Higher favorability will increase the maid's health and attack.$(br2)improving maid favorability:$(li)When the maid is in idle schedule, she will play with the keyboard, computer, bookshelf or gomoku.$(li)Maid sleeping.$(br2)Reducing maid favorability:$(li)Death of the maid."
+  "patchouli.touhou_little_maid.book.entries.overview.favorability.pages.0.text": "Higher favorability will increase the maid's health and attack.$(br2)improving maid favorability:$(li)When the maid is in idle schedule, she will play with the keyboard, computer, bookshelf or gomoku.$(li)Maid sleeping.$(br2)Reducing maid favorability:$(li)Death of the maid.",
+  "item.touhou_little_maid.gomoku_board_state": "Gomoku Board State",
+  "item.touhou_little_maid.cchess_board_state": "Xiangqi Board State",
+  "item.touhou_little_maid.wchess_board_state": "Chess Board State",
+  "tooltips.touhou_little_maid.board_state.empty": "There is no board game data on it",
+  "tooltips.touhou_little_maid.board_state.author": "Author: %s",
+  "board_state.touhou_little_maid.show_picture": "<Press Shift To Show Details>",
+  "board_state.touhou_little_maid.gomoku.default": "Gomoku Endgame",
+  "board_state.touhou_little_maid.gomoku.moon": "Moon Endgame",
+  "board_state.touhou_little_maid.gomoku.stealth_cow": "Stealth Cow Endgame",
+  "board_state.touhou_little_maid.gomoku.noodles": "Noodles Endgame",
+  "board_state.touhou_little_maid.gomoku.square": "Square Endgame",
+  "board_state.touhou_little_maid.gomoku.bed": "Bed Endgame",
+  "board_state.touhou_little_maid.xiangqi.default": "Xiangqi Endgame",
+  "board_state.touhou_little_maid.chess.default": "Chess Endgame"
 }

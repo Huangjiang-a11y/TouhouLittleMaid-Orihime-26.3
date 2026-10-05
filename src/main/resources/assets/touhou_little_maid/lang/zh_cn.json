@@ -1143,5 +1143,19 @@
   "patchouli.touhou_little_maid.book.entries.overview.vanilla_change.pages.0.text": "我们把史莱姆模型修改成了油库里。",
   "patchouli.touhou_little_maid.book.entries.overview.vanilla_change.pages.1.text": "我们还修改了经验球、附魔之瓶和不死图腾的纹理。$(br2)这些都可以在配置文件中关闭。",
   "patchouli.touhou_little_maid.book.entries.overview.favorability.name": "好感度",
-  "patchouli.touhou_little_maid.book.entries.overview.favorability.pages.0.text": "好感度能够增加女仆的生命值和攻击力。$(br2)提升女仆好感度：$(li)女仆在空闲日程，玩耍电子琴、电脑、书架和五子棋。$(li)女仆睡觉。$(br2)减少女仆好感度：$(li)女仆死亡。"
+  "patchouli.touhou_little_maid.book.entries.overview.favorability.pages.0.text": "好感度能够增加女仆的生命值和攻击力。$(br2)提升女仆好感度：$(li)女仆在空闲日程，玩耍电子琴、电脑、书架和五子棋。$(li)女仆睡觉。$(br2)减少女仆好感度：$(li)女仆死亡。",
+  "item.touhou_little_maid.gomoku_board_state": "五子棋残局道具",
+  "item.touhou_little_maid.cchess_board_state": "中国象棋残局道具",
+  "item.touhou_little_maid.wchess_board_state": "国际象棋残局道具",
+  "tooltips.touhou_little_maid.board_state.empty": "这上面没有残局数据",
+  "tooltips.touhou_little_maid.board_state.author": "作者：%s",
+  "board_state.touhou_little_maid.show_picture": "< 按下 Shift 显示细节 >",
+  "board_state.touhou_little_maid.gomoku.default": "五子棋残局",
+  "board_state.touhou_little_maid.gomoku.moon": "月亮阵",
+  "board_state.touhou_little_maid.gomoku.stealth_cow": "隐身牛阵",
+  "board_state.touhou_little_maid.gomoku.noodles": "面条阵",
+  "board_state.touhou_little_maid.gomoku.square": "口字阵",
+  "board_state.touhou_little_maid.gomoku.bed": "床阵",
+  "board_state.touhou_little_maid.xiangqi.default": "中国象棋残局",
+  "board_state.touhou_little_maid.chess.default": "国际象棋残局"
 }

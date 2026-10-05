@@ -108,6 +108,9 @@ public interface InitItems {
     // 成就图标
     Item CHANGE_CHAIR_MODEL = register("change_chair_model", ItemAdvancementIcon::new);
     Item CHANGE_MAID_MODEL = register("change_maid_model", ItemAdvancementIcon::new);
+    Item GOMOKU_BOARD_STATE = register("gomoku_board_state", ItemBoardState::new);
+    Item CCHESS_BOARD_STATE = register("cchess_board_state", ItemBoardState::new);
+    Item WCHESS_BOARD_STATE = register("wchess_board_state", ItemBoardState::new);
     Item MAID_100_HEALTHY = register("maid_100_healthy", ItemAdvancementIcon::new);
     Item KILL_100 = register("kill_100", ItemAdvancementIcon::new);
     Item KILL_SLIME_300 = register("kill_slime_300", ItemAdvancementIcon::new);

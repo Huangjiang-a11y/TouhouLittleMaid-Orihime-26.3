@@ -1,5 +1,6 @@
 package com.github.tartaricacid.touhoulittlemaid.compat.jei.category;
 
+import com.github.tartaricacid.touhoulittlemaid.client.book.EntityPageRenderer;
 import com.github.tartaricacid.touhoulittlemaid.util.IdentifierUtil;
 import com.github.tartaricacid.touhoulittlemaid.crafting.AltarRecipe;
 import com.github.tartaricacid.touhoulittlemaid.init.InitRecipes;
@@ -15,6 +16,7 @@ import mezz.jei.api.recipe.types.IRecipeType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
@@ -62,6 +64,13 @@ public class AltarRecipeCategory implements IRecipeCategory<RecipeHolder<AltarRe
                 Component.translatable(recipe.getLangKey())
         );
         int width = (WIDTH - font.width(resultText)) / 2;
+
+        // 实体产物：26.x 丢了 entity_placeholder 那套（NeoForge ITEM_EXTENSIONS），产物槽只能显示刷怪蛋。
+        // 这里直接把实体画在产物槽下方，复用书壳里的实体渲染（带失败缓存，不会每帧重建）。
+        if (!recipe.isItemCraft()) {
+            EntityRenderState entityState = EntityPageRenderer.state(recipe.getEntityType().toString());
+            EntityPageRenderer.drawCentered(graphics, entityState, 22.0F, 131, 22, 157, 62, 0.12F);
+        }
 
         graphics.text(font, powerText, 65, 55, TEXT_COLOR, false);
         graphics.text(font, resultText.getVisualOrderText(), width, 85, TEXT_COLOR, false);

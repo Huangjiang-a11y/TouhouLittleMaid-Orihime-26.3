@@ -2,6 +2,7 @@ package com.github.tartaricacid.touhoulittlemaid.blockentity;
 
 import com.github.tartaricacid.touhoulittlemaid.api.block.IBoardGameEntityBlock;
 import com.github.tartaricacid.touhoulittlemaid.api.game.gomoku.Point;
+import com.github.tartaricacid.touhoulittlemaid.api.game.gomoku.GomokuCodec;
 import com.github.tartaricacid.touhoulittlemaid.api.game.gomoku.Statue;
 import com.github.tartaricacid.touhoulittlemaid.init.InitBlocks;
 import com.mojang.serialization.Codec;
@@ -101,6 +102,18 @@ public class BlockEntityGomoku extends BlockEntityJoy implements IBoardGameEntit
         this.chessCounter = 15 * 15 - 3;
         this.statue = Statue.IN_PROGRESS.ordinal();
         this.playerTurn = true;
+    }
+
+    /**
+     * 载入残局（来自 {@code ItemBoardState}）。原实现见 1.21.1 TileEntityGomoku#setStateData。
+     */
+    public void setStateData(GomokuCodec.StateData stateData) {
+        this.chessData = stateData.board();
+        this.chessCounter = stateData.turnCount();
+        this.latestChessPoint = stateData.latestPoint();
+        this.statue = Statue.IN_PROGRESS.ordinal();
+        this.playerTurn = stateData.turnCount() % 2 == 0;
+        this.refresh();
     }
 
     public boolean isPlayerTurn() {

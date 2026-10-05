@@ -68,6 +68,14 @@ public class BlockEntityWChess extends BlockEntityJoy implements IBoardGameEntit
         this.moveNumberLimit = false;
     }
 
+    /**
+     * 载入残局（来自 {@code ItemBoardState}）。原实现见 1.21.1 TileEntityWChess#setEndgame。
+     */
+    public void setEndgame(String endgame) {
+        this.chessData.fromFen(endgame);
+        this.refresh();
+    }
+
     public Position getChessData() {
         return chessData;
     }

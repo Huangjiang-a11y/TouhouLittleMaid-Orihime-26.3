@@ -3,6 +3,7 @@ package com.github.tartaricacid.touhoulittlemaid.init;
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.item.ItemFoxScroll.TrackInfo;
 import com.mojang.serialization.Codec;
+import com.github.tartaricacid.touhoulittlemaid.item.ItemBoardState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.UUIDUtil;
@@ -37,6 +38,13 @@ public class InitDataComponent {
             register("track_info", DataComponentType.<TrackInfo>builder()
                     .persistent(TrackInfo.CODEC)
                     .networkSynchronized(TrackInfo.STREAM_CODEC)
+                    .build());
+
+    public static final String BOARD_STATE_TAG_NAME = "board_state";
+    public static final DataComponentType<ItemBoardState.BoardStateInfo> BOARD_STATE_TAG =
+            register(BOARD_STATE_TAG_NAME, DataComponentType.<ItemBoardState.BoardStateInfo>builder()
+                    .persistent(ItemBoardState.BoardStateInfo.CODEC)
+                    .networkSynchronized(ItemBoardState.BoardStateInfo.STREAM_CODEC)
                     .build());
 
     public static final String MODEL_ID_TAG_NAME = "model_id";

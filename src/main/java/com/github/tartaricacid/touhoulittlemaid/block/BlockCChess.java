@@ -11,6 +11,8 @@ import com.github.tartaricacid.touhoulittlemaid.config.subconfig.MaidConfig;
 import com.github.tartaricacid.touhoulittlemaid.entity.favorability.Type;
 import com.github.tartaricacid.touhoulittlemaid.entity.item.EntitySit;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
+import com.github.tartaricacid.touhoulittlemaid.item.ItemBoardState;
+import org.apache.commons.lang3.StringUtils;
 import com.github.tartaricacid.touhoulittlemaid.init.InitItems;
 import com.github.tartaricacid.touhoulittlemaid.init.InitSounds;
 import com.github.tartaricacid.touhoulittlemaid.init.InitTrigger;
@@ -260,6 +262,17 @@ public class BlockCChess extends BlockJoy implements IBoardGameBlock, IBlockExpl
         }
         if (!chess.isPlayerTurn() && !chess.isCheckmate()) {
             return InteractionResult.FAIL;
+        }
+
+        // 残局道具：直接载入残局
+        ItemStack boardStateItem = player.getMainHandItem();
+        if (boardStateItem.is(InitItems.CCHESS_BOARD_STATE)) {
+            String[] boardState = ItemBoardState.getState(boardStateItem);
+            if (boardState != null && !StringUtils.isEmpty(boardState[0])) {
+                chess.setEndgame(boardState[0]);
+                level.playSound(null, centerPos, InitSounds.GOMOKU_RESET, SoundSource.BLOCKS, 1.0f, 1.0f);
+                return InteractionResult.SUCCESS;
+            }
         }
 
         // 只能空手操作
