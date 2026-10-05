@@ -1,12 +1,12 @@
 package com.github.tartaricacid.touhoulittlemaid.client.book;
 
-import com.github.tartaricacid.touhoulittlemaid.util.GuiTools;
 import com.github.tartaricacid.touhoulittlemaid.util.migrate.ScreenUtil;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.gui.TextAlignment;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineLabel;
@@ -199,21 +199,50 @@ public class BookScreen extends Screen {
         }
     }
 
-    /** image 页：images[] 里的贴图居中画 + 图注。 */
+    /** 右侧内容区可用下边界（避开底部按钮行）。 */
+    private int contentBottom() {
+        return (this.height - HEIGHT) / 2 + HEIGHT - 26;
+    }
+
+    /**
+     * image 页：按贴图真实宽高等比缩放到页面内**完整**显示（不裁剪、不放大），居中 + 描边 + 白底。
+     * 注意：必须用带源区域参数的 blit（12 参数版），
+     * 只有它会在「源区域 -&gt; 目标尺寸」之间做缩放；10 参数版是 1:1 像素裁剪。
+     */
     private int renderImage(GuiGraphicsExtractor graphics, BookPage page, int x, int y, int width) {
         List<String> images = page.strList("images");
         if (images.isEmpty() && page.has("image")) {
             images = List.of(page.str("image"));
         }
-        int w = Math.min(page.integer("width", 100), width);
-        int h = page.integer("height", 75);
         for (String raw : images) {
             Identifier id = Identifier.tryParse(raw);
             if (id == null) {
                 continue;
             }
-            GuiTools.guiBlit(graphics, id, x + (width - w) / 2, y, 0, 0, w, h);
-            y += h + 4;
+            int[] size = BookImages.size(id);
+            int texW = Math.max(1, size[0]);
+            int texH = Math.max(1, size[1]);
+            int availH = Math.max(24, this.contentBottom() - y);
+            int wantW = page.integer("width", 0);
+            int wantH = page.integer("height", 0);
+            int drawW;
+            int drawH;
+            if (wantW > 0 && wantH > 0) {
+                drawW = Math.min(wantW, width);
+                drawH = Math.min(wantH, availH);
+            } else {
+                int boxW = wantW > 0 ? Math.min(wantW, width) : width;
+                float scale = Math.min((float) boxW / texW, (float) availH / texH);
+                scale = Math.min(scale, 1.0F);
+                drawW = Math.max(1, Math.round(texW * scale));
+                drawH = Math.max(1, Math.round(texH * scale));
+            }
+            int drawX = x + (width - drawW) / 2;
+            graphics.fill(drawX - 1, y - 1, drawX + drawW + 1, y + drawH + 1, 0xFF8A8A85);
+            graphics.fill(drawX, y, drawX + drawW, y + drawH, 0xFFFFFFFF);
+            graphics.blit(RenderPipelines.GUI_TEXTURED, id, drawX, y, 0.0F, 0.0F,
+                    drawW, drawH, texW, texH, texW, texH);
+            y += drawH + 6;
         }
         return y;
     }
