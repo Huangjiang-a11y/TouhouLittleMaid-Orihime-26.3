@@ -65,6 +65,11 @@ public class BookPage {
         return translate(str(key));
     }
 
+    /** 同 {@link #text}，但直接给出最终字符串（lang key 已解析，宏原样保留）。 */
+    public String plain(String key) {
+        return text(key).getString();
+    }
+
     /** 文本页的每一页正文：pages.N.text 可能直接是 lang key。 */
     public List<Component> lines(String key) {
         List<Component> out = new ArrayList<>();

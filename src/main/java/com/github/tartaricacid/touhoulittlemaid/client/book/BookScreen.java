@@ -1,19 +1,23 @@
 package com.github.tartaricacid.touhoulittlemaid.client.book;
 
 import com.github.tartaricacid.touhoulittlemaid.util.migrate.ScreenUtil;
+import com.mojang.blaze3d.Blaze3D;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.gui.TextAlignment;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.MultiLineLabel;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 /** 自包含书壳 GUI（不依赖 Patchouli）：左侧分类 + 条目，右侧页内容。 */
@@ -24,6 +28,7 @@ public class BookScreen extends Screen {
     private static final int ROWS = 8;
     private static final int ROW_H = 13;
     private static final int TEXT_COLOR = 0xFF40403F;
+    private static final int LINK_COLOR = 0xFF1F6FC0;
     private static final int DIM_COLOR = 0xFF80807F;
     private static final int PANEL = 0xFFF0E6D2;
     private static final int PANEL_LEFT = 0xFFE4D8C0;
@@ -31,6 +36,9 @@ public class BookScreen extends Screen {
 
     private final BookContent content;
     private final Screen lastScreen;
+
+    private final List<BookRichText.ClickRegion> clickRegions = new ArrayList<>();
+    private BookPage lastRenderedPage;
 
     private int categoryIndex;
     private int entryScroll;
@@ -145,6 +153,8 @@ public class BookScreen extends Screen {
     public void extractRenderState(GuiGraphicsExtractor graphics, int pMouseX, int pMouseY, float pPartialTick) {
         int left = (this.width - WIDTH) / 2;
         int top = (this.height - HEIGHT) / 2;
+        this.clickRegions.clear();
+        MultiblockPageRenderer.clearHitBox();
         graphics.fill(left, top, left + WIDTH, top + HEIGHT, PANEL);
         graphics.fill(left, top, left + LEFT_W, top + HEIGHT, PANEL_LEFT);
 
@@ -175,27 +185,190 @@ public class BookScreen extends Screen {
         super.extractRenderState(graphics, pMouseX, pMouseY, pPartialTick);
     }
 
-    /** 页渲染：text / image / spotlight 已实现，其余先回退成文本。 */
+    /** 页渲染：text / image / spotlight / altar_recipe / crafting / link / entity / multiblock / item / header / separator。 */
     private void renderPage(GuiGraphicsExtractor graphics, BookPage page, int x, int y, int width) {
+        if (page != this.lastRenderedPage) {
+            this.lastRenderedPage = page;
+            MultiblockPageRenderer.resetRotation();
+        }
         String type = page.type();
-        if (!"text".equals(type) && page.has("title")) {
+        // Patchouli 允许 patchouli:xxx 前缀，这里统一剥掉
+        if (type.startsWith("patchouli:")) {
+            type = type.substring("patchouli:".length());
+        }
+        if (!"text".equals(type) && !"header".equals(type) && !"separator".equals(type) && page.has("title")) {
             graphics.text(this.font, page.text("title"), x, y, TEXT_COLOR, false);
             y += 12;
         }
-        if ("image".equals(type)) {
-            y = this.renderImage(graphics, page, x, y, width);
-        } else if ("spotlight".equals(type)) {
-            y = this.renderSpotlight(graphics, page, x, y, width);
-        } else if ("altar_recipe".equals(type)) {
-            AltarPageRenderer.render(graphics, page, x, y + 12, width, this.font, TEXT_COLOR);
+        switch (type) {
+            case "image" -> y = this.renderImage(graphics, page, x, y, width);
+            case "spotlight" -> y = this.renderSpotlight(graphics, page, x, y, width);
+            case "item" -> y = this.renderItemPage(graphics, page, x, y, width);
+            case "entity" -> y = EntityPageRenderer.render(graphics, page, x, y, width, this.font, TEXT_COLOR, this.clickRegions);
+            case "multiblock" -> y = MultiblockPageRenderer.render(graphics, page, x, y, width, this.font, TEXT_COLOR);
+            case "crafting" -> {
+                CraftingPageRenderer.render(graphics, page, x, y, width, this.font, TEXT_COLOR);
+                return;
+            }
+            case "link" -> {
+                this.renderLink(graphics, page, x, y, width);
+                return;
+            }
+            case "altar_recipe" -> {
+                AltarPageRenderer.render(graphics, page, x, y + 12, width, this.font, TEXT_COLOR);
+                return;
+            }
+            case "header" -> {
+                this.renderHeader(graphics, page, x, y, width);
+                return;
+            }
+            case "separator" -> {
+                this.renderSeparator(graphics, x, y, width);
+                return;
+            }
+            default -> {
+                if (!page.has("text") && !page.has("name")) {
+                    graphics.text(this.font, Component.literal("<" + type + ">"), x, y, DIM_COLOR, false);
+                    return;
+                }
+            }
+        }
+        this.renderBody(graphics, page, x, y, width);
+    }
+
+    /** 富文本正文（text / name 字段）：走 $() 宏解析，链接会登记成可点击区域。 */
+    private void renderBody(GuiGraphicsExtractor graphics, BookPage page, int x, int y, int width) {
+        String bodyKey = page.has("text") ? "text" : (page.has("name") ? "name" : null);
+        if (bodyKey == null) {
             return;
         }
-        String bodyKey = page.has("text") ? "text" : (page.has("name") ? "name" : null);
-        if (bodyKey != null) {
-            MultiLineLabel label = MultiLineLabel.create(this.font, page.text(bodyKey), width);
-            label.visitLines(TextAlignment.LEFT, x, y, 9, graphics.textRenderer());
-        } else if (!"image".equals(type) && !"spotlight".equals(type)) {
-            graphics.text(this.font, Component.literal("<" + type + ">"), x, y, DIM_COLOR, false);
+        BookRichText.of(page.plain(bodyKey), TEXT_COLOR, this.font, width)
+                .render(graphics, this.font, x, y, this.clickRegions);
+    }
+
+    /** link 页：正文 + 居中的可点击外链。 */
+    private void renderLink(GuiGraphicsExtractor graphics, BookPage page, int x, int y, int width) {
+        int cy = y;
+        if (page.has("text")) {
+            BookRichText body = BookRichText.of(page.plain("text"), TEXT_COLOR, this.font, width);
+            body.render(graphics, this.font, x, cy, this.clickRegions);
+            cy += body.height() + 4;
+        }
+        String url = page.str("url");
+        if (url.isEmpty() || !page.has("link_text")) {
+            return;
+        }
+        String label = page.plain("link_text");
+        int w = this.font.width(label);
+        int lx = x + (width - w) / 2;
+        MutableComponent component = Component.literal(label)
+                .withStyle(style -> style.withColor(LINK_COLOR).withUnderlined(true));
+        graphics.text(this.font, component, lx, cy, LINK_COLOR, false);
+        this.clickRegions.add(new BookRichText.ClickRegion(lx, cy, lx + w, cy + 9, null, url));
+    }
+
+    /** item 页：物品图标 + 名称。 */
+    private int renderItemPage(GuiGraphicsExtractor graphics, BookPage page, int x, int y, int width) {
+        Identifier id = Identifier.tryParse(page.str("item").trim());
+        if (id == null) {
+            return y;
+        }
+        ItemStack stack = new ItemStack(BuiltInRegistries.ITEM.getValue(id));
+        if (stack.isEmpty()) {
+            return y;
+        }
+        int cx = x + width / 2 - 8;
+        graphics.item(stack, cx, y + 2);
+        graphics.itemDecorations(this.font, stack, cx, y + 2);
+        graphics.centeredText(this.font, stack.getHoverName(), x + width / 2, y + 24, TEXT_COLOR);
+        return y + 38;
+    }
+
+    /** header 页：居中标题 + 下划线。 */
+    private void renderHeader(GuiGraphicsExtractor graphics, BookPage page, int x, int y, int width) {
+        Component title = page.has("text") ? page.text("text") : Component.empty();
+        graphics.centeredText(this.font, title, x + width / 2, y + 4, TEXT_COLOR);
+        graphics.fill(x, y + 16, x + width, y + 17, 0x33000000);
+    }
+
+    /** separator 页：一条分隔线。 */
+    private void renderSeparator(GuiGraphicsExtractor graphics, int x, int y, int width) {
+        graphics.fill(x, y + 6, x + width, y + 7, 0x33000000);
+    }
+
+    @Override
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        double mouseX = event.x();
+        double mouseY = event.y();
+        for (BookRichText.ClickRegion region : this.clickRegions) {
+            if (!region.contains(mouseX, mouseY)) {
+                continue;
+            }
+            if (region.url() != null && !region.url().isEmpty()) {
+                this.openUrl(region.url());
+                return true;
+            }
+            if (region.entry() != null && !region.entry().isEmpty()) {
+                this.openEntry(region.entry());
+                return true;
+            }
+        }
+        int[] box = MultiblockPageRenderer.hitBox();
+        if (box != null && mouseX >= box[0] && mouseX < box[2] && mouseY >= box[1] && mouseY < box[3]) {
+            MultiblockPageRenderer.rotate();
+            return true;
+        }
+        return super.mouseClicked(event, doubleClick);
+    }
+
+    /** 书内跳转：$(l:条目) 的目标（相对 id 会补上本书命名空间，并忽略 #锚点）。 */
+    private void openEntry(String target) {
+        String id = target;
+        int anchor = id.indexOf('#');
+        if (anchor >= 0) {
+            id = id.substring(0, anchor);
+        }
+        if (!id.contains(":")) {
+            String contentId = this.content.id();
+            int colon = contentId.indexOf(':');
+            id = (colon >= 0 ? contentId.substring(0, colon) : contentId) + ":" + id;
+        }
+        for (BookEntry entry : this.content.entries()) {
+            if (!entry.id().equals(id)) {
+                continue;
+            }
+            List<BookCategory> categories = this.content.categories();
+            for (int i = 0; i < categories.size(); i++) {
+                if (categories.get(i).id().equals(entry.category())) {
+                    this.categoryIndex = i;
+                    break;
+                }
+            }
+            List<BookEntry> current = this.currentEntries();
+            for (int i = 0; i < current.size(); i++) {
+                if (current.get(i).id().equals(id)) {
+                    this.entryIndex = i;
+                    break;
+                }
+            }
+            this.entryScroll = Math.max(0, (this.entryIndex / ROWS) * ROWS);
+            this.pageIndex = 0;
+            this.rebuildWidgets();
+            return;
+        }
+    }
+
+    /** 外链：先弹确认框，同意后交给系统浏览器。 */
+    private void openUrl(String url) {
+        try {
+            URI uri = URI.create(url);
+            ScreenUtil.setScreen(new ConfirmLinkScreen(yes -> {
+                if (yes) {
+                    Blaze3D.openUri(uri);
+                }
+                ScreenUtil.setScreen(this);
+            }, uri, true));
+        } catch (Exception ignored) {
         }
     }
 
