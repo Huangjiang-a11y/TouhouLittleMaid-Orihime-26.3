@@ -62,30 +62,24 @@ public final class EntityPageRenderer {
         int cx = x + width / 2;
         int centerY = y + entityH / 2;
         int half = Math.max(8, Math.round(scale / 2.0F));
-        // 实体以方块中心为原点、向上生长，所以 translate.y 补上半个身高才正好居中
-        Vector3f translation = new Vector3f(0.0F, offset + state.boundingBoxHeight / 2.0F, 0.0F);
-        Quaternionf pose = new Quaternionf().rotateZ((float) Math.PI);
-        pose.mul(new Quaternionf().rotateY((float) Math.toRadians(YAW)).rotateX(PITCH));
-        graphics.enableScissor(x, y, x + width, y + entityH);
-        graphics.entity(state, scale, translation, pose, null,
-                cx - half, centerY - half, cx + half, centerY + half);
-        graphics.disableScissor();
+        drawCentered(graphics, state, scale, cx - half, centerY - half, cx + half, centerY + half, offset);
         return y + entityH + 6;
     }
 
-    /** 在 (centerX, centerY) 处居中画一个已建好的实体状态（供祭坛页复用）。 */
+    /**
+     * 在给定方块 (x0,y0)-(x1,y1) 内居中画一个已建好的实体状态（祭坛页复用）。
+     * 实体的原点在方块中心、向上生长，所以 translate.y 要补上半个身高才正好居中。
+     */
     public static void drawCentered(GuiGraphicsExtractor graphics, EntityRenderState state, float scale,
-                                    int centerX, int centerY) {
+                                    int x0, int y0, int x1, int y1, float yOffset) {
         if (state == null) {
             return;
         }
-        int half = Math.max(8, Math.round(scale / 2.0F));
-        Vector3f translation = new Vector3f(0.0F, state.boundingBoxHeight / 2.0F, 0.0F);
+        Vector3f translation = new Vector3f(0.0F, yOffset + state.boundingBoxHeight / 2.0F, 0.0F);
         Quaternionf pose = new Quaternionf().rotateZ((float) Math.PI);
-        pose.mul(new Quaternionf().rotateY((float) Math.toRadians(YAW)));
-        graphics.enableScissor(centerX - half, centerY - half, centerX + half, centerY + half);
-        graphics.entity(state, scale, translation, pose, null,
-                centerX - half, centerY - half, centerX + half, centerY + half);
+        pose.mul(new Quaternionf().rotateY((float) Math.toRadians(YAW)).rotateX(PITCH));
+        graphics.enableScissor(x0, y0, x1, y1);
+        graphics.entity(state, scale, translation, pose, null, x0, y0, x1, y1);
         graphics.disableScissor();
     }
 

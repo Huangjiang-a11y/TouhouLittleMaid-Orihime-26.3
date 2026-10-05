@@ -94,11 +94,14 @@ public final class AltarPageRenderer {
             }
             EntityRenderState state = EntityPageRenderer.state(entityId == null ? "" : entityId.toString());
             if (state != null) {
-                int bx = ox + 44;
-                int by = oy + 108;
-                graphics.fill(bx - 1, by - 1, bx + 42, by + 42, SLOT_LIGHT);
-                graphics.fill(bx, by, bx + 41, by + 41, SLOT_DARK);
-                EntityPageRenderer.drawCentered(graphics, state, 30.0F, bx + 20, by + 21);
+                int bs = 34;
+                int bx = ox + 50;
+                int by = oy + 112;
+                // 缩放按实体身高反算，保证画满整个框又不会被 scissor 裁掉
+                float entityScale = Math.max(6.0F, (bs - 4.0F) / Math.max(0.4F, state.boundingBoxHeight));
+                graphics.fill(bx - 1, by - 1, bx + bs, by + bs, SLOT_LIGHT);
+                graphics.fill(bx, by, bx + bs - 1, by + bs - 1, SLOT_DARK);
+                EntityPageRenderer.drawCentered(graphics, state, entityScale, bx, by, bx + bs, by + bs, 0.0F);
             }
         }
     }
