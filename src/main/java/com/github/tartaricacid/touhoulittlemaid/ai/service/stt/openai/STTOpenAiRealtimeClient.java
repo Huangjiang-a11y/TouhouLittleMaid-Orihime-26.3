@@ -101,7 +101,8 @@ public class STTOpenAiRealtimeClient implements STTClient {
     }
 
     private void send(byte[] recorded, ResponseCallback<String> callback) {
-        byte[] pcm = appendTailSilence(resample(recorded, RECORD_RATE, API_RATE), API_RATE, TAIL_SILENCE_MILLIS);
+        byte[] pcm = appendTailSilence(
+                resample(stripWavHeader(recorded), RECORD_RATE, API_RATE), API_RATE, TAIL_SILENCE_MILLIS);
         CompletableFuture<String> finished = new CompletableFuture<>();
         AtomicBoolean done = new AtomicBoolean(false);
         List<String> segments = Collections.synchronizedList(new ArrayList<>());
@@ -237,6 +238,36 @@ public class STTOpenAiRealtimeClient implements STTClient {
         } catch (Exception e) {
             TouhouLittleMaid.LOGGER.warn("Invalid realtime event: {}", text);
         }
+    }
+
+    /**
+     * 去掉 WAV 容器头。MicrophoneManager 会往原始 PCM 前面套一段 WAV 头（RIFF/fmt/data），
+     * 但 Realtime 协议要求 base64 裸 PCM、"without a WAV or other container header"。
+     * 不剥的话这几十个字节会被当成音频样本解码（约 1.4ms 噪音），还可能让靠音频静默
+     * 断句的服务误判出一个垃圾分段。按 chunk 找到 data 块取其后内容，非 WAV 原样返回。
+     */
+    private static byte[] stripWavHeader(byte[] data) {
+        boolean riff = data.length >= 44 && data[0] == 'R' && data[1] == 'I' && data[2] == 'F'
+                && data[3] == 'F' && data[8] == 'W' && data[9] == 'A' && data[10] == 'V' && data[11] == 'E';
+        if (!riff) {
+            return data;
+        }
+        int offset = 12;
+        while (offset + 8 <= data.length) {
+            int size = (data[offset + 4] & 0xFF) | ((data[offset + 5] & 0xFF) << 8)
+                    | ((data[offset + 6] & 0xFF) << 16) | ((data[offset + 7] & 0xFF) << 24);
+            if (data[offset] == 'd' && data[offset + 1] == 'a' && data[offset + 2] == 't'
+                    && data[offset + 3] == 'a') {
+                int start = offset + 8;
+                return java.util.Arrays.copyOfRange(data, start, Math.min(data.length, start + Math.max(size, 0)));
+            }
+            if (size < 0 || offset + 8 + size > data.length) {
+                break;
+            }
+            offset += 8 + size + (size & 1);
+        }
+        // 兜底：标准 WAV 头就是 44 字节
+        return java.util.Arrays.copyOfRange(data, Math.min(44, data.length), data.length);
     }
 
     /**
