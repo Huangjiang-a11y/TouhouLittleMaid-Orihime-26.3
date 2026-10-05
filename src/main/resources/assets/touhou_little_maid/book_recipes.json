@@ -1,0 +1,66 @@
+{
+  "touhou_little_maid:chair": {
+    "grid": [
+      "",
+      "",
+      "",
+      "minecraft:white_wool",
+      "minecraft:white_wool",
+      "minecraft:white_wool",
+      "minecraft:iron_ingot",
+      "minecraft:oak_planks",
+      "minecraft:iron_ingot"
+    ],
+    "height": 3,
+    "result": "touhou_little_maid:chair",
+    "width": 3
+  },
+  "touhou_little_maid:chair_show": {
+    "grid": [
+      "",
+      "minecraft:redstone",
+      "",
+      "minecraft:white_wool",
+      "minecraft:white_wool",
+      "minecraft:white_wool",
+      "minecraft:iron_ingot",
+      "minecraft:oak_planks",
+      "minecraft:iron_ingot"
+    ],
+    "height": 3,
+    "result": "touhou_little_maid:chair_show",
+    "width": 3
+  },
+  "touhou_little_maid:hakurei_gohei": {
+    "grid": [
+      "",
+      "",
+      "minecraft:diamond",
+      "",
+      "minecraft:stick",
+      "minecraft:paper",
+      "minecraft:stick",
+      "",
+      "minecraft:paper"
+    ],
+    "height": 3,
+    "result": "touhou_little_maid:hakurei_gohei",
+    "width": 3
+  },
+  "touhou_little_maid:sanae_gohei": {
+    "grid": [
+      "",
+      "minecraft:paper",
+      "minecraft:diamond",
+      "",
+      "minecraft:stick",
+      "minecraft:paper",
+      "minecraft:stick",
+      "",
+      ""
+    ],
+    "height": 3,
+    "result": "touhou_little_maid:sanae_gohei",
+    "width": 3
+  }
+}

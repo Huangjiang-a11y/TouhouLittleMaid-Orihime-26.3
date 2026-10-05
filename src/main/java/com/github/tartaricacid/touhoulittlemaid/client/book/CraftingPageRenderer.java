@@ -16,13 +16,14 @@ import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.minecraft.world.item.crafting.display.SlotDisplayContext;
 import net.minecraft.world.level.Level;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * crafting 页：合成配方（3x3 网格 + 箭头 + 产物），支持 recipe 与 recipe2 两个配方。
  * <p>
- * 数据来源说明：26.3 的客户端只从 {@code ClientboundUpdateRecipesPacket} 收到「可合成物品集合」，
- * 不再持有完整配方表，所以这里只能向集成服务端的 RecipeManager 要；多人游戏拿不到 → 退化为显示配方 id。
+ * 数据来源优先用烤进资源的 {@link BookRecipeData}（单机/多人通用、零网络开销）；
+ * 拿不到时才退回集成服务端的完整配方表（单机），再不行就显示配方 id。
  */
 public final class CraftingPageRenderer {
     private static final int SLOT = 18;
@@ -55,8 +56,15 @@ public final class CraftingPageRenderer {
 
     private static int renderOne(GuiGraphicsExtractor graphics, String idStr, int x, int y, int width,
                                  Font font, int textColor) {
-        Level level = Minecraft.getInstance().level;
         Identifier id = Identifier.tryParse(idStr);
+
+        BookRecipeData.Entry baked = BookRecipeData.get(id);
+        if (baked != null) {
+            return drawGrid(graphics, baked.width(), baked.height(), baked.grid(), baked.result(),
+                    x, y, width, font);
+        }
+
+        Level level = Minecraft.getInstance().level;
         RecipeHolder<?> holder = (level == null || id == null) ? null : ClientRecipeEvent.findRecipe(id);
         if (holder == null) {
             graphics.text(font, Component.literal("<recipe " + idStr + ">"), x, y + 2, textColor, false);
@@ -65,28 +73,36 @@ public final class CraftingPageRenderer {
         ContextMap context = SlotDisplayContext.fromLevel(level);
         int cy = y;
         for (RecipeDisplay display : holder.value().display()) {
-            cy = draw(graphics, display, context, x, cy, width, font);
+            cy = drawDisplay(graphics, display, context, x, cy, width, font);
         }
         return cy;
     }
 
-    private static int draw(GuiGraphicsExtractor graphics, RecipeDisplay display, ContextMap context,
-                            int x, int y, int width, Font font) {
+    private static int drawDisplay(GuiGraphicsExtractor graphics, RecipeDisplay display, ContextMap context,
+                                   int x, int y, int width, Font font) {
+        List<ItemStack> cells = new ArrayList<>();
         if (display instanceof ShapedCraftingRecipeDisplay shaped) {
-            return drawGrid(graphics, shaped.width(), shaped.height(), shaped.ingredients(),
-                    shaped.result(), context, x, y, width, font);
+            for (SlotDisplay slot : shaped.ingredients()) {
+                cells.add(firstStack(slot, context));
+            }
+            return drawGrid(graphics, shaped.width(), shaped.height(), cells, firstStack(shaped.result(), context),
+                    x, y, width, font);
         }
         if (display instanceof ShapelessCraftingRecipeDisplay shapeless) {
             List<SlotDisplay> ingredients = shapeless.ingredients();
+            for (SlotDisplay slot : ingredients) {
+                cells.add(firstStack(slot, context));
+            }
             int cols = Math.min(3, Math.max(1, ingredients.size()));
             int rows = (ingredients.size() + cols - 1) / cols;
-            return drawGrid(graphics, cols, rows, ingredients, shapeless.result(), context, x, y, width, font);
+            return drawGrid(graphics, cols, rows, cells, firstStack(shapeless.result(), context),
+                    x, y, width, font);
         }
         return y;
     }
 
-    private static int drawGrid(GuiGraphicsExtractor graphics, int cols, int rows, List<SlotDisplay> ingredients,
-                                SlotDisplay result, ContextMap context, int x, int y, int width, Font font) {
+    private static int drawGrid(GuiGraphicsExtractor graphics, int cols, int rows, List<ItemStack> cells,
+                                ItemStack result, int x, int y, int width, Font font) {
         int gridW = cols * SLOT;
         int gridH = rows * SLOT;
         int totalW = gridW + ARROW_W + SLOT;
@@ -97,18 +113,17 @@ public final class CraftingPageRenderer {
             int sx = gx + (i % cols) * SLOT;
             int sy = gy + (i / cols) * SLOT;
             drawSlot(graphics, sx, sy);
-            if (i < ingredients.size()) {
-                drawStack(graphics, font, firstStack(ingredients.get(i), context), sx, sy);
+            if (i < cells.size()) {
+                drawStack(graphics, font, cells.get(i), sx, sy);
             }
         }
 
-        int arrowY = gy + gridH / 2;
-        drawArrow(graphics, gx + gridW + 4, arrowY);
+        drawArrow(graphics, gx + gridW + 4, gy + gridH / 2);
 
         int rx = gx + gridW + ARROW_W;
         int ry = gy + (gridH - SLOT) / 2;
         drawSlot(graphics, rx, ry);
-        drawStack(graphics, font, firstStack(result, context), rx, ry);
+        drawStack(graphics, font, result, rx, ry);
 
         return gy + gridH + 4;
     }
@@ -119,7 +134,7 @@ public final class CraftingPageRenderer {
     }
 
     private static void drawStack(GuiGraphicsExtractor graphics, Font font, ItemStack stack, int x, int y) {
-        if (stack.isEmpty()) {
+        if (stack == null || stack.isEmpty()) {
             return;
         }
         graphics.item(stack, x + 1, y + 1);
