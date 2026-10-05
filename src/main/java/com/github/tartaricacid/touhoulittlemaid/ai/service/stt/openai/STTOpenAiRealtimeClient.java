@@ -55,6 +55,10 @@ public class STTOpenAiRealtimeClient implements STTClient {
      * completed 事件。收到最后一段后静默这么久没有新段，就认为识别结束。
      */
     private static final long SEGMENT_SILENCE_SECONDS = 2;
+    /**
+     * 发给服务端的音频尾部补的静音量（毫秒），见 appendTailSilence
+     */
+    private static final int TAIL_SILENCE_MILLIS = 1000;
     private static final ScheduledExecutorService TIMER = Executors.newSingleThreadScheduledExecutor(task -> {
         Thread thread = new Thread(task, "tlm-realtime-stt-timer");
         thread.setDaemon(true);
@@ -92,7 +96,7 @@ public class STTOpenAiRealtimeClient implements STTClient {
     }
 
     private void send(byte[] recorded, ResponseCallback<String> callback) {
-        byte[] pcm = resample(recorded, RECORD_RATE, API_RATE);
+        byte[] pcm = appendTailSilence(resample(recorded, RECORD_RATE, API_RATE), API_RATE, TAIL_SILENCE_MILLIS);
         CompletableFuture<String> finished = new CompletableFuture<>();
         AtomicBoolean done = new AtomicBoolean(false);
         List<String> segments = Collections.synchronizedList(new ArrayList<>());
@@ -199,6 +203,18 @@ public class STTOpenAiRealtimeClient implements STTClient {
         } catch (Exception e) {
             TouhouLittleMaid.LOGGER.warn("Invalid realtime event: {}", text);
         }
+    }
+
+    /**
+     * 尾部补静音。服务端自己断句的兼容服务（靠音频里的静默判定一句结束，比如
+     * SenseVoice 那种 min_silence=0.4s）如果录到最后一个字就停，最后一句永远
+     * 等不到静默，不会有 completed 事件，结果就是整段被丢掉。补 1 秒静音即可。
+     */
+    private static byte[] appendTailSilence(byte[] pcm, int rate, int millis) {
+        int bytes = rate * 2 * millis / 1000;
+        byte[] out = new byte[pcm.length + bytes];
+        System.arraycopy(pcm, 0, out, 0, pcm.length);
+        return out;
     }
 
     private static String joinSegments(List<String> segments) {
