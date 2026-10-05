@@ -49,10 +49,24 @@ import static net.minecraft.world.entity.ai.village.poi.PoiManager.Occupancy.ANY
 public class EntityFairy extends Monster implements RangedAttackMob, IHasPowerPoint {
     public static final Identifier ENTITY_ID = IdentifierUtil.modLoc("fairy");
     public static final ResourceKey<EntityType<?>> ENTITY_KEY = ResourceKey.create(Registries.ENTITY_TYPE, ENTITY_ID);
+    /**
+     * 注意 {@code notInPeaceful()} 不能少。
+     * <p>
+     * 1.21.1 及以前，"和平模式不刷怪"是靠 {@code Monster.checkMonsterSpawnRules} 里的
+     * {@code level.getDifficulty() != Difficulty.PEACEFUL} 兜住的，所以这里不用写。
+     * 26.3 把这套机制换成了实体类型上的开关 {@code EntityType#isAllowedInPeaceful()}：
+     * {@code SpawnPlacements.checkSpawnRules} 开头就是
+     * {@code if (!type.isAllowedInPeaceful() && 难度==PEACEFUL) return false;}，
+     * {@code Mob.checkDespawn()} 也用它决定"切到和平后是否立刻消失"
+     * （老的 {@code shouldDespawnInPeaceful()} 在 26.3 已删除）。
+     * 而 {@code EntityType.Builder} 里它默认是 true，原版每个敌对生物都显式调 {@code notInPeaceful()}
+     * （{@code EntityTypes} 里共 38 处）。漏了就会"和平模式下照样刷、切和平也不消失"。
+     */
     public static final EntityType<EntityFairy> TYPE = EntityType.Builder
             .<EntityFairy>of(EntityFairy::new, MobCategory.MONSTER)
             .sized(0.6f, 1.5f)
             .clientTrackingRange(10)
+            .notInPeaceful()
             .build(ENTITY_KEY);
 
     public static final String RICK = "rick";
