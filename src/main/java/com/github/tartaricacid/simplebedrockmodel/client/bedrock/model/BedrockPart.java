@@ -80,6 +80,21 @@ public class BedrockPart extends ModelPart {
         }
     }
 
+    /**
+     * 把本骨骼的「位移 + 旋转」作用到原点，得到模型空间里的位置。
+     * <p>
+     * 新版 simplebedrockmodel 删掉了这个方法（26.2 也没有），但 TLM 用它算女仆的牵绳连接点
+     * （{@code MaidMiscManager#getLegacyLeashOffset}），所以这里补回来 —— 实现与 1.21.1 完全一致。
+     */
+    public Vector3f getTranslateAndRotateVector3f() {
+        Quaternionf quaternionf = new Quaternionf();
+        if (this.xRot != 0.0F || this.yRot != 0.0F || this.zRot != 0.0F) {
+            quaternionf.rotateZYX(this.zRot, this.yRot, this.xRot);
+        }
+        Vector3f translation = new Vector3f(this.x / 16.0F + this.offsetX, this.y / 16.0F + this.offsetY, this.z / 16.0F + this.offsetZ);
+        return quaternionf.transform(translation);
+    }
+
     @Override
     public void compile(PoseStack.Pose pose, VertexConsumer consumer, int lightmap, int overlay, int color) {
         Matrix3f normal = pose.normal();

@@ -237,16 +237,12 @@ public class MaidMiscManager {
             if (arm != null) {
                 BedrockPart positioningModel = model.getArmPositioningModel(armSide);
                 Vector3f positionVec;
-                // TODO: getTranslateAndRotateVector3f() 在 BedrockPart 中已被移除
-                // 需要使用新的变换获取方式（可能是 x/y/z 字段 + rotationDegreesX/Y/Z 组合）
                 if (positioningModel != null) {
-                    // positionVec = positioningModel.getTranslateAndRotateVector3f();
-                    positionVec = new Vector3f(0, 0.5f, 0);  // 临时默认值
+                    positionVec = positioningModel.getTranslateAndRotateVector3f();
                 } else {
                     positionVec = new Vector3f(0, 0.5f, 0);
                 }
-                // Vector3f armVec = arm.getTranslateAndRotateVector3f();
-                Vector3f armVec = new Vector3f(0, 10, 0);  // 临时默认值
+                Vector3f armVec = arm.getTranslateAndRotateVector3f();
                 Vector3f pose = armVec.add(positionVec);
                 return new Vec3(pose.x() * renderEntityScale, (1.5 - pose.y) * renderEntityScale, pose.z() * renderEntityScale);
             }

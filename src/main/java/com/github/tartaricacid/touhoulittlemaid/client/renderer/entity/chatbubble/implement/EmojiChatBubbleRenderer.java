@@ -5,6 +5,7 @@ import com.github.tartaricacid.touhoulittlemaid.client.renderer.entity.EntityMai
 import com.github.tartaricacid.touhoulittlemaid.client.renderer.entity.chatbubble.EntityGraphics;
 import com.github.tartaricacid.touhoulittlemaid.client.renderer.entity.chatbubble.IChatBubbleRenderer;
 import com.github.tartaricacid.touhoulittlemaid.client.resource.listener.EmojiReloadListener;
+import com.github.tartaricacid.touhoulittlemaid.client.renderer.texture.GifTexture;
 import net.minecraft.resources.Identifier;
 
 public class EmojiChatBubbleRenderer implements IChatBubbleRenderer {
@@ -21,10 +22,9 @@ public class EmojiChatBubbleRenderer implements IChatBubbleRenderer {
             this.emoji = emojiRes.location();
             this.width = emojiRes.width();
             this.height = emojiRes.height();
-            // 如果是 gif 表情的话，需要手动注册
-            // FIXME 暂时删除 gif 动图功能
+            // gif 表情不会走原版纹理加载，需要手动注册成动态纹理才会动
             if (emojiRes.isGif()) {
-                //this.registerGifImage();
+                GifTexture.register(this.emoji);
             }
         } else {
             // 如果没有表情资源，就使用一个默认的空白资源
