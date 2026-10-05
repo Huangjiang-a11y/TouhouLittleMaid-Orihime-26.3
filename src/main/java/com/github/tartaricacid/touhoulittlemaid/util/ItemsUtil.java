@@ -18,6 +18,8 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.tags.TagKey;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;
@@ -318,5 +320,25 @@ public final class ItemsUtil {
     public static IndexModifier<ItemVariant> createIndexModifier(ResourceHandler<ItemVariant> handler) {
         return (index, resource, amount) ->
                 setStackInSlot(handler, index, resource.isBlank() || amount <= 0 ? ItemStack.EMPTY : resource.toStack(amount));
+    }
+
+    /**
+     * 判断物品是否匹配配置里写的"物品 id"或"#标签"
+     * （对应 1.21.1 EntityMaid#getConfigIngredient 的解析逻辑）
+     */
+    public static boolean matchItemOrTag(ItemStack stack, @Nullable String config) {
+        if (config == null || config.isEmpty()) {
+            return false;
+        }
+        if (config.startsWith("#")) {
+            Identifier id = Identifier.tryParse(config.substring(1));
+            return id != null && stack.is(TagKey.create(Registries.ITEM, id));
+        }
+        Identifier id = Identifier.tryParse(config);
+        if (id == null) {
+            return false;
+        }
+        Item item = BuiltInRegistries.ITEM.getValue(id);
+        return item != null && stack.is(item);
     }
 }

@@ -40,6 +40,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static com.github.tartaricacid.touhoulittlemaid.init.InitDataAttachment.MAID_NUM;
+import com.github.tartaricacid.touhoulittlemaid.config.subconfig.MaidConfig;
+import com.github.tartaricacid.touhoulittlemaid.util.ItemsUtil;
 
 /**
  * 无法归类的部分功能，全部放入此 Manager 里
@@ -76,7 +78,8 @@ public class MaidMiscManager {
     private InteractionResult tameMaid(ItemStack stack, Player player) {
         MaidNumAttachment cap = player.getAttachedOrCreate(MAID_NUM);
         if (cap.canAdd() || player.isCreative()) {
-            boolean isNormal = !maid.isTame() && stack.is(TagItem.MAID_TAMED_ITEM);
+            boolean isNormal = !maid.isTame()
+                    && (stack.is(TagItem.MAID_TAMED_ITEM) || ItemsUtil.matchItemOrTag(stack, MaidConfig.MAID_TAMED_ITEM.get()));
             boolean isNtr = stack.is(InitItems.OWNER_CONVERSION_TOOL);
             if (isNormal || isNtr) {
                 if (!player.isCreative()) {

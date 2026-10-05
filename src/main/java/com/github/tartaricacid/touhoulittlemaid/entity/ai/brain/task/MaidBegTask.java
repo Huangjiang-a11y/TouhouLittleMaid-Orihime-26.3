@@ -1,6 +1,8 @@
 package com.github.tartaricacid.touhoulittlemaid.entity.ai.brain.task;
 
 import com.github.tartaricacid.touhoulittlemaid.datagen.tag.TagItem;
+import com.github.tartaricacid.touhoulittlemaid.config.subconfig.MaidConfig;
+import com.github.tartaricacid.touhoulittlemaid.util.ItemsUtil;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.server.level.ServerLevel;
@@ -59,6 +61,7 @@ public class MaidBegTask extends Behavior<EntityMaid> {
     }
 
     private boolean holdTemptationItem(LivingEntity e) {
-        return e.getMainHandItem().is(TagItem.MAID_TEMPTATION_ITEM);
+        return e.getMainHandItem().is(TagItem.MAID_TEMPTATION_ITEM)
+                || ItemsUtil.matchItemOrTag(e.getMainHandItem(), MaidConfig.MAID_TEMPTATION_ITEM.get());
     }
 }

@@ -29,6 +29,14 @@ public final class MaidConfig {
 
     public static ModConfigSpec.IntValue FEED_ANIMAL_MAX_NUMBER;
     public static ModConfigSpec.BooleanValue MAID_CHANGE_MODEL;
+    /**
+     * 驯服女仆用的物品（物品 id，或带 # 前缀的标签），与 tag 叠加生效
+     */
+    public static ModConfigSpec.ConfigValue<String> MAID_TAMED_ITEM;
+    /**
+     * 引诱女仆用的物品（物品 id，或带 # 前缀的标签）
+     */
+    public static ModConfigSpec.ConfigValue<String> MAID_TEMPTATION_ITEM;
     public static ModConfigSpec.BooleanValue MAID_GOMOKU_OWNER_LIMIT;
     public static ModConfigSpec.IntValue OWNER_MAX_MAID_NUM;
     public static ModConfigSpec.DoubleValue REPLACE_ALLAY_PERCENT;
@@ -66,6 +74,14 @@ public final class MaidConfig {
         builder.comment("This is a global config that applies to all maids: Whether or not to display chat bubbles")
                 .translation(translateKey("global_maid_show_chat_bubble"));
         GLOBAL_MAID_SHOW_CHAT_BUBBLE = builder.define("GlobalMaidShowChatBubble", true);
+
+        builder.comment("The item that can tame maid", "Use the registered name of the item directly or write tag name with # as prefix")
+                .translation(translateKey("maid_tamed_item"));
+        MAID_TAMED_ITEM = builder.define("MaidTamedItem", "minecraft:cake");
+
+        builder.comment("The item that can temptation maid", "Use the registered name of the item directly or write tag name with # as prefix")
+                .translation(translateKey("maid_temptation_item"));
+        MAID_TEMPTATION_ITEM = builder.define("MaidTemptationItem", "minecraft:cake");
 
         builder.comment("When installed Curios mod, whether to enable maid curios slot support");
         ENABLE_MAID_CURIOS = builder.define("EnableMaidCurios", true);

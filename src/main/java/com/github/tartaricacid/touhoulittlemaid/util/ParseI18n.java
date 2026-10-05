@@ -2,7 +2,7 @@ package com.github.tartaricacid.touhoulittlemaid.util;
 
 import com.google.common.collect.Lists;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.resources.language.I18n;
+import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
@@ -27,7 +27,7 @@ public final class ParseI18n {
     }
 
     public static String getI18nValue(String strIn) {
-        return I18n.get(getI18nKey(strIn));
+        return Language.getInstance().getOrDefault(getI18nKey(strIn));
     }
 
     /**
