@@ -12,6 +12,7 @@ public final class CommonConfig {
         ChairConfig.init(builder);
         MiscConfig.init(builder);
         RenderConfig.init(builder);
+        VanillaConfig.init(builder);
         AIConfig.init(builder);
         CONFIG = builder.build();
         return CONFIG;

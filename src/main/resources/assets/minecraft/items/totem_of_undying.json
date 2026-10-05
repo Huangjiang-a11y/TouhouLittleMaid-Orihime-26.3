@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "minecraft:item/totem_of_undying",
+    "model": {
+      "type": "touhou_little_maid:replaceable_sprite",
+      "switch": "totem",
+      "enabled": "touhou_little_maid:item/life_point",
+      "disabled": "minecraft:item/totem_of_undying"
+    }
+  }
+}

@@ -5,6 +5,7 @@ import com.github.tartaricacid.touhoulittlemaid.block.BlockScarecrow;
 import com.github.tartaricacid.touhoulittlemaid.init.InitBlocks;
 import com.github.tartaricacid.touhoulittlemaid.init.InitEntities;
 import com.github.tartaricacid.touhoulittlemaid.init.InitItems;
+import com.github.tartaricacid.touhoulittlemaid.loot.RandomBoardStateFunction;
 import com.github.tartaricacid.touhoulittlemaid.loot.SetInitMaidOwnerFunction;
 import com.github.tartaricacid.touhoulittlemaid.util.IdentifierUtil;
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
@@ -67,6 +68,7 @@ public class LootTableGenerator {
     public static final ResourceKey<LootTable> SHRINE_MORE = getLootTableKey("chest/shrine_more");
 
     public static final ResourceKey<LootTable> SPAWN_BONUS = getLootTableKey("chest/spawn_bonus");
+    public static final ResourceKey<LootTable> RANDOM_BOARD_STATE = getLootTableKey("chest/random_board_state");
     public static final ResourceKey<LootTable> NORMAL_BACKPACK = getLootTableKey("chest/normal_backpack");
 
     public static final ResourceKey<LootTable> NORMAL_BAUBLE = getLootTableKey("chest/normal_bauble");
@@ -100,6 +102,12 @@ public class LootTableGenerator {
                     .add(LootItem.lootTableItem(InitItems.POWER_POINT)
                             .apply(SetItemCountFunction.setCount(uniform(1, 2))))
                     .add(EmptyLootItem.emptyItem().setWeight(2))));
+
+            consumer.accept(RANDOM_BOARD_STATE, LootTable.lootTable().withPool(LootPool.lootPool()
+                    .setRolls(intConst(1))
+                    .add(LootItem.lootTableItem(InitItems.GOMOKU_BOARD_STATE).apply(RandomBoardStateFunction.create().addTag("library")))
+                    .add(LootItem.lootTableItem(InitItems.CCHESS_BOARD_STATE).apply(RandomBoardStateFunction.create().addTag("library")))
+                    .add(LootItem.lootTableItem(InitItems.WCHESS_BOARD_STATE).apply(RandomBoardStateFunction.create().addTag("library")))));
 
             consumer.accept(FISHING_POWER_POINT, LootTable.lootTable().withPool(LootPool.lootPool()
                     .setRolls(intConst(1))

@@ -10,10 +10,12 @@ import com.github.tartaricacid.touhoulittlemaid.entity.projectile.EntityDanmaku;
 import com.github.tartaricacid.touhoulittlemaid.entity.projectile.EntityThrowPowerPoint;
 import com.github.tartaricacid.touhoulittlemaid.entity.projectile.MaidFishingHook;
 import com.github.tartaricacid.touhoulittlemaid.init.InitBlocks;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.ModelLayerRegistry;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
+import net.minecraft.world.entity.EntityTypes;
 
 public final class InitEntitiesRender {
     public static void onEntityRenderers() {
@@ -29,6 +31,11 @@ public final class InitEntitiesRender {
         EntityRenderers.register(EntitySit.TYPE, EntitySitRenderer::new);
         EntityRenderers.register(EntityBroom.TYPE, EntityBroomRender::new);
         EntityRenderers.register(MaidFishingHook.TYPE, MaidFishingHookRenderer::new);
+
+        // 原版替换（由 VanillaConfig 控制开关，与 1.21.1 一致）
+        EntityRendererRegistry.register(EntityTypes.SLIME, EntityYukkuriSlimeRender::new);
+        EntityRendererRegistry.register(EntityTypes.MAGMA_CUBE, EntityMarisaYukkuriSlimeRender::new);
+        EntityRendererRegistry.register(EntityTypes.EXPERIENCE_ORB, ReplaceExperienceOrbRenderer::new);
 
         BlockEntityRenderers.register(InitBlocks.ALTAR_BE, AltarRenderer::new);
         BlockEntityRenderers.register(InitBlocks.STATUE_BE, StatueRenderer::new);

@@ -2,6 +2,7 @@ package com.github.tartaricacid.touhoulittlemaid.client.event;
 
 import com.github.tartaricacid.touhoulittlemaid.client.renderer.item.ChairItemRenderer;
 import com.github.tartaricacid.touhoulittlemaid.client.renderer.item.GarageKitItemRenderer;
+import com.github.tartaricacid.touhoulittlemaid.client.renderer.item.ReplaceableSpriteSpecialRenderer;
 import net.minecraft.client.renderer.special.SpecialModelRenderers;
 
 public class RegisterSpecialModelEvent {
@@ -9,5 +10,6 @@ public class RegisterSpecialModelEvent {
         var mapper = SpecialModelRenderers.ID_MAPPER;
         mapper.put(ChairItemRenderer.CHAIR_ITEM_RENDERER, ChairItemRenderer.Unbaked.MAP_CODEC);
         mapper.put(GarageKitItemRenderer.GARAGE_KIT_ITEM_RENDERER, GarageKitItemRenderer.Unbaked.MAP_CODEC);
+        mapper.put(ReplaceableSpriteSpecialRenderer.ID, ReplaceableSpriteSpecialRenderer.Unbaked.MAP_CODEC);
     }
 }

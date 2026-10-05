@@ -2,6 +2,7 @@ package com.github.tartaricacid.touhoulittlemaid.init;
 
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.datagen.LootTableGenerator;
+import com.github.tartaricacid.touhoulittlemaid.loot.RandomBoardStateFunction;
 import com.github.tartaricacid.touhoulittlemaid.loot.SetInitMaidOwnerFunction;
 import com.mojang.serialization.MapCodec;
 import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
@@ -22,6 +23,9 @@ public class InitLootModifier {
         return Registry.register(BuiltInRegistries.LOOT_CONDITION_TYPE, Identifier.fromNamespaceAndPath(TouhouLittleMaid.MOD_ID, id), condition);
     }
 
+    public static final MapCodec<? extends LootItemConditionalFunction> BOARD_STATE_RANDOMLY =
+            registerFunction("board_state_randomly", RandomBoardStateFunction.CODEC);
+
     private static MapCodec<? extends LootItemConditionalFunction> registerFunction(String id, MapCodec<? extends LootItemConditionalFunction> function) {
         return Registry.register(BuiltInRegistries.LOOT_FUNCTION_TYPE, Identifier.fromNamespaceAndPath(TouhouLittleMaid.MOD_ID, id), function);
     }
@@ -37,6 +41,8 @@ public class InitLootModifier {
                         builder.withPool(LootPool.lootPool().add(NestedLootTable.lootTableReference(provider.getOrThrow(LootTableGenerator.SPAWN_BONUS))));
                     else if (key.equals(BuiltInLootTables.VILLAGE_TEMPLE))
                         builder.withPool(LootPool.lootPool().add(NestedLootTable.lootTableReference(provider.getOrThrow(LootTableGenerator.NORMAL_BAUBLE))));
+                    else if (key.equals(BuiltInLootTables.VILLAGE_CARTOGRAPHER))
+                        builder.withPool(LootPool.lootPool().add(NestedLootTable.lootTableReference(provider.getOrThrow(LootTableGenerator.RANDOM_BOARD_STATE))));
                     else if (key.equals(BuiltInLootTables.DESERT_PYRAMID))
                         builder.withPool(LootPool.lootPool().add(NestedLootTable.lootTableReference(provider.getOrThrow(LootTableGenerator.RARE_BAUBLE))));
                     else if (key.equals(BuiltInLootTables.JUNGLE_TEMPLE))
@@ -51,6 +57,7 @@ public class InitLootModifier {
                     else if (key.equals(BuiltInLootTables.STRONGHOLD_LIBRARY))
                         builder.withPool(LootPool.lootPool()
                                 .add(NestedLootTable.lootTableReference(provider.getOrThrow(LootTableGenerator.SHRINE_LESS)))
+                                .add(NestedLootTable.lootTableReference(provider.getOrThrow(LootTableGenerator.RANDOM_BOARD_STATE)))
                         );
                     else if (key.equals(BuiltInLootTables.ANCIENT_CITY))
                         builder.withPool(LootPool.lootPool().add(NestedLootTable.lootTableReference(provider.getOrThrow(LootTableGenerator.SHRINE_LESS))));
