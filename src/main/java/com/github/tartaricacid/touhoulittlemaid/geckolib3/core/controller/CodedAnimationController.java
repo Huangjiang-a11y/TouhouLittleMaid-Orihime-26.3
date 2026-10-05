@@ -208,7 +208,14 @@ public class CodedAnimationController<T extends AnimatableEntity<?>> implements 
     @Override
     @Deprecated
     public boolean blendRotation() {
-        // TODO: 仅临时缓解，未完全修复过渡动画混合问题。
+        // 旧版 geckolib 语义：本次旋转以"累加"方式参与混合（高并行动画在用），而不是覆盖。
+        //
+        // 过渡期间必须关掉累加，否则收尾过渡会残留在累加值里：
+        // AnimationProcessor 中 blendRotation 为真时走 pointData.add(rot)，而 pointData 保存的是
+        // 上一次的累加结果；过渡淡出时 rot 本身会衰减，但 pointData 不会跟着衰减，
+        // 于是骨骼会卡在最后一次的旋转上。关掉后退回 applyRotation（覆盖语义），
+        // 过渡就能正确地淡回默认姿态；起始过渡同理，从骨骼初始旋转淡入。
+        // 因此这里的状态判断不是"缓解"，而是累加混合在过渡期的正确处理。
         return blendRotation && animationPlayer.getState() == AnimationState.RUNNING;
     }
 

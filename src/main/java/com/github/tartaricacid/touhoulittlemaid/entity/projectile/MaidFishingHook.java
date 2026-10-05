@@ -350,8 +350,18 @@ public class MaidFishingHook extends Projectile {
         // 咬钩时间到了，收杆
         EntityMaid maid = getMaidOwner();
         int retrieveTime = Mth.nextInt(this.random, 2, 10);
-        // TODO：收杆应该有成功率，应该和好感度挂钩
         if (this.nibble <= retrieveTime && maid != null) {
+            // 收杆成功率与好感度等级挂钩：0 级 40%，每级 +20%（满级 100%）
+            float chance = Math.min(1.0F, 0.4F + 0.2F * maid.getFavorabilityManager().getLevel());
+            if (this.random.nextFloat() > chance) {
+                // 鱼跑了：结束这次咬钩，浮漂回到等待状态，下一轮还会重新咬钩
+                this.nibble = 0;
+                this.getEntityData().set(DATA_BITING, false);
+                level.playSound(null, this.getX(), this.getY(), this.getZ(),
+                        SoundEvents.FISHING_BOBBER_SPLASH, SoundSource.NEUTRAL,
+                        0.5F, 0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F));
+                return;
+            }
             ItemStack rodItem = maid.getMainHandItem();
             int rodDamage = this.retrieve(rodItem);
             this.hurtRod(maid, rodItem, rodDamage);

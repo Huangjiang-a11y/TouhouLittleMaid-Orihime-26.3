@@ -38,6 +38,11 @@ import java.util.function.Predicate;
 import static com.github.tartaricacid.touhoulittlemaid.datagen.EnchantmentKeys.getEnchantmentHolder;
 
 public class TaskTridentAttack implements IRangedAttackTask {
+    /**
+     * 原版三叉戟（TridentItem）的投掷基础伤害
+     */
+    private static final float TRIDENT_BASE_DAMAGE = 8.0F;
+
     public static final Identifier UID = IdentifierUtil.modLoc("trident_attack");
 
     @Override
@@ -129,8 +134,12 @@ public class TaskTridentAttack implements IRangedAttackTask {
             EnchantmentHelper.updateEnchantments(tridentItem, mutable -> mutable.set(loyalty, 0));
         }
 
-        // TODO：伤害和好感度挂钩
+        // 伤害和好感度挂钩：沿用 FavorabilityManager 里已有的等级攻击力表（2/3/4/6），
+        // 以 0 级为基准按比例放大原版三叉戟基础伤害（TridentItem 的 8.0）
+        double damageFactor = shooter.getFavorabilityManager().getAttackByLevel(shooter.getFavorabilityManager().getLevel())
+                / (double) shooter.getFavorabilityManager().getAttackByLevel(0);
         ThrownTrident thrownTrident = new ThrownTrident(shooter.level, shooter, tridentItem);
+        thrownTrident.setBaseDamage(TRIDENT_BASE_DAMAGE * damageFactor);
         double x = target.getX() - shooter.getX();
         double y = target.getEyeY() - shooter.getEyeY();
         double z = target.getZ() - shooter.getZ();
