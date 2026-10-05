@@ -15,12 +15,21 @@ import com.google.gson.JsonPrimitive;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.Mixer;
 import java.net.URI;
+import java.net.http.HttpClient;
 import java.net.http.WebSocket;
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * OpenAI Realtime 语音识别客户端（WebSocket）。
@@ -41,6 +50,24 @@ public class STTOpenAiRealtimeClient implements STTClient {
     private static final int API_RATE = 24000;
     private static final int CHUNK_BYTES = 32 * 1024;
     private static final long TIMEOUT_SECONDS = 45;
+    /**
+     * 服务端自己断句的服务（比如本地 SenseVoice 那种），一段录音会被切成多条
+     * completed 事件。收到最后一段后静默这么久没有新段，就认为识别结束。
+     */
+    private static final long SEGMENT_SILENCE_SECONDS = 2;
+    private static final ScheduledExecutorService TIMER = Executors.newSingleThreadScheduledExecutor(task -> {
+        Thread thread = new Thread(task, "tlm-realtime-stt-timer");
+        thread.setDaemon(true);
+        return thread;
+    });
+    /**
+     * 本地地址专用：不走代理。否则用户给 STT 配了代理（为了连 OpenAI 官方端点）
+     * 之后，ws://127.0.0.1 之类的本地服务会被代理掉，连不上。
+     */
+    private static final HttpClient LOCAL_HTTP_CLIENT = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(10))
+            .version(HttpClient.Version.HTTP_1_1)
+            .build();
 
     private final STTOpenAiRealtimeSite site;
     private volatile WebSocket socket;
@@ -68,6 +95,8 @@ public class STTOpenAiRealtimeClient implements STTClient {
         byte[] pcm = resample(recorded, RECORD_RATE, API_RATE);
         CompletableFuture<String> finished = new CompletableFuture<>();
         AtomicBoolean done = new AtomicBoolean(false);
+        List<String> segments = Collections.synchronizedList(new ArrayList<>());
+        AtomicReference<ScheduledFuture<?>> pendingFinish = new AtomicReference<>();
 
         WebSocket.Listener listener = new WebSocket.Listener() {
             private final StringBuilder buffer = new StringBuilder();
@@ -95,7 +124,7 @@ public class STTOpenAiRealtimeClient implements STTClient {
                 }
                 String text = buffer.toString();
                 buffer.setLength(0);
-                handleEvent(text, finished);
+                handleEvent(text, finished, segments, pendingFinish);
                 webSocket.request(1);
                 return null;
             }
@@ -107,7 +136,7 @@ public class STTOpenAiRealtimeClient implements STTClient {
         };
 
         URI uri = URI.create(this.endpoint());
-        var builder = STTSite.STT_HTTP_CLIENT.newWebSocketBuilder().connectTimeout(java.time.Duration.ofSeconds(10));
+        var builder = clientFor(uri).newWebSocketBuilder().connectTimeout(Duration.ofSeconds(10));
         if (!this.site.getSecretKey().isBlank()) {
             builder.header("Authorization", "Bearer " + this.site.getSecretKey());
         }
@@ -134,7 +163,8 @@ public class STTOpenAiRealtimeClient implements STTClient {
         });
     }
 
-    private void handleEvent(String text, CompletableFuture<String> finished) {
+    private void handleEvent(String text, CompletableFuture<String> finished, List<String> segments,
+                             AtomicReference<ScheduledFuture<?>> pendingFinish) {
         try {
             JsonElement element = JsonParser.parseString(text);
             if (!element.isJsonObject()) {
@@ -146,8 +176,19 @@ public class STTOpenAiRealtimeClient implements STTClient {
                 return;
             }
             switch (typeElement.getAsString()) {
-                case "conversation.item.input_audio_transcription.completed" ->
-                        finished.complete(getString(event, "transcript", ""));
+                case "conversation.item.input_audio_transcription.completed" -> {
+                    String transcript = getString(event, "transcript", "").trim();
+                    if (!transcript.isEmpty()) {
+                        segments.add(transcript);
+                        // 服务端自己断句时，后面可能还有别的段，静默一段时间再收工
+                        ScheduledFuture<?> previous = pendingFinish.getAndSet(TIMER.schedule(
+                                () -> finished.complete(joinSegments(segments)),
+                                SEGMENT_SILENCE_SECONDS, TimeUnit.SECONDS));
+                        if (previous != null) {
+                            previous.cancel(false);
+                        }
+                    }
+                }
                 case "conversation.item.input_audio_transcription.failed" ->
                         finished.completeExceptionally(new Throwable(errorMessage(event, "Transcription failed")));
                 case "error" ->
@@ -158,6 +199,27 @@ public class STTOpenAiRealtimeClient implements STTClient {
         } catch (Exception e) {
             TouhouLittleMaid.LOGGER.warn("Invalid realtime event: {}", text);
         }
+    }
+
+    private static String joinSegments(List<String> segments) {
+        synchronized (segments) {
+            return String.join("", segments);
+        }
+    }
+
+    /**
+     * 本地（回环）地址不走代理，其余地址用带代理配置的共享客户端
+     */
+    private static HttpClient clientFor(URI uri) {
+        String host = uri.getHost();
+        if (host != null) {
+            String lower = host.toLowerCase();
+            if ("127.0.0.1".equals(lower) || "localhost".equals(lower)
+                    || "::1".equals(lower) || "[::1]".equals(lower)) {
+                return LOCAL_HTTP_CLIENT;
+            }
+        }
+        return STTSite.STT_HTTP_CLIENT;
     }
 
     private static String errorMessage(JsonObject event, String fallback) {
