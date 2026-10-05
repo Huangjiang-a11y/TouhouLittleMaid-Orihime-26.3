@@ -43,6 +43,11 @@ import java.util.concurrent.atomic.AtomicReference;
  * <p>
  * 注意：麦克风录制用的是 16kHz，而 Realtime 的 audio/pcm 默认 24000，
  * 所以这里做一次 16k -> 24k 线性插值重采样再发。
+ * <p>
+ * 收尾策略是自适应的：服务端回 session.updated（承认手工模式，等于官方行为，
+ * 一次 commit 只出一条 completed）时收到第一条就收工；没有回执的兼容服务
+ * （自己按音频静默断句，会切出多条 completed）则等 SEGMENT_SILENCE_SECONDS
+ * 静默，并把多段拼接起来。
  */
 public class STTOpenAiRealtimeClient implements STTClient {
     private static final AudioFormat RECORD_FORMAT = new AudioFormat(16000, 16, 1, true, false);
@@ -101,6 +106,10 @@ public class STTOpenAiRealtimeClient implements STTClient {
         AtomicBoolean done = new AtomicBoolean(false);
         List<String> segments = Collections.synchronizedList(new ArrayList<>());
         AtomicReference<ScheduledFuture<?>> pendingFinish = new AtomicReference<>();
+        // 服务端是否承认了我们的手工模式会话（回了 session.updated）。
+        // 承认 = 一次 commit 恰好一条 completed = 官方行为，收到第一条就能收工；
+        // 不承认（兼容服务自己断句）= 一段录音会有多条 completed，必须等静默。
+        AtomicBoolean manualModeAcked = new AtomicBoolean(false);
 
         WebSocket.Listener listener = new WebSocket.Listener() {
             private final StringBuilder buffer = new StringBuilder();
@@ -128,7 +137,7 @@ public class STTOpenAiRealtimeClient implements STTClient {
                 }
                 String text = buffer.toString();
                 buffer.setLength(0);
-                handleEvent(text, finished, segments, pendingFinish);
+                handleEvent(text, finished, segments, pendingFinish, manualModeAcked);
                 webSocket.request(1);
                 return null;
             }
@@ -168,7 +177,7 @@ public class STTOpenAiRealtimeClient implements STTClient {
     }
 
     private void handleEvent(String text, CompletableFuture<String> finished, List<String> segments,
-                             AtomicReference<ScheduledFuture<?>> pendingFinish) {
+                             AtomicReference<ScheduledFuture<?>> pendingFinish, AtomicBoolean manualModeAcked) {
         try {
             JsonElement element = JsonParser.parseString(text);
             if (!element.isJsonObject()) {
@@ -180,17 +189,42 @@ public class STTOpenAiRealtimeClient implements STTClient {
                 return;
             }
             switch (typeElement.getAsString()) {
+                case "session.updated" -> {
+                    if (manualModeAcked.compareAndSet(false, true)) {
+                        TouhouLittleMaid.LOGGER.info(
+                                "[STT] OpenAI Realtime：服务端回了 session.updated，手工模式有效（收到首段即收工）");
+                    }
+                }
                 case "conversation.item.input_audio_transcription.completed" -> {
                     String transcript = getString(event, "transcript", "").trim();
-                    if (!transcript.isEmpty()) {
+                    if (transcript.isEmpty()) {
+                        return;
+                    }
+                    if (finished.isDone()) {
+                        // 只有"承认了手工模式却还在自己断句"的服务会走到这里：回调已经发过，
+                        // 这一段接不上了。打出来，方便定位该不该退回静默窗口模式。
+                        TouhouLittleMaid.LOGGER.warn(
+                                "OpenAI realtime STT: 收到晚到的分段，已丢弃：{}", transcript);
+                        return;
+                    }
+                    if (manualModeAcked.get() && segments.isEmpty()) {
+                        // 官方行为：一次 commit 只产生一条 completed，立刻收工，不等静默
                         segments.add(transcript);
-                        // 服务端自己断句时，后面可能还有别的段，静默一段时间再收工
-                        ScheduledFuture<?> previous = pendingFinish.getAndSet(TIMER.schedule(
-                                () -> finished.complete(joinSegments(segments)),
-                                SEGMENT_SILENCE_SECONDS, TimeUnit.SECONDS));
-                        if (previous != null) {
-                            previous.cancel(false);
-                        }
+                        finished.complete(joinSegments(segments));
+                        return;
+                    }
+                    segments.add(transcript);
+                    if (segments.size() == 1) {
+                        TouhouLittleMaid.LOGGER.info(
+                                "[STT] OpenAI Realtime：未收到 session.updated，按服务端自行断句处理（静默 {} 秒收尾）",
+                                SEGMENT_SILENCE_SECONDS);
+                    }
+                    // 服务端自己断句时，后面可能还有别的段，静默一段时间再收工
+                    ScheduledFuture<?> previous = pendingFinish.getAndSet(TIMER.schedule(
+                            () -> finished.complete(joinSegments(segments)),
+                            SEGMENT_SILENCE_SECONDS, TimeUnit.SECONDS));
+                    if (previous != null) {
+                        previous.cancel(false);
                     }
                 }
                 case "conversation.item.input_audio_transcription.failed" ->
