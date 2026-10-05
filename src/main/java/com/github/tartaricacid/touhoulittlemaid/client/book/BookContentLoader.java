@@ -20,9 +20,11 @@ import java.util.Optional;
 
 /**
  * 自包含书壳的加载器（不依赖 Patchouli）。
- * 按 Patchouli 的约定读两处：
- *   data/<ns>/patchouli_books/<book>/book.json      书定义（数据包）
- *   assets/<ns>/patchouli_books/<book>/<lang>/...   分类 / 条目 / 模板（客户端资源）
+ * 全部走客户端资源管理器（assets 根）：
+ *   <ns>:patchouli_books/&lt;book&gt;/book.json                      书定义（assets 里放了一份副本，data 里的那份给 Patchouli 用）
+ *   <ns>:patchouli_books/&lt;book&gt;/&lt;lang&gt;/{categories,entries}  分类 / 条目
+ * 注意：getResource / listResources 的 path 是「命名空间内的路径」，
+ * 绝不能带 assets/ 或 data/ 前缀（带了会被当成命名空间，永远找不到 → 书空白）。
  */
 public final class BookContentLoader {
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -38,48 +40,47 @@ public final class BookContentLoader {
     public static BookContent load(Identifier bookId, String lang) {
         ResourceManager manager = Minecraft.getInstance().getResourceManager();
         String namespace = bookId.getNamespace();
-        String book = bookId.getPath();
-        JsonObject definition = readJson(manager,
-                "data/" + namespace + "/patchouli_books/" + book + "/book.json",
-                "assets/" + namespace + "/patchouli_books/" + book + "/book.json");
+        String root = "patchouli_books/" + bookId.getPath() + "/";
+        JsonObject definition = readJson(manager, Identifier.fromNamespaceAndPath(namespace, root + "book.json"));
         if (definition == null) {
+            LOGGER.warn("[TLM Book] 找不到书定义 {}{}book.json", namespace, ":" + root);
             definition = new JsonObject();
         }
-        List<BookCategory> categories = loadCategories(manager, namespace, book, lang);
-        List<BookEntry> entries = loadEntries(manager, namespace, book, lang);
-        if (categories.isEmpty() && entries.isEmpty() && !FALLBACK_LANG.equals(lang)) {
-            // 内容只在 en_us 目录里，其余语言靠 lang key 本地化
-            categories = loadCategories(manager, namespace, book, FALLBACK_LANG);
-            entries = loadEntries(manager, namespace, book, FALLBACK_LANG);
+        String usedLang = lang;
+        List<BookCategory> categories = loadCategories(manager, namespace, root, usedLang);
+        List<BookEntry> entries = loadEntries(manager, namespace, root, usedLang);
+        if (categories.isEmpty() && entries.isEmpty() && !FALLBACK_LANG.equals(usedLang)) {
+            // 内容只放在 en_us 目录里，其它语言靠条目内的 lang key 本地化
+            usedLang = FALLBACK_LANG;
+            categories = loadCategories(manager, namespace, root, usedLang);
+            entries = loadEntries(manager, namespace, root, usedLang);
         }
+        LOGGER.info("[TLM Book] 载入 {} (lang={}) 分类 {} 个 / 条目 {} 个", bookId, usedLang, categories.size(), entries.size());
         return new BookContent(bookId.toString(), definition, categories, entries);
     }
 
-    private static List<BookCategory> loadCategories(ResourceManager manager, String namespace, String book, String lang) {
+    private static List<BookCategory> loadCategories(ResourceManager manager, String namespace, String root, String lang) {
         List<BookCategory> out = new ArrayList<>();
-        for (Map.Entry<String, JsonObject> entry : readDir(manager, dir(namespace, book, lang, "categories")).entrySet()) {
+        for (Map.Entry<String, JsonObject> entry : readDir(manager, namespace, root + lang + "/categories").entrySet()) {
             out.add(BookCategory.fromJson(namespace + ":" + entry.getKey(), entry.getValue()));
         }
         return out;
     }
 
-    private static List<BookEntry> loadEntries(ResourceManager manager, String namespace, String book, String lang) {
+    private static List<BookEntry> loadEntries(ResourceManager manager, String namespace, String root, String lang) {
         List<BookEntry> out = new ArrayList<>();
-        for (Map.Entry<String, JsonObject> entry : readDir(manager, dir(namespace, book, lang, "entries")).entrySet()) {
+        for (Map.Entry<String, JsonObject> entry : readDir(manager, namespace, root + lang + "/entries").entrySet()) {
             out.add(BookEntry.fromJson(namespace + ":" + entry.getKey(), entry.getValue()));
         }
         return out;
     }
 
-    private static String dir(String namespace, String book, String lang, String kind) {
-        return "assets/" + namespace + "/patchouli_books/" + book + "/" + lang + "/" + kind;
-    }
-
     /** 读一个目录下所有 .json，返回 相对路径(不含 .json) -> json。 */
-    private static Map<String, JsonObject> readDir(ResourceManager manager, String dir) {
+    private static Map<String, JsonObject> readDir(ResourceManager manager, String namespace, String dir) {
         Map<String, JsonObject> out = new LinkedHashMap<>();
         try {
-            Map<Identifier, Resource> found = manager.listResources(dir, id -> id.getPath().endsWith(".json"));
+            Map<Identifier, Resource> found = manager.listResources(dir,
+                    id -> id.getNamespace().equals(namespace) && id.getPath().endsWith(".json"));
             for (Map.Entry<Identifier, Resource> entry : found.entrySet()) {
                 JsonObject json = readJson(entry.getValue());
                 if (json == null) {
@@ -95,21 +96,9 @@ public final class BookContentLoader {
         return out;
     }
 
-    private static JsonObject readJson(ResourceManager manager, String... candidates) {
-        for (String candidate : candidates) {
-            Identifier id = Identifier.tryParse(candidate);
-            if (id == null) {
-                continue;
-            }
-            Optional<Resource> resource = manager.getResource(id);
-            if (resource.isPresent()) {
-                JsonObject json = readJson(resource.get());
-                if (json != null) {
-                    return json;
-                }
-            }
-        }
-        return null;
+    private static JsonObject readJson(ResourceManager manager, Identifier id) {
+        Optional<Resource> resource = manager.getResource(id);
+        return resource.map(BookContentLoader::readJson).orElse(null);
     }
 
     private static JsonObject readJson(Resource resource) {
