@@ -826,7 +826,7 @@
   "config.touhou_little_maid.global_ai.stt_enable": "Enable STT",
   "config.touhou_little_maid.global_ai.stt_enable.tooltip": "Whether or not to enable AI STT",
   "config.touhou_little_maid.global_ai.stt_type": "STT Type",
-  "config.touhou_little_maid.global_ai.stt_type.tooltip": "STT Type, currently support player2 app, aliyun or siliconflow",
+  "config.touhou_little_maid.global_ai.stt_type.tooltip": "STT type, currently supports player2 app, Aliyun, SiliconFlow, Tencent Cloud and OpenAI",
   "config.touhou_little_maid.global_ai.stt_microphone": "STT Microphone",
   "config.touhou_little_maid.global_ai.stt_microphone.tooltip": "The name of the microphone device, empty is default",
   "config.touhou_little_maid.global_ai.stt_proxy_address": "STT Proxy Address",
