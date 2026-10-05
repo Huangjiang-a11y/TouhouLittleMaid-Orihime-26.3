@@ -41,8 +41,9 @@ import java.util.concurrent.atomic.AtomicReference;
  * 4. 发 input_audio_buffer.commit；
  * 5. 收 conversation.item.input_audio_transcription.completed 里的 transcript。
  * <p>
- * 注意：麦克风录制用的是 16kHz，而 Realtime 的 audio/pcm 默认 24000，
- * 所以这里做一次 16k -> 24k 线性插值重采样再发。
+ * 注意：麦克风录制用的就是 16kHz，这里直接把 rate 声明成 16000 发裸 PCM
+ * （官方 WebSockets 指南里 audio/pcm 明确支持 16000 一档），本地不重采样、
+ * 服务端也不用再把 24k 降到 16k。resample 保留，万一以后录制采样率变了还能用。
  * <p>
  * 收尾策略是自适应的：服务端回 session.updated（承认手工模式，等于官方行为，
  * 一次 commit 只出一条 completed）时收到第一条就收工；没有回执的兼容服务
@@ -52,7 +53,12 @@ import java.util.concurrent.atomic.AtomicReference;
 public class STTOpenAiRealtimeClient implements STTClient {
     private static final AudioFormat RECORD_FORMAT = new AudioFormat(16000, 16, 1, true, false);
     private static final int RECORD_RATE = 16000;
-    private static final int API_RATE = 24000;
+    /**
+     * 发给服务端的采样率，必须和 append 进去的字节一致（不一致 = 服务端按错误速率解码
+     * = 语速快/慢 1.5 倍 = 识别糊掉）。麦克风录制就是 16kHz，官方 audio/pcm 也支持
+     * 16000 一档，所以直发 16k：本地零重采样，服务端也不用再降采样。
+     */
+    private static final int API_RATE = 16000;
     private static final int CHUNK_BYTES = 32 * 1024;
     private static final long TIMEOUT_SECONDS = 45;
     /**
