@@ -826,7 +826,7 @@
   "config.touhou_little_maid.global_ai.stt_enable": "Enable STT",
   "config.touhou_little_maid.global_ai.stt_enable.tooltip": "Whether or not to enable AI STT",
   "config.touhou_little_maid.global_ai.stt_type": "STT Type",
-  "config.touhou_little_maid.global_ai.stt_type.tooltip": "STT type, currently supports player2 app, Aliyun, SiliconFlow, Tencent Cloud and OpenAI",
+  "config.touhou_little_maid.global_ai.stt_type.tooltip": "STT type, currently supports player2 app, Aliyun, SiliconFlow, Tencent Cloud, OpenAI and OpenAI Realtime",
   "config.touhou_little_maid.global_ai.stt_microphone": "STT Microphone",
   "config.touhou_little_maid.global_ai.stt_microphone.tooltip": "The name of the microphone device, empty is default",
   "config.touhou_little_maid.global_ai.stt_proxy_address": "STT Proxy Address",
@@ -1165,5 +1165,6 @@
   "config.touhou_little_maid.vanilla.replace_totem_texture.tooltip": "Whether to replace the vanilla totem texture with the life point",
   "config.touhou_little_maid.vanilla.replace_xp_bottle_texture": "Replace XP Bottle Texture",
   "config.touhou_little_maid.vanilla.replace_xp_bottle_texture.tooltip": "Whether to replace the vanilla bottle of xp texture with the point items",
-  "commands.touhou_little_maid.roulette.success": "Played animation \\\"%1$s\\\" on %2$s maid(s)"
+  "commands.touhou_little_maid.roulette.success": "Played animation \\\"%1$s\\\" on %2$s maid(s)",
+  "ai.touhou_little_maid.chat.site.openai_realtime.name": "OpenAI Realtime"
 }

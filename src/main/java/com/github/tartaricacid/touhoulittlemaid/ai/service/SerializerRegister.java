@@ -7,6 +7,7 @@ import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.openai.LLMOpenAIS
 import com.github.tartaricacid.touhoulittlemaid.ai.service.stt.STTSite;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.stt.aliyun.STTAliyunSite;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.stt.player2.STTPlayer2Site;
+import com.github.tartaricacid.touhoulittlemaid.ai.service.stt.openai.STTOpenAiRealtimeSite;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.stt.openai.STTOpenAiSite;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.stt.siliconflow.STTSiliconflowSite;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.stt.tencent.STTTencentSite;
@@ -37,6 +38,7 @@ public final class SerializerRegister {
         register.register(ServiceType.STT, STTAliyunSite.API_TYPE, new STTAliyunSite.Serializer());
         register.register(ServiceType.STT, STTSiliconflowSite.API_TYPE, new STTSiliconflowSite.Serializer());
         register.register(ServiceType.STT, STTOpenAiSite.API_TYPE, new STTOpenAiSite.Serializer());
+        register.register(ServiceType.STT, STTOpenAiRealtimeSite.API_TYPE, new STTOpenAiRealtimeSite.Serializer());
         register.register(ServiceType.STT, STTTencentSite.API_TYPE, new STTTencentSite.Serializer());
 
         register.register(ServiceType.TTS, TTSSystemSite.API_TYPE, new TTSSystemSite.Serializer());
