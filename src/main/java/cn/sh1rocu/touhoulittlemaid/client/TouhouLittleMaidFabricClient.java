@@ -45,6 +45,7 @@ public class TouhouLittleMaidFabricClient implements ClientModInitializer {
 
         ClientReloadListenerRegistry.onRegisterClientReloadListeners();
         RegisterSpecialModelEvent.registerSpecialModelRenderers();
+        RegisterSpecialModelEvent.registerItemModelProperties();
 
         MaidPackLoaderEvent.LEGACY.register(HardcodedAnimation::onMaidPackLoader);
 

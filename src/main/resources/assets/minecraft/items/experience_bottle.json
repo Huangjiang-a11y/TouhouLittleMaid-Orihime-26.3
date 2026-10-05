@@ -1,12 +1,14 @@
 {
   "model": {
-    "type": "minecraft:special",
-    "base": "minecraft:item/experience_bottle",
-    "model": {
-      "type": "touhou_little_maid:replaceable_sprite",
-      "switch": "xp_bottle",
-      "enabled": "touhou_little_maid:item/point_item",
-      "disabled": "minecraft:item/experience_bottle"
+    "type": "minecraft:condition",
+    "property": "touhou_little_maid:replace_xp_bottle_texture",
+    "on_true": {
+      "type": "minecraft:model",
+      "model": "touhou_little_maid:item/point_item"
+    },
+    "on_false": {
+      "type": "minecraft:model",
+      "model": "minecraft:item/experience_bottle"
     }
   }
 }

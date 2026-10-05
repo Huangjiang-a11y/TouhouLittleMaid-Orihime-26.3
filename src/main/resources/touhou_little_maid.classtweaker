@@ -63,3 +63,5 @@ accessible class net/minecraft/client/renderer/gizmos/DrawableGizmoPrimitives$Te
 accessible class net/minecraft/client/renderer/gizmos/DrawableGizmoPrimitives$Group
 
 inject-interface net/minecraft/client/renderer/entity/state/EntityRenderState cn/sh1rocu/touhoulittlemaid/api/mixin/IEntityRenderStatePartialTick
+
+accessible field net/minecraft/client/renderer/item/properties/conditional/ConditionalItemModelProperties ID_MAPPER Lnet/minecraft/util/ExtraCodecs$LateBoundIdMapper; # 物品模型 condition 属性注册表
