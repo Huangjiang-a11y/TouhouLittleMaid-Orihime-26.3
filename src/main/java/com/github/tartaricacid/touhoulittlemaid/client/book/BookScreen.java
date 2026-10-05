@@ -204,7 +204,7 @@ public class BookScreen extends Screen {
             case "image" -> y = this.renderImage(graphics, page, x, y, width);
             case "spotlight" -> y = this.renderSpotlight(graphics, page, x, y, width);
             case "item" -> y = this.renderItemPage(graphics, page, x, y, width);
-            case "entity" -> y = EntityPageRenderer.render(graphics, page, x, y, width, this.font, TEXT_COLOR, this.clickRegions);
+            case "entity" -> y = EntityPageRenderer.render(graphics, page, x, y, width);
             case "multiblock" -> y = MultiblockPageRenderer.render(graphics, page, x, y, width, this.font, TEXT_COLOR);
             case "crafting" -> {
                 CraftingPageRenderer.render(graphics, page, x, y, width, this.font, TEXT_COLOR);
@@ -411,8 +411,13 @@ public class BookScreen extends Screen {
                 drawH = Math.max(1, Math.round(texH * scale));
             }
             int drawX = x + (width - drawW) / 2;
-            graphics.fill(drawX - 1, y - 1, drawX + drawW + 1, y + drawH + 1, 0xFF8A8A85);
-            graphics.fill(drawX, y, drawX + drawW, y + drawH, 0xFFFFFFFF);
+            // 不要再铺白底：书插图（256x256）四周本来就是透明边距（内容只在左上 200x200），
+            // 铺白底会变成一大块白板，看着就像"缩放不对"。只描一圈细边即可。
+            int frame = 0x55808080;
+            graphics.fill(drawX - 1, y - 1, drawX + drawW + 1, y, frame);
+            graphics.fill(drawX - 1, y + drawH, drawX + drawW + 1, y + drawH + 1, frame);
+            graphics.fill(drawX - 1, y, drawX, y + drawH, frame);
+            graphics.fill(drawX + drawW, y, drawX + drawW + 1, y + drawH, frame);
             graphics.blit(RenderPipelines.GUI_TEXTURED, id, drawX, y, 0.0F, 0.0F,
                     drawW, drawH, texW, texH, texW, texH);
             y += drawH + 6;

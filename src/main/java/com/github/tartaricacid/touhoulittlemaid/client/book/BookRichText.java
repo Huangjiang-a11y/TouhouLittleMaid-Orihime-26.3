@@ -3,12 +3,12 @@ package com.github.tartaricacid.touhoulittlemaid.client.book;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 书的富文本：把 Patchouli 的 <code>$(...)</code> 宏解析成「带样式的行」，负责折行、绘制，
@@ -23,9 +23,53 @@ public final class BookRichText {
     private static final int MAX_CACHE = 256;
     private static final Map<String, BookRichText> CACHE = new HashMap<>();
 
-    /** 一段统一样式的文字；linkEntry / linkUrl 至多一个非空表示可点击。 */
-    private record Span(String text, int color, boolean bold, boolean underline, boolean italic, boolean strike,
-                        String linkEntry, String linkUrl) {
+    /**
+     * 一段统一样式的文字；linkEntry / linkUrl 至多一个非空表示可点击。
+     * <p>
+     * 注意：排版时会把**连续同样式的字符合并成一个 span**（见 Builder#addAtom），
+     * 否则中文正文会退化成「一个字一个 span」，每帧几百次 text() 提交，白白拖慢帧率。
+     * Component 在这里预先建好，渲染时直接用。
+     */
+    private static final class Span {
+        private final String text;
+        private final int color;
+        private final boolean bold;
+        private final boolean underline;
+        private final boolean italic;
+        private final boolean strike;
+        private final String linkEntry;
+        private final String linkUrl;
+        private final Component component;
+
+        private Span(String text, int color, boolean bold, boolean underline, boolean italic, boolean strike,
+                     String linkEntry, String linkUrl) {
+            this.text = text;
+            this.color = color;
+            this.bold = bold;
+            this.underline = underline;
+            this.italic = italic;
+            this.strike = strike;
+            this.linkEntry = linkEntry;
+            this.linkUrl = linkUrl;
+            this.component = Component.literal(text).withStyle(style -> style
+                    .withColor(color)
+                    .withBold(bold)
+                    .withUnderlined(underline)
+                    .withItalic(italic)
+                    .withStrikethrough(strike));
+        }
+
+        private boolean sameStyle(int color, boolean bold, boolean underline, boolean italic, boolean strike,
+                                  String linkEntry, String linkUrl) {
+            return this.color == color && this.bold == bold && this.underline == underline
+                    && this.italic == italic && this.strike == strike
+                    && Objects.equals(this.linkEntry, linkEntry) && Objects.equals(this.linkUrl, linkUrl);
+        }
+
+        private Span concat(String more) {
+            return new Span(this.text + more, this.color, this.bold, this.underline, this.italic, this.strike,
+                    this.linkEntry, this.linkUrl);
+        }
     }
 
     /** 一行：若干 span + 缩进。 */
@@ -69,20 +113,13 @@ public final class BookRichText {
         for (Line line : this.lines) {
             int cx = x + line.indent();
             for (Span span : line.spans()) {
-                String text = span.text();
-                if (text.isEmpty()) {
+                if (span.text.isEmpty()) {
                     continue;
                 }
-                MutableComponent component = Component.literal(text).withStyle(style -> style
-                        .withColor(span.color())
-                        .withBold(span.bold())
-                        .withUnderlined(span.underline())
-                        .withItalic(span.italic())
-                        .withStrikethrough(span.strike()));
-                graphics.text(font, component, cx, cy, span.color(), false);
-                int w = font.width(text);
-                if (clicks != null && (span.linkEntry() != null || span.linkUrl() != null)) {
-                    clicks.add(new ClickRegion(cx, cy, cx + w, cy + 9, span.linkEntry(), span.linkUrl()));
+                graphics.text(font, span.component, cx, cy, span.color, false);
+                int w = font.width(span.text);
+                if (clicks != null && (span.linkEntry != null || span.linkUrl != null)) {
+                    clicks.add(new ClickRegion(cx, cy, cx + w, cy + 9, span.linkEntry, span.linkUrl));
                 }
                 cx += w;
             }
@@ -163,6 +200,15 @@ public final class BookRichText {
             }
             if (this.line.isEmpty() && atom.isBlank()) {
                 return;
+            }
+            if (!this.line.isEmpty()) {
+                Span last = this.line.get(this.line.size() - 1);
+                if (last.sameStyle(this.color, this.bold, this.underline, this.italic, this.strike,
+                        this.linkEntry, this.linkUrl)) {
+                    this.line.set(this.line.size() - 1, last.concat(atom));
+                    this.lineWidth += w;
+                    return;
+                }
             }
             this.line.add(new Span(atom, this.color, this.bold, this.underline, this.italic, this.strike,
                     this.linkEntry, this.linkUrl));
