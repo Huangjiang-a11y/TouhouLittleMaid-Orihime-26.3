@@ -95,9 +95,12 @@ public class STTOpenAiRealtimeClient implements STTClient {
     public void startRecord(STTConfig config, ResponseCallback<String> callback) {
         Mixer.Info info = MicrophoneManager.getMicrophoneInfo(RECORD_FORMAT);
         if (info == null) {
+            TouhouLittleMaid.LOGGER.error("[STT] 找不到可用麦克风设备（Android/FCL 上 javax.sound 可能枚举不到任何设备），站点 URL={}",
+                    this.site.url());
             callback.onFailure(null, new Throwable("No suitable microphone found"), ErrorCode.MICROPHONE_NOT_FOUND);
             return;
         }
+        TouhouLittleMaid.LOGGER.info("[STT] 开始录音，麦克风设备={}，站点 URL={}", info.getName(), this.site.url());
         MicrophoneManager.startRecord(info.getName(), RECORD_FORMAT, data -> send(data, callback));
     }
 

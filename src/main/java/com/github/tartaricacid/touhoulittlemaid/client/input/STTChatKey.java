@@ -1,5 +1,6 @@
 package com.github.tartaricacid.touhoulittlemaid.client.input;
 
+import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.entity.STTCallback;
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.site.AvailableSites;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.stt.STTConfig;
@@ -35,17 +36,22 @@ public class STTChatKey {
 
     public static void onSttChatPress(int action, KeyEvent event) {
         if (keyIsMatch(event)) {
+            TouhouLittleMaid.LOGGER.info("[STT] 按键命中（按键 {}", STT_CHAT_KEY.getTranslatedKeyMessage().getString());
             if (!AIConfig.LLM_ENABLED.get()) {
+                TouhouLittleMaid.LOGGER.info("[STT] 跳过：LLMEnabled=false");
                 return;
             }
             if (!AIConfig.STT_ENABLED.get()) {
+                TouhouLittleMaid.LOGGER.info("[STT] 跳过：STTEnabled=false");
                 return;
             }
             LocalPlayer player = Minecraft.getInstance().player;
             if (player == null || player.isSpectator()) {
+                TouhouLittleMaid.LOGGER.info("[STT] 跳过：玩家为空或旁观者");
                 return;
             }
             if (!isInGame()) {
+                TouhouLittleMaid.LOGGER.info("[STT] 跳过：不在游戏内（GUI/加载界面/鼠标未捕获/窗口非激活）");
                 return;
             }
             STT_CHAT_KEY.consumeClick();
@@ -73,9 +79,11 @@ public class STTChatKey {
         List<EntityMaid> maids = level.getEntitiesOfClass(EntityMaid.class, aabb, maid -> maid.isOwnedBy(player) && maid.isAlive());
         maids.sort(Comparator.comparingDouble(maid -> maid.distanceToSqr(player)));
         if (!maids.isEmpty()) {
+            TouhouLittleMaid.LOGGER.info("[STT] 12 格内找到 {} 只自己的女仆，取最近的一只", maids.size());
             consumer.accept(maids.get(0));
             return;
         }
+        TouhouLittleMaid.LOGGER.info("[STT] 跳过：{} 格内没有自己的女仆", range);
         if (isStart) {
             player.sendSystemMessage(Component.translatable("ai.touhou_little_maid.chat.stt.no_maid_found", range));
         }
@@ -104,8 +112,17 @@ public class STTChatKey {
         if (player == null) {
             return;
         }
-        STTSite sttSite = AvailableSites.getSTTSite(AIConfig.STT_TYPE.get().getName());
+        String typeName = AIConfig.STT_TYPE.get().getName();
+        STTSite sttSite = AvailableSites.getSTTSite(typeName);
+        TouhouLittleMaid.LOGGER.info("[STT] 配置类型={}，解析到站点={}，enabled={}", typeName, sttSite,
+                sttSite != null && sttSite.enabled());
+        if (sttSite == null) {
+            TouhouLittleMaid.LOGGER.error("[STT] 跳过：类型 {} 没有对应的站点（站点 id 与类型名不匹配？）", typeName);
+            player.sendSystemMessage(Component.translatable("ai.touhou_little_maid.chat.stt.empty"));
+            return;
+        }
         if (!sttSite.enabled()) {
+            TouhouLittleMaid.LOGGER.info("[STT] 跳过：站点未被启用（站点列表里点亮它）");
             player.sendSystemMessage(Component.translatable("ai.touhou_little_maid.chat.stt.empty"));
             return;
         }
@@ -124,7 +141,8 @@ public class STTChatKey {
             return;
         }
         STTSite sttSite = AvailableSites.getSTTSite(AIConfig.STT_TYPE.get().getName());
-        if (sttSite.enabled()) {
+        TouhouLittleMaid.LOGGER.info("[STT] 松键停止，站点={}", sttSite);
+        if (sttSite != null && sttSite.enabled()) {
             STTConfig config = new STTConfig();
             STTCallback callback = new STTCallback(player, maid);
             sttSite.client().stopRecord(config, callback);
