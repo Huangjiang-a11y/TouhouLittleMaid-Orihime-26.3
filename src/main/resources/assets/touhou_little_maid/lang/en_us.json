@@ -597,6 +597,7 @@
   "message.touhou_little_maid.altar.not_enough_power": "You don't have enough power.",
   "message.touhou_little_maid.owner_maid_num.can_not_add": "You can no longer tame maids, you have reached the limit (%d/%d)",
   "message.touhou_little_maid.photo.not_suitable_for_place_maid": "This place is unsuitable for placing a maid",
+  "message.touhou_little_maid.photo.maid_already_exists": "This maid already exists in the world; the item was not consumed",
   "message.touhou_little_maid.photo.have_no_nbt_data": "This damnable photo doesn't have NBT data.",
   "message.touhou_little_maid.chisel.hit_block_error": "Please right click on a clay block",
   "message.touhou_little_maid.chisel.offhand_not_photo": "Please have a photo of a maid in your offhand",

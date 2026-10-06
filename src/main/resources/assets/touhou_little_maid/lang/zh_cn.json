@@ -597,6 +597,7 @@
   "message.touhou_little_maid.altar.not_enough_power": "你没有足够多的P点",
   "message.touhou_little_maid.owner_maid_num.can_not_add": "你无法再驯服女仆，你已经达到了上限（%d/%d）",
   "message.touhou_little_maid.photo.not_suitable_for_place_maid": "这该死的地方不能放置女仆",
+  "message.touhou_little_maid.photo.maid_already_exists": "该女仆已存在于世界中，物品未被消耗",
   "message.touhou_little_maid.photo.have_no_nbt_data": "这该死的照片没有NBT数据",
   "message.touhou_little_maid.chisel.hit_block_error": "请右击黏土块",
   "message.touhou_little_maid.chisel.offhand_not_photo": "请将女仆照片拿在副手",
