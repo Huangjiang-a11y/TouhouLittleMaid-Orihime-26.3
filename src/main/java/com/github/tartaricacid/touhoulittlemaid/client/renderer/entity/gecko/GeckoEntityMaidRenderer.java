@@ -6,6 +6,7 @@ import com.github.tartaricacid.touhoulittlemaid.client.renderer.entity.state.Ent
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.geckolib3.geo.GeoReplacedEntityRenderer;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -46,6 +47,14 @@ public class GeckoEntityMaidRenderer extends GeoReplacedEntityRenderer<EntityMai
             }
         }
         super.setupRotations(state, poseStack, bodyRot, entityScale);
+        // 玩家用鞍抱起女仆时，基岩模型那条分支（EntityMaidRenderer#setupRotations）会把女仆摆到肩上；
+        // Gecko 模型此前整条跳过，导致女仆以坐姿留在玩家身前（上游 issue #35 第 1 点）。
+        // 两个渲染器都是在未镜像的实体坐标系里做这一步，故数值可直接复用。
+        if (state.playerVehicle) {
+            poseStack.translate(-0.375, 0.8325, 0.375);
+            poseStack.rotate(Axis.ZN.rotationDegrees(65));
+            poseStack.rotate(Axis.YN.rotationDegrees(-80));
+        }
     }
 
     @Override
