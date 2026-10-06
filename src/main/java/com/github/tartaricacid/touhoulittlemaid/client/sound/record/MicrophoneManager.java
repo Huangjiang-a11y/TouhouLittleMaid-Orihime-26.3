@@ -110,6 +110,7 @@ public class MicrophoneManager {
 
     public static void stopRecord() {
         IS_RECORDING.set(false);
+        TouhouLittleMaid.LOGGER.info("[STT] 已请求停止采集：IS_RECORDING=false，采集线={}", CURRENT_LINE != null);
         // read() 是阻塞调用，光翻标志位没用：必须把线停掉/冲掉，read 才会返回
         TargetDataLine line = CURRENT_LINE;
         if (line != null) {
@@ -132,6 +133,8 @@ public class MicrophoneManager {
 
             CURRENT_LINE = dataLine;
             IS_RECORDING.set(true);
+            TouhouLittleMaid.LOGGER.info("[STT] 采集线程已启动：设备={}，格式={}Hz/{}bit/{}声道", deviceName,
+                    format.getSampleRate(), format.getSampleSizeInBits(), format.getChannels());
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             byte[] buffer = new byte[4096];
             dataLine.open(format);
@@ -139,8 +142,13 @@ public class MicrophoneManager {
 
             // 绝不能用阻塞的 read()：采集端不吐数据时会永远卡在里面，stopRecord() 也解不开
             //（安卓 FCL 上 OpenAL / AAudio 的采集端都会这样）。改成先问有多少可用、只读可用的量。
+            int ticks = 0;
             while (IS_RECORDING.get()) {
                 int available = dataLine.available();
+                if (++ticks % 200 == 0) {
+                    TouhouLittleMaid.LOGGER.info("[STT] 采集中：已收 {} 字节，available={}，IS_RECORDING={}",
+                            stream.size(), available, IS_RECORDING.get());
+                }
                 if (available <= 0) {
                     try {
                         Thread.sleep(5L);
@@ -156,6 +164,7 @@ public class MicrophoneManager {
                 }
             }
 
+            TouhouLittleMaid.LOGGER.info("[STT] 采集循环退出（已收 {} 字节），停止采集线", stream.size());
             dataLine.stop();
             dataLine.flush();
 
