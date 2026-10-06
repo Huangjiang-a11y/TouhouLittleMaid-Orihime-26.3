@@ -53,22 +53,26 @@ public class ItemCamera extends Item {
         }
 
         EntityMaid maid = result.get();
-        if (maid.isAlive() && maid.isOwnedBy(playerIn) && !maid.isSleeping()) {
+        // 收纳必须只在服务端执行：客户端若也执行 discard()，会单方面删掉本地女仆实体，
+        // 表现为"女仆看不见、但还能听到声音、重进存档才恢复"（上游 issue #41）。
+        if (!worldIn.isClientSide() && maid.isAlive() && maid.isOwnedBy(playerIn) && !maid.isSleeping()) {
             ItemStack photo = InitItems.PHOTO.getDefaultInstance();
             MaidItemStorageHelper.saveMaid(photo, maid, Consumers.nop());
             playerIn.getInventory().placeItemBackInInventory(photo, Prediction.SERVER_ONLY);
 
-            maid.spawnExplosionParticle();
             maid.discard();
 
             camera.hurtAndBreak(1, playerIn, EquipmentSlot.MAINHAND);
             playerIn.getCooldowns().addCooldown(camera, 20);
-            playerIn.playSound(InitSounds.CAMERA_USE, 1.0f, 1.0f);
 
             if (playerIn instanceof ServerPlayer serverPlayer) {
                 InitTrigger.MAID_EVENT.trigger(serverPlayer, TriggerType.PHOTO_MAID);
             }
         }
+
+        // 粒子与音效照 1.21.1 的行为放在两端执行（粒子只会在客户端真正生成）
+        maid.spawnExplosionParticle();
+        playerIn.playSound(InitSounds.CAMERA_USE, 1.0f, 1.0f);
 
         return InteractionResult.SUCCESS;
     }
