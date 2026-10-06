@@ -9,6 +9,7 @@ import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.implement.Text
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
@@ -46,12 +47,13 @@ public class AutoGenSettingCallback extends LLMCallback {
         }
 
         LivingEntity owner = maid.getOwner();
-        if (owner instanceof Player player) {
-            player.sendSystemMessage(Component.translatable("ai.touhou_little_maid.chat.llm.auto_gen_setting").withStyle(ChatFormatting.GRAY));
-        }
         if (maid.level instanceof ServerLevel serverLevel) {
             MinecraftServer server = serverLevel.getServer();
+            // 这个回调跑在 HTTP 线程上：发消息、动实体都得回到服务端主线程做
             server.submit(() -> {
+                if (owner instanceof ServerPlayer player) {
+                    player.sendSystemMessage(Component.translatable("ai.touhou_little_maid.chat.llm.auto_gen_setting").withStyle(ChatFormatting.GRAY));
+                }
                 maid.getChatBubbleManager().removeChatBubble(waitingChatBubbleId);
                 maid.getChatBubbleManager().addTextChatBubble("ai.touhou_little_maid.chat.llm.auto_gen_setting");
             });
