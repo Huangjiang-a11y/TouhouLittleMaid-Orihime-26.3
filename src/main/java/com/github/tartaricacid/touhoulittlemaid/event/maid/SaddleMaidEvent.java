@@ -28,7 +28,11 @@ public class SaddleMaidEvent {
                 }
                 boolean success = maid.startRiding(player);
                 if (!success) {
-                    // 没抱起来就不算交互成功：不给成就、不关家模式
+                    // 没抱起来就不算交互成功：不给成就、不关家模式。
+                    // 同时把女仆从"坐在空气里"的残留状态里拉出来（上游 issue #5：抱失败后可能卡在悬空坐姿）
+                    maid.setInSittingPose(false);
+                    maid.getNavigation().stop();
+                    maid.setDeltaMovement(Vec3.ZERO);
                     event.setCanceled(true);
                     return;
                 }
