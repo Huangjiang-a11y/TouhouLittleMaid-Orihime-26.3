@@ -25,6 +25,8 @@ public class MicrophoneManager {
     private static final AudioFormat DEFAULT_FORMAT = new AudioFormat(16000, 16, 1, true, false);
     private static final int MAX_RECORD_TIME_SECONDS = 20;
     private static final ScheduledExecutorService SERVICE = Executors.newSingleThreadScheduledExecutor();
+    /** 当前正在采集的线：stopRecord 要直接停它，否则 read() 会一直阻塞、循环退不出来 */
+    private static volatile TargetDataLine CURRENT_LINE = null;
     private static final AtomicBoolean IS_RECORDING = new AtomicBoolean();
     private static CompletableFuture<?> TASK = null;
 
@@ -108,6 +110,16 @@ public class MicrophoneManager {
 
     public static void stopRecord() {
         IS_RECORDING.set(false);
+        // read() 是阻塞调用，光翻标志位没用：必须把线停掉/冲掉，read 才会返回
+        TargetDataLine line = CURRENT_LINE;
+        if (line != null) {
+            try {
+                line.stop();
+                line.flush();
+            } catch (Exception e) {
+                TouhouLittleMaid.LOGGER.warn("[STT] 停止采集线时出错: {}", e.getMessage());
+            }
+        }
     }
 
     private static void doRecord(String deviceName, AudioFormat format, Consumer<byte[]> consumer) {
@@ -118,6 +130,7 @@ public class MicrophoneManager {
             }
             TouhouLittleMaid.LOGGER.debug("Microphone start record...");
 
+            CURRENT_LINE = dataLine;
             IS_RECORDING.set(true);
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             byte[] buffer = new byte[4096];
@@ -135,6 +148,11 @@ public class MicrophoneManager {
             dataLine.flush();
 
             byte[] byteArray = pcmToWav(stream.toByteArray(), format);
+            int pcmSize = stream.size();
+            TouhouLittleMaid.LOGGER.info("[STT] 录音结束：PCM {} 字节 → WAV {} 字节，开始上传", pcmSize, byteArray.length);
+            if (pcmSize <= 0) {
+                TouhouLittleMaid.LOGGER.warn("[STT] 麦克风没有给出任何数据（该设备可能不支持采集，安卓/FCL 上常见）");
+            }
             // debugFile(byteArray);
             consumer.accept(byteArray);
 

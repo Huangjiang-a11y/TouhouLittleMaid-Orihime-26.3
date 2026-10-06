@@ -112,6 +112,8 @@ public class STTOpenAiRealtimeClient implements STTClient {
     private void send(byte[] recorded, ResponseCallback<String> callback) {
         byte[] pcm = appendTailSilence(
                 resample(stripWavHeader(recorded), RECORD_RATE, API_RATE), API_RATE, TAIL_SILENCE_MILLIS);
+        TouhouLittleMaid.LOGGER.info("[STT] 上传开始：PCM {} 字节，站点 {}，分块 {}", pcm.length, this.site.url(),
+                (pcm.length + CHUNK_BYTES - 1) / CHUNK_BYTES);
         CompletableFuture<String> finished = new CompletableFuture<>();
         AtomicBoolean done = new AtomicBoolean(false);
         List<String> segments = Collections.synchronizedList(new ArrayList<>());
@@ -127,6 +129,7 @@ public class STTOpenAiRealtimeClient implements STTClient {
             @Override
             public void onOpen(WebSocket webSocket) {
                 socket = webSocket;
+                TouhouLittleMaid.LOGGER.info("[STT] WebSocket 已连接，发送 session.update");
                 webSocket.sendText(sessionUpdateEvent(), true);
                 for (int offset = 0; offset < pcm.length; offset += CHUNK_BYTES) {
                     int length = Math.min(CHUNK_BYTES, pcm.length - offset);
@@ -140,6 +143,7 @@ public class STTOpenAiRealtimeClient implements STTClient {
 
             @Override
             public CompletionStage<?> onText(WebSocket webSocket, CharSequence data, boolean last) {
+                TouhouLittleMaid.LOGGER.info("[STT] 收到事件: {}", data.length() > 300 ? data.subSequence(0, 300) + "..." : data);
                 buffer.append(data);
                 if (!last) {
                     webSocket.request(1);
@@ -154,6 +158,7 @@ public class STTOpenAiRealtimeClient implements STTClient {
 
             @Override
             public void onError(WebSocket webSocket, Throwable error) {
+                TouhouLittleMaid.LOGGER.error("[STT] WebSocket 出错: {}", error.toString());
                 finished.completeExceptionally(error);
             }
         };
@@ -178,7 +183,7 @@ public class STTOpenAiRealtimeClient implements STTClient {
                 webSocket.sendClose(WebSocket.NORMAL_CLOSURE, "done");
             }
             if (throwable != null) {
-                TouhouLittleMaid.LOGGER.error("OpenAI realtime STT failed", throwable);
+                TouhouLittleMaid.LOGGER.error("[STT] OpenAI realtime STT failed", throwable);
                 callback.onFailure(null, throwable, ErrorCode.REQUEST_RECEIVED_ERROR);
             } else {
                 callback.onSuccess(transcript);
