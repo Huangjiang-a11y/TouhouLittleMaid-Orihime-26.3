@@ -96,8 +96,14 @@ public abstract class AbstractStoreMaidItem extends Item implements IItemEntity 
 
         MaidItemStorageHelper.loadMaid(stack, maid, maidCompound);
         maid.snapTo(context.getClickedPos().above(), 0, 0);
-        if (worldIn instanceof ServerLevel) {
-            worldIn.addFreshEntity(maid);
+        if (worldIn instanceof ServerLevel serverLevel) {
+            // 服务端已存在同 UUID 实体时（例如创造模式反复放出同一张照片/魂符）addFreshEntity 会失败，
+            // 原实现会让照片/魂符被白白消耗而女仆不出现（上游 issue #41）。这里检查返回值，失败就提示且不消耗。
+            if (!serverLevel.addFreshEntity(maid)) {
+                player.sendSystemMessage(Component.translatable(
+                        "message.touhou_little_maid.photo.maid_already_exists"));
+                return InteractionResult.FAIL;
+            }
         }
 
         maid.spawnExplosionParticle();
