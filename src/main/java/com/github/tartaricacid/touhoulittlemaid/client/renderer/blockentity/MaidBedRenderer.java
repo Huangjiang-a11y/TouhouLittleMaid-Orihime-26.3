@@ -89,9 +89,15 @@ public class MaidBedRenderer implements BlockEntityRenderer<BlockEntityMaidBed, 
         return renderType;
     }
 
+    /**
+     * 26.3：女仆床模型实测 1×0.8×1.94 格（1.21.1 里那个 ±2 的盒子是给动画留的宽松值），不需要离屏渲染：返回 true 会让 64 格内所有该方块实体
+     * 即使不可见也每帧提取 + 提交；false（等价接口默认）＝只在其所在区块可见时提交。
+     * 真正需要 true 的是模型远大于方块的（祭坛 11.7×7.3×10.9 格、雕像最大 3×6×3 格、
+     * 野餐垫 3.9×4.5 格、坐垫为数据包自定义模型尺寸不可知）。
+     */
     @Override
     public boolean shouldRenderOffScreen() {
-        return true;
+        return false;
     }
 
     // TODO

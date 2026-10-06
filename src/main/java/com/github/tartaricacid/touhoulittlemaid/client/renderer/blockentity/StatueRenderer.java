@@ -205,9 +205,15 @@ public class StatueRenderer implements BlockEntityRenderer<BlockEntityStatue, St
         poseStack.translate(0.5 / size, 1.5, 0.5 / size);
     }
 
+    /**
+     * 26.3：统一返回 false（等价接口默认）＝只在该方块所在区块可见时提交，
+     * 不再让 64 格内的方块实体在不可见时也每帧提取 + 提交。
+     * 代价：雕像最大 BIG 档 3×6×3 格，模型会超出方块范围，站在区块边界往另一侧看时有几率看到"半截消失"，
+     * 权衡下取性能（原 26.2/1.21.1 用 getRenderBoundingBox 留的宽松盒子补偿，26.3 已无该方法）。
+     */
     @Override
     public boolean shouldRenderOffScreen() {
-        return true;
+        return false;
     }
 
     // TODO

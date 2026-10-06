@@ -276,9 +276,15 @@ public class WChessRenderer implements BlockEntityRenderer<BlockEntityWChess, WC
         poseStack.popPose();
     }
 
+    /**
+     * 26.3：国际象棋盘模型实测 3×3 格，不需要离屏渲染：返回 true 会让 64 格内所有该方块实体
+     * 即使不可见也每帧提取 + 提交；false（等价接口默认）＝只在其所在区块可见时提交。
+     * 真正需要 true 的是模型远大于方块的（祭坛 11.7×7.3×10.9 格、雕像最大 3×6×3 格、
+     * 野餐垫 3.9×4.5 格、坐垫为数据包自定义模型尺寸不可知）。
+     */
     @Override
     public boolean shouldRenderOffScreen() {
-        return true;
+        return false;
     }
 
     // TODO
