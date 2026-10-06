@@ -37,10 +37,19 @@ import static net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_SPEED;
 
 @SuppressWarnings("deprecation")
 public class ItemGohei extends ProjectileWeaponItem {
+    /**
+     * 附魔能力。26.3 已不能覆写 Item#getDescriptionId/getEnchantmentValue，改由
+     * Item.Properties#enchantable 决定（Enchantable 数据组件）。
+     * 取 22（金质工具档）：御币定位是魔法武器，三个御币专用附魔（御币可附魔标签）
+     * 与耐久类附魔标签早已就绪，缺的只是这个值（上游 issue #37）。
+     */
+    private static final int ENCHANTABILITY = 22;
+
     public ItemGohei(Identifier id) {
         super(new Properties()
                 .setId(ResourceKey.create(Registries.ITEM, id))
                 .durability(1200)
+                .enchantable(ENCHANTABILITY)
                 .attributes(createAttributes()));
     }
 
