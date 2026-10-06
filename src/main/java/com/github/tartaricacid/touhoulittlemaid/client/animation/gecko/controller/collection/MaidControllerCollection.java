@@ -50,9 +50,6 @@ public class MaidControllerCollection {
                 new HybridAnimationController(entity, name, 0, anim != null ? e -> AnimationManager.predicateParallel(e, anim) : AnimationManager.empty(), true));
 
         armor("armor", (name, entity, slot) -> new HybridAnimationController(entity, name, 0, e -> AnimationManager.predicateArmor(e, slot)));
-
-        // 轮盘动画（对应 1.21.1 的 playRouletteAnim），放在最后，覆盖其它控制器的姿态
-        simple("roulette", (name, entity) -> new HybridAnimationController(entity, name, 0.2f, AnimationManager::predicateRoulette));
     }
 
     public static Consumer<GeckoMaidEntity<?>> build(ControllerResource resource) {

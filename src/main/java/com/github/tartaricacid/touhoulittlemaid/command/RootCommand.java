@@ -19,7 +19,6 @@ public final class RootCommand {
         root.then(MaidDebugCommand.get());
         root.then(AIChatCommand.get());
         root.then(MaidCommand.get());
-        root.then(RouletteCommand.get());
         root.then(BackupCommand.get());
         dispatcher.register(root);
     }
