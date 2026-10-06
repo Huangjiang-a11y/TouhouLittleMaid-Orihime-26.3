@@ -15,7 +15,6 @@ import com.github.tartaricacid.touhoulittlemaid.client.init.*;
 import com.github.tartaricacid.touhoulittlemaid.client.input.DismountBroomKey;
 import com.github.tartaricacid.touhoulittlemaid.client.input.STTChatKey;
 import com.github.tartaricacid.touhoulittlemaid.debug.target.DebugClientRenderEvent;
-import com.github.tartaricacid.touhoulittlemaid.event.ClientExtensionsEvent;
 import com.github.tartaricacid.touhoulittlemaid.event.ClientTickEvent;
 import com.github.tartaricacid.touhoulittlemaid.network.NetworkHandler;
 import com.github.tartaricacid.touhoulittlemaid.util.EntityCacheUtil;
@@ -40,7 +39,6 @@ public class TouhouLittleMaidFabricClient implements ClientModInitializer {
         ClientRecipeSynchronizedEvent.EVENT.register(ClientRecipeEvent::onRecipeReceived);
         TouhouLittleMaidClient.setup();
         NetworkHandler.registerClientReceivers();
-        ClientExtensionsEvent.RegisterClientExtensions();
         InfoGetManager.onClientSetup();
 
         ClientReloadListenerRegistry.onRegisterClientReloadListeners();
