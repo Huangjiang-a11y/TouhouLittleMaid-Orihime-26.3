@@ -53,6 +53,21 @@ public class GarageKitRenderer implements BlockEntityRenderer<BlockEntityGarageK
         this.baseModel = InternalBedrockModelRegistry.getModel(STATUE_BASE);
     }
 
+    /**
+     * 方块实体默认只渲染 64 格以内（BlockEntityRenderer#shouldRender 用 getViewDistance 判定距离），
+     * 手办的女仆模型远大于方块本身，60 格左右会整体被剔除、只剩底座方块模型（上游 issue #47）。
+     * 与信标等大模型方块实体一致：视距提到 256，并允许离屏渲染（模型超出方块包围盒）。
+     */
+    @Override
+    public int getViewDistance() {
+        return 256;
+    }
+
+    @Override
+    public boolean shouldRenderOffScreen() {
+        return true;
+    }
+
     @Override
     public GarageKitRenderState createRenderState() {
         return new GarageKitRenderState();
