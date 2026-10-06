@@ -137,8 +137,20 @@ public class MicrophoneManager {
             dataLine.open(format);
             dataLine.start();
 
+            // 绝不能用阻塞的 read()：采集端不吐数据时会永远卡在里面，stopRecord() 也解不开
+            //（安卓 FCL 上 OpenAL / AAudio 的采集端都会这样）。改成先问有多少可用、只读可用的量。
             while (IS_RECORDING.get()) {
-                int bytesRead = dataLine.read(buffer, 0, buffer.length);
+                int available = dataLine.available();
+                if (available <= 0) {
+                    try {
+                        Thread.sleep(5L);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        break;
+                    }
+                    continue;
+                }
+                int bytesRead = dataLine.read(buffer, 0, Math.min(available, buffer.length));
                 if (bytesRead > 0) {
                     stream.write(buffer, 0, bytesRead);
                 }
