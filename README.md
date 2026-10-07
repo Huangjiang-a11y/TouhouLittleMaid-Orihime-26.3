@@ -46,8 +46,8 @@ touhoulittlemaid-fabric-1.0.0-26.3-<短哈希>.jar
 
 ### 有意保留的"看似死代码"
 
-- **9 个方块实体渲染器的离屏渲染**：中国象棋盘 / 国际象棋盘 / 围棋盘 / 祭坛 / 野餐垫 = `shouldRenderOffScreen() = true`；女仆床 / 零食柜 / 雕像 / 坐垫 = `false`。
-  模型明显大于方块本身时必须为 `true`，否则 ① 站在区块边界往另一侧看会"半截消失"；② 装了 EntityCulling / MoreCulling 时，锚点方块被挡住会让**整个模型不渲染**。
+- **9 个方块实体渲染器的离屏渲染统一返回 `false`（等价接口默认）**：`shouldRenderOffScreen()` 只决定走"提交两趟"里的哪一趟，**挡不住剔除模组** —— 实测装了 EntityCulling 时，即使返回 `true`，锚点方块被遮挡后模型照样整个不渲染，只是白多一份每帧提取+提交，所以全部关闭。
+  这类"模型远超方块边界"的方块实体（祭坛 / 棋类 / 野餐垫 / 手办等）若要不被剔除，应在**客户端的 EntityCulling 配置**里按方块实体 ID 加白名单 `blockEntityWhitelist`（其官方文档即写明这类方块实体需要白名单，举例为原版信标、Create 的滑轮），而不是靠本模组的代码。
 - **`InitDataComponent` 里的 `tanks` 数据组件**：代码里零引用，但老存档的物品数据会引用它 —— 删掉注册后载入存档会弹 `Missing content detected`。**注册保留、功能不搬。**
 - **储物背包家族**（Tank / CraftingTable / EnderChest / Furnace）不搬回：上游 26.x 已主动砍掉，只剩 4 种纯存储背包。
 

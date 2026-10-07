@@ -84,9 +84,12 @@ Caused by: IllegalClassLoadError:
 
 - `BlockEntityRenderer#shouldRender` 的默认实现是 `Vec3.atCenterOf(pos).closerThan(cameraPos, getViewDistance())`，
   **`getViewDistance()` 默认只有 64** —— 大范围模型（手办）必须覆写它。
-- `shouldRenderOffScreen()` 决定走"提交两趟"里的哪一趟：`true` = 全局列表那趟（不看区块可见性/遮挡），
-  `false` = 可见区块那趟。模型明显大于方块本身时要 `true`，否则 ① 在区块边界会"半截消失"，
-  ② 装了 EntityCulling / MoreCulling 时，锚点方块被遮挡就会让**整个模型不渲染**。
+- `shouldRenderOffScreen()` 决定走"提交两趟"里的哪一趟（`true` = 全局列表那趟，不看区块可见性），
+  但它**挡不住 EntityCulling / MoreCulling**：这类模组挂在"真正渲染这个方块实体"那一步按遮挡剔除，
+  与提交走哪一趟无关。2026-10-07 真机复测：返回 `true` 时锚点方块被遮挡，模型照样整个不渲染，
+  只是每帧白多一份提取+提交 → 9 个渲染器最终**全部返回 false**（`958b4f2`）。
+  大模型被剔除的正解在客户端配置：把方块实体 ID 加进 EntityCulling 的 `blockEntityWhitelist`
+  （例：`touhou_little_maid:gomoku` / `touhou_little_maid:altar` / `touhou_little_maid:garage_kit`）。
 - 1.21.1 的 `getRenderBoundingBox` 在 26.3 已不存在；它当年给的 ±2/±3/±9 是给动画留的**宽松盒子**，
   不是模型尺寸 —— 量模型尺寸要读 bedrock JSON，且 `inflate` 为负的占位大块必须折算掉。
 - 渲染状态（RenderState）是每帧新建的（`EntityRenderer#createRenderState`），因此帧间不会残留脏值；
