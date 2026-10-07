@@ -124,6 +124,21 @@ public class InitDataComponent {
                     .build());
 
 
+    /**
+     * 储罐背包（上游 26.x 已砍掉整套功能背包）遗留的数据组件注册。
+     * <p>
+     * 代码里确实没有任何引用，但**不能删**：上游 26.2/26.3 与本站 968e4de 之前构建保存过的
+     * 世界，其物品数据里会记录该组件类型，删掉后载入存档会弹 "Missing content detected!
+     * Missing entries in 'minecraft:data_component_type' ... - tanks"，并丢掉对应数据。
+     * 保留一个空注册零成本，换世界兼容。
+     */
+    public static final String TANK_BACKPACK_TAG_NAME = "tanks";
+    public static final DataComponentType<CompoundTag> TANK_BACKPACK_TAG =
+            register(TANK_BACKPACK_TAG_NAME, DataComponentType.<CompoundTag>builder()
+                    .persistent(CompoundTag.CODEC)
+                    .networkSynchronized(ByteBufCodecs.COMPOUND_TAG)
+                    .build());
+
     public static final String SAKUYA_BELL_UUID_TAG_NAME = "sakuya_bell_uuid";
     public static final DataComponentType<UUID> SAKUYA_BELL_UUID_TAG =
             register(SAKUYA_BELL_UUID_TAG_NAME, DataComponentType.<UUID>builder()
