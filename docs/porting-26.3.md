@@ -60,3 +60,49 @@
 `repo1.maven.org`、`raw.githubusercontent.com`、`ghfast.top`、`api.github.com` 均可达；
 仅 **`github.com`（git 协议）** 不通。因此构建依赖可直连拉取，仅推送需要走
 GitHub Git Data API（`api.github.com`）或另行代理。
+
+## 运行时踩坑增补（2026-10-07，真机验证）
+
+### mixin 包内未注册的类不能被直接引用
+
+`com.github.tartaricacid.touhoulittlemaid.mixin.*` 与 `cn.sh1rocu.touhoulittlemaid.mixin.*` 是被 json 声明的 **mixin 包**：
+包内**每一个类都必须在该 json 的 `mixins`/`client` 列表里注册**，否则一旦被普通代码或别的 mixin
+`implements` / cast 引用，运行期直接抛（编译期与静态检查都发现不了）：
+
+```
+Caused by: IllegalClassLoadError:
+  <类> is in a defined mixin package <pkg>.* owned by <cfg>.mixins.json and cannot be referenced directly
+```
+
+现象是客户端启动到 `Minecraft.<init>` 就崩。
+
+> **约定**：duck 接口（用来读写 mixin 注入的 `@Unique` 字段的接口）一律放 `api/mixin`（mixin 包之外，
+> 与既有的 `IPlayerMixin` / `INavigationMixin` 同模式），由 mixin 包内的 `@Mixin` 类 `implements` 它；
+> 已注册的 `accessor.*` 则可以被自由引用。
+
+### 方块实体的可见性、视距与剔除模组
+
+- `BlockEntityRenderer#shouldRender` 的默认实现是 `Vec3.atCenterOf(pos).closerThan(cameraPos, getViewDistance())`，
+  **`getViewDistance()` 默认只有 64** —— 大范围模型（手办）必须覆写它。
+- `shouldRenderOffScreen()` 决定走"提交两趟"里的哪一趟：`true` = 全局列表那趟（不看区块可见性/遮挡），
+  `false` = 可见区块那趟。模型明显大于方块本身时要 `true`，否则 ① 在区块边界会"半截消失"，
+  ② 装了 EntityCulling / MoreCulling 时，锚点方块被遮挡就会让**整个模型不渲染**。
+- 1.21.1 的 `getRenderBoundingBox` 在 26.3 已不存在；它当年给的 ±2/±3/±9 是给动画留的**宽松盒子**，
+  不是模型尺寸 —— 量模型尺寸要读 bedrock JSON，且 `inflate` 为负的占位大块必须折算掉。
+- 渲染状态（RenderState）是每帧新建的（`EntityRenderer#createRenderState`），因此帧间不会残留脏值；
+  摆姿势发生在 feature 渲染阶段（`ModelFeatureRenderer` 调 `setupAnim`），所以写在 RenderState 上的标记
+  对基础模型与盔甲层同时生效。
+
+### 数据组件与"删死代码"
+
+- 26.3 不能再覆写 `Item#getEnchantmentValue`：能否附魔由 `Enchantable` 数据组件决定
+  （`ItemStack#isEnchantable` 只查该组件是否存在且未附魔）。
+- **注册项（数据组件 / 物品 / 方块 / 实体）即使代码零引用也不要删**：老存档的数据会引用它们，
+  删掉注册后载入存档会弹 `Missing content detected`（实例：`touhou_little_maid:tanks`）。
+  纯资源（模型 / 贴图 / lang 键 / 死类）删掉才是安全的。
+
+### 排查手法
+
+- 找"某个方法/常量在哪被调用"：用 `python zipfile` 单次内存扫全 jar 的 class 字节码（比逐类 `javap` 快得多）。
+- 找"某个机制挪到哪去了"：`javap -p -c -classpath <fabric-loom 的 minecraft-merged-deobf jar> <类>`。
+- 改完 mixin 必跑自检：遍历 mixin 包下的 `.java`，与对应 json 的注册条目做集合比对，报告未注册者。

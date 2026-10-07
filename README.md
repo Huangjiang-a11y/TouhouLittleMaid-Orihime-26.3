@@ -21,26 +21,82 @@
 | Fabric Loader | `0.19.5`+ |
 | Fabric API | `0.161.0+26.3` |
 | Gradle Loom | `1.17-SNAPSHOT` |
-| 状态 | 🚧 移植中（编译修复阶段，尚未出可用构建） |
+| 状态 | ✅ 实验性可用：已在 Android（FCL + MobileGlues）真机跑通，可正常进存档游玩 |
+
+构建产物由 GitHub Actions 的 `26.3-Snapshot` 工作流在每次推送后自动发布（Release 标签形如 `26.3-snapshot-<日期-时间>`）。文件名与 jar 内 `fabric.mod.json` 的版本号都带 git 短哈希：
+
+```
+touhoulittlemaid-fabric-1.0.0-26.3-<短哈希>.jar
+```
+
+## 本分支做了什么（相对上游 26.x）
+
+### 修复上游尚未处理的 issue
+
+截至 2026-10-07，上游 open 的 7 条里修了 6 条（第 7 条 `#49` 是 Kaleidoscope 兼容请求，按下面"兼容先剥离"的方针不做）：
+
+| issue | 现象 | 修法 |
+| --- | --- | --- |
+| #41 | 相机收纳女仆 / 照片放出后女仆"消失"（有声音、重进存档又回来） | 客户端也执行了 `discard`（移植回归）→ 状态变更改为仅服务端；并且"放出失败"不再消耗物品、给出提示 |
+| #37 | 御币不能在附魔台附魔 | 26.3 能否附魔由 `Enchantable` 数据组件决定（`Item#getEnchantmentValue` 已不可覆写）→ 补 `.enchantable(22)` |
+| #47 | 手办超过 60 格只剩阴影 | `BlockEntityRenderer#getViewDistance()` 默认只有 64 → 手办提高到 256 |
+| #35 | Gecko 模型女仆被抱起时不在肩上 | Gecko 渲染分支补上与基岩分支相同的肩部变换 |
+| #48 | 坐垫 / 椅子上入睡时视角偏下 | 乘客坐标每 tick 被载具覆盖 → `startSleeping` 前先离开座椅 |
+| #5 | 抱起失败后残留坐姿、看着像悬空 | 失败分支清坐姿、停寻路、清动量 |
+
+### 有意保留的"看似死代码"
+
+- **9 个方块实体渲染器的离屏渲染**：中国象棋盘 / 国际象棋盘 / 围棋盘 / 祭坛 / 野餐垫 = `shouldRenderOffScreen() = true`；女仆床 / 零食柜 / 雕像 / 坐垫 = `false`。
+  模型明显大于方块本身时必须为 `true`，否则 ① 站在区块边界往另一侧看会"半截消失"；② 装了 EntityCulling / MoreCulling 时，锚点方块被挡住会让**整个模型不渲染**。
+- **`InitDataComponent` 里的 `tanks` 数据组件**：代码里零引用，但老存档的物品数据会引用它 —— 删掉注册后载入存档会弹 `Missing content detected`。**注册保留、功能不搬。**
+- **储物背包家族**（Tank / CraftingTable / EnderChest / Furnace）不搬回：上游 26.x 已主动砍掉，只剩 4 种纯存储背包。
+
+### 原则
+
+非官方移植，不做复杂定制：凡上游靠其它模组或非官方扩展才有的能力、且本移植没有入口/消费者的，直接删掉。
+
+## 构建
+
+```bash
+./gradlew build     # 产物在 build/libs/，取带 git 短哈希的那个（不要取 -sources）
+```
+
+- 文件名与 jar 内 `fabric.mod.json` 版本都是 `1.0.0-26.3-<短哈希>`；带 `-dirty` 说明工作区有未提交改动（名字与内部版本不一致就是包不对）。
+- 依赖与版本集中在 `gradle.properties`。
+- 移植过程中的踩坑记录（26.3 API 变更、报错清单、渲染/注册机制）见 [`docs/porting-26.3.md`](docs/porting-26.3.md)。
 
 ## 保留的依赖
 
-| 模组 | 版本 |
-| --- | --- |
-| Sodium | `mc26.3-0.9.2-fabric` |
-| Iris | `1.11.7+26.3-fabric` |
-| Mod Menu | `21.0.0` |
-| Cloth Config | `26.3.159` |
-| Trinkets | `4.2.1+26.3` |
-| Forge Config API Port | `26.3.1`（硬依赖） |
-| Inventory Profiles Next（+ libipn） | `fabric-26.3-2.3.8` / `fabric-26.3-6.9.0` |
-| Patchouli | `26.1-94-beta` ⚠️ 上游未发布 26.2/26.3 版本，本分支仅以 `compileOnly` 占位，运行时由 `isModLoaded` 自动降级（手册入口不显示，不会崩溃） |
+| 模组 | 版本 | 说明 |
+| --- | --- | --- |
+| Forge Config API Port | `26.3.1` | **硬依赖**（配置系统） |
+| Cloth Config | `26.3.159` | 想在游戏内改配置就需要 |
+| Mod Menu | `21.0.0` | 模组列表入口 |
+| Sodium | `mc26.3-0.9.2-fabric` | 开发/测试环境保留 |
+| Iris | `1.11.7+26.3-fabric` | 开发/测试环境保留 |
+| Trinkets | `4.2.1+26.3` | 饰品（其 GUI 由上游禁用，详见移植笔记） |
+| Inventory Profiles Next（+ libipn） | `fabric-26.3-2.3.8` / `fabric-26.3-6.9.0` | 可选 |
+| JEI | `31.9.0.57` | 可选兼容，未安装自动降级 |
+| Jade | `26.3.5+fabric` | 可选兼容，未安装自动降级 |
+| Patchouli | `26.1-94-beta` ⚠️ | 上游未发布 26.2/26.3 版本，本分支仅以 `compileOnly` 占位，运行时由 `isModLoaded` 自动降级（手册入口不显示，不会崩溃） |
 
 ## 第三方兼容：先剥离，后续重新加回
 
-本分支**暂时移除**以下兼容（共 21 个包 / 47 个文件），计划在后续版本重新加回：
+**当前状态：JEI 与 Jade 已回搬**（entrypoint 已注册）。其余仍剥离，相对上游 `26.2` 共 **14 个包 / 31 个文件**：
 
-`JEI`、`Jade`、`Aquaculture`、`Kaleidoscope`、`Farmer's Delight`、`Simple Hats`、`Oculus`、`Embeddium`、`Ponder`、`PatPat`、`JMC`、`TACZ / 卓越前线`（gun）、`Travelers' Backpack`、`Immersive Melodies`、`Sophisticated Backpacks`、`SlashBlade`、`Improved Mobs` mixin。
+| 兼容 | 文件数 |
+| --- | --- |
+| Aquaculture | 6 |
+| Sophisticated Backpacks | 4 |
+| TACZ / 卓越前线（gun） | 3 |
+| Kaleidoscope | 3 |
+| SlashBlade | 3 |
+| Farmer's Delight | 2 |
+| Immersive Melodies | 2 |
+| Travelers' Backpack | 2 |
+| Embeddium / Oculus / JMC / PatPat / Ponder / Simple Hats | 各 1 |
+
+另移除 Improved Mobs 的 mixin、TACZ 工具类，以及随上游一起清掉的 YSM 动画链。
 
 > 其中多数在 26.3 上并无可用版本（Aquaculture、Simple Hats、Improved Mobs 等），剥离后无实际功能损失；Oculus / Embeddium 是 Iris / Sodium 的 NeoForge 侧分支，Fabric 端本就冗余；其余为体积与维护成本考虑。
 
