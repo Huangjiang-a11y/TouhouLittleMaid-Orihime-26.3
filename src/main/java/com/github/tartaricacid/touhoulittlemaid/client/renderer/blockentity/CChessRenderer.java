@@ -279,14 +279,14 @@ public class CChessRenderer implements BlockEntityRenderer<BlockEntityCChess, CC
     }
 
     /**
-     * 26.3：中国象棋盘模型实测 3×3 格（64 单位的方块 inflate=-8 → 48 单位），不需要离屏渲染：返回 true 会让 64 格内所有该方块实体
-     * 即使不可见也每帧提取 + 提交；false（等价接口默认）＝只在其所在区块可见时提交。
-     * 真正需要 true 的是模型远大于方块的（祭坛 11.7×7.3×10.9 格、雕像最大 3×6×3 格、
-     * 野餐垫 3.9×4.5 格、坐垫为数据包自定义模型尺寸不可知）。
+     * 26.3：返回 true ＝ 该方块实体不参与"按区块可见性"的过滤，64 格内每帧都会提取+提交。
+     * 这里必须开：中国象棋盘实测 3×3 格（64 单位块 inflate=-8 → 实际 48 单位），模型远大于方块自身范围，若只在所在区块可见时提交，
+     * 站在区块边界往另一侧看就会"半截消失"。
+     * 代价是它不可见时也在提交（棋盘/祭坛/垫子这类几何简单，代价可接受）。
      */
     @Override
     public boolean shouldRenderOffScreen() {
-        return false;
+        return true;
     }
 
 //    // TODO

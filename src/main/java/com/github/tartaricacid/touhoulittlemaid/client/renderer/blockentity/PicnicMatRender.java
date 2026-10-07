@@ -124,14 +124,14 @@ public class PicnicMatRender implements BlockEntityRenderer<BlockEntityPicnicMat
     }
 
     /**
-     * 26.3：统一返回 false（等价接口默认）＝只在该方块所在区块可见时提交，
-     * 不再让 64 格内的方块实体在不可见时也每帧提取 + 提交。
-     * 代价：野餐垫模型实测 3.9×4.5 格，模型会超出方块范围，站在区块边界往另一侧看时有几率看到"半截消失"，
-     * 权衡下取性能（原 26.2/1.21.1 用 getRenderBoundingBox 留的宽松盒子补偿，26.3 已无该方法）。
+     * 26.3：返回 true ＝ 该方块实体不参与"按区块可见性"的过滤，64 格内每帧都会提取+提交。
+     * 这里必须开：野餐垫实测 3.9×4.5 格，模型远大于方块自身范围，若只在所在区块可见时提交，
+     * 站在区块边界往另一侧看就会"半截消失"。
+     * 代价是它不可见时也在提交（棋盘/祭坛/垫子这类几何简单，代价可接受）。
      */
     @Override
     public boolean shouldRenderOffScreen() {
-        return false;
+        return true;
     }
 
     // TODO
