@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import com.github.tartaricacid.touhoulittlemaid.api.mixin.ICarryingMaidRenderState;
 
 /**
  * 玩家背着女仆（女仆为玩家第一乘客）时，双手摆出托举姿态（1.21.1 旧功能）。

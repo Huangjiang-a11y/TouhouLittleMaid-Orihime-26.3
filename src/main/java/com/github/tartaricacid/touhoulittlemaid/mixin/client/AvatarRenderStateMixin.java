@@ -3,6 +3,7 @@ package com.github.tartaricacid.touhoulittlemaid.mixin.client;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
+import com.github.tartaricacid.touhoulittlemaid.api.mixin.ICarryingMaidRenderState;
 
 @Mixin(AvatarRenderState.class)
 public class AvatarRenderStateMixin implements ICarryingMaidRenderState {

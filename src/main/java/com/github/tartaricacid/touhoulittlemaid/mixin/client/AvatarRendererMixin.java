@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import com.github.tartaricacid.touhoulittlemaid.api.mixin.ICarryingMaidRenderState;
 
 /**
  * 26.3 渲染状态重构后，HumanoidModel#setupAnim 只接收渲染状态、不再有实体引用。
