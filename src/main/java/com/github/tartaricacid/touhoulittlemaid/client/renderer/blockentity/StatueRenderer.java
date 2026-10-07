@@ -206,10 +206,10 @@ public class StatueRenderer implements BlockEntityRenderer<BlockEntityStatue, St
     }
 
     /**
-     * 26.3：统一返回 false（等价接口默认）＝只在该方块所在区块可见时提交，
-     * 不再让 64 格内的方块实体在不可见时也每帧提取 + 提交。
-     * 代价：雕像最大 BIG 档 3×6×3 格，模型会超出方块范围，站在区块边界往另一侧看时有几率看到"半截消失"，
-     * 权衡下取性能（原 26.2/1.21.1 用 getRenderBoundingBox 留的宽松盒子补偿，26.3 已无该方法）。
+     * 26.3：返回 false（等价接口默认）＝ 只在该方块所在区块可见时提交，
+     * 省掉不可见时每帧的提取+提交。这里可以关（2026-10-07 真机结论）：
+     * 雕像按档 TINY0.5/SMALL1/MIDDLE2/BIG3（最大 3×6×3），被剔除时玩家本来也看不到，上面那条"半截消失 / 被剔除模组整块吞掉"的影响
+     * 实测几乎为零，权衡下取性能。
      */
     @Override
     public boolean shouldRenderOffScreen() {
