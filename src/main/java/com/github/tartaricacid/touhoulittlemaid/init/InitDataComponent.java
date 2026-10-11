@@ -54,6 +54,14 @@ public class InitDataComponent {
                     .networkSynchronized(ByteBufCodecs.STRING_UTF8)
                     .build());
 
+    /** 手提音响保存的播放链接（http/https/file） */
+    public static final String PORTABLE_AUDIO_URL_TAG_NAME = "portable_audio_url";
+    public static final DataComponentType<String> PORTABLE_AUDIO_URL =
+            register(PORTABLE_AUDIO_URL_TAG_NAME, DataComponentType.<String>builder()
+                    .persistent(Codec.STRING)
+                    .networkSynchronized(ByteBufCodecs.STRING_UTF8)
+                    .build());
+
     public static final String MOUNTED_HEIGHT_TAG_NAME = "mounted_height";
     public static final DataComponentType<Float> MOUNTED_HEIGHT_TAG =
             register(MOUNTED_HEIGHT_TAG_NAME, DataComponentType.<Float>builder()

@@ -1165,5 +1165,12 @@
   "gui.touhou_little_maid.maid_config.value.sasimono.1": "红旗",
   "gui.touhou_little_maid.maid_config.value.sasimono.2": "白旗",
   "gui.touhou_little_maid.maid_config.value.sasimono.3": "蓝旗",
-  "gui.touhou_little_maid.maid_config.value.sasimono.4": "黑旗"
+  "gui.touhou_little_maid.maid_config.value.sasimono.4": "黑旗",
+  "item.touhou_little_maid.portable_audio": "手提音响",
+  "tooltips.touhou_little_maid.portable_audio.desc": "手持右击打开播放界面，填入链接即可播放（支持 http(s):// 与 file://）",
+  "tooltips.touhou_little_maid.portable_audio.empty": "尚未设置播放链接",
+  "gui.touhou_little_maid.portable_audio.title": "手提音响",
+  "gui.touhou_little_maid.portable_audio.url": "播放链接",
+  "gui.touhou_little_maid.portable_audio.play": "播放",
+  "gui.touhou_little_maid.portable_audio.stop": "停止"
 }

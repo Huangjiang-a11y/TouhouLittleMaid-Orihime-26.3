@@ -55,9 +55,15 @@ public final class InitSounds {
     public static final SoundEvent RECORDING_START = registerSound("ui.recording_start");
     public static final SoundEvent RECORDING_END = registerSound("ui.recording_end");
     public static final SoundEvent GECKO_CUSTOM = registerSound("gecko_custom");
+    // 手提音响（播放链接音乐），作用范围给大一点
+    public static final SoundEvent PORTABLE_AUDIO = registerSoundRange("item.portable_audio", 48.0F);
 
     private static SoundEvent registerSound(String name) {
+        return registerSoundRange(name, 16.0F);
+    }
+
+    private static SoundEvent registerSoundRange(String name, float range) {
         Identifier id = IdentifierUtil.modLoc(name);
-        return Registry.register(BuiltInRegistries.SOUND_EVENT, id, SoundEvent.createFixedRangeEvent(id, 16.0F));
+        return Registry.register(BuiltInRegistries.SOUND_EVENT, id, SoundEvent.createFixedRangeEvent(id, range));
     }
 }
