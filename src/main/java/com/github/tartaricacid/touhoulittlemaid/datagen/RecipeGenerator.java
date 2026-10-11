@@ -409,6 +409,16 @@ public class RecipeGenerator extends RecipeProvider {
                 .unlockedBy(getHasName(Items.REDSTONE), has(ConventionalItemTags.REDSTONE_DUSTS))
                 .save(recipeOutput);
 
+        // 旗指物：木棍 ×3 + 蓝色羊毛 ×2（照搬 1.12.2 原版配方）
+        this.shaped(RecipeCategory.MISC, InitItems.HATA_SASIMONO)
+                .pattern(" WS")
+                .pattern(" WS")
+                .pattern(" S ")
+                .define('W', Items.WOOL.blue())
+                .define('S', Items.STICK)
+                .unlockedBy(getHasName(Items.WOOL.blue()), has(Items.WOOL.blue()))
+                .save(recipeOutput);
+
         this.shapeless(RecipeCategory.MISC, InitItems.ENTITY_ID_COPY)
                 .requires(ConventionalItemTags.LEATHERS)
                 .requires(Items.PAPER)

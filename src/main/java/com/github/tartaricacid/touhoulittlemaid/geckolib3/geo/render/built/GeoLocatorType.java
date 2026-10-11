@@ -11,6 +11,8 @@ public class GeoLocatorType {
     public static final GeoLocatorType RIGHT_HAND = new GeoLocatorType("RightHandLocator");
     public static final GeoLocatorType BACKPACK = new GeoLocatorType("BackpackLocator");
     public static final GeoLocatorType HEAD = new GeoLocatorType("Head");
+    // 旗指物用的躯干定位（模型里名为 Body 的骨）
+    public static final GeoLocatorType BODY = new GeoLocatorType("Body");
 /*
     public static final GeoLocatorType LEFT_WAIST = new GeoLocatorType("LeftWaistLocator");
     public static final GeoLocatorType RIGHT_WAIST = new GeoLocatorType("RightWaistLocator");

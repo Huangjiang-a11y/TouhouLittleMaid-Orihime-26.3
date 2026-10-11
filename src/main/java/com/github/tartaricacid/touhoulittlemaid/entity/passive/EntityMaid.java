@@ -53,6 +53,7 @@ import net.minecraft.world.entity.ai.behavior.BehaviorUtils;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.monster.CrossbowAttackMob;
+import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.schedule.Activity;
 import net.minecraft.world.item.ItemStack;
@@ -409,10 +410,24 @@ public class EntityMaid extends MaidManagerHost implements IEntity, CrossbowAtta
 
     @Override
     public boolean canAttack(LivingEntity target) {
+        // 旗指物友伤防护：不把玩家和已驯服的宠物当作攻击目标
+        if (this.getConfigManager().getSasimonoStyle() > 0 && isSasimonoProtected(target)) {
+            return false;
+        }
         if (this.getTask() instanceof IAttackTask attackTask) {
             return attackTask.canAttack(this, target);
         }
         return super.canAttack(target);
+    }
+
+    /**
+     * 旗指物的友伤防护对象：玩家、以及已驯服的宠物（狼/猫等）。
+     */
+    public static boolean isSasimonoProtected(Entity target) {
+        if (target instanceof Player) {
+            return true;
+        }
+        return target instanceof TamableAnimal animal && animal.isTame();
     }
 
     @Override

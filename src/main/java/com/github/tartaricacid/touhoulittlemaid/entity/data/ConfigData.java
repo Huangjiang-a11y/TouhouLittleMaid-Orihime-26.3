@@ -11,8 +11,11 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.Mth;
 
-public record ConfigData(long booleanValue, PickType pickupType, float soundFreq) {
+public record ConfigData(long booleanValue, PickType pickupType, float soundFreq, int sasimonoStyle) {
+    /** 旗指物样式的数量上限（0 = 未装备），供 UI 循环切换用 */
+    public static final int SASIMONO_STYLE_MAX = 4;
     private static final int PICKUP_FLAG = 0;
     private static final int HOME_MODE_FLAG = 1;
     private static final int RIDEABLE_FLAG = 2;
@@ -39,13 +42,15 @@ public record ConfigData(long booleanValue, PickType pickupType, float soundFreq
     private static final Codec<ConfigData> CODEC = RecordCodecBuilder.create(ins -> ins.group(
             Codec.LONG.fieldOf("boolean_value").forGetter(ConfigData::booleanValue),
             PickType.CODEC.fieldOf("pickup_type").forGetter(ConfigData::pickupType),
-            Codec.FLOAT.fieldOf("sound_freq").forGetter(ConfigData::soundFreq)
+            Codec.FLOAT.fieldOf("sound_freq").forGetter(ConfigData::soundFreq),
+            Codec.INT.optionalFieldOf("sasimono_style", 0).forGetter(ConfigData::sasimonoStyle)
     ).apply(ins, ConfigData::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, ConfigData> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.LONG, ConfigData::booleanValue,
             PickType.STREAM_CODEC, ConfigData::pickupType,
             ByteBufCodecs.FLOAT, ConfigData::soundFreq,
+            ByteBufCodecs.VAR_INT, ConfigData::sasimonoStyle,
             ConfigData::new
     );
 
@@ -56,7 +61,7 @@ public record ConfigData(long booleanValue, PickType pickupType, float soundFreq
                     .syncWith(STREAM_CODEC, AttachmentSyncPredicate.all()));
 
     private static ConfigData defaultConfig() {
-        return new ConfigData(DEFAULT_BOOLEAN_VALUE, PickType.ALL, DEFAULT_SOUND_FREQ);
+        return new ConfigData(DEFAULT_BOOLEAN_VALUE, PickType.ALL, DEFAULT_SOUND_FREQ, 0);
     }
 
     public ConfigData {
@@ -66,7 +71,7 @@ public record ConfigData(long booleanValue, PickType pickupType, float soundFreq
     private ConfigData setFlag(int flag, boolean enabled) {
         long mask = 1L << flag;
         long newBooleanValue = enabled ? (booleanValue | mask) : (booleanValue & ~mask);
-        return new ConfigData(newBooleanValue, pickupType, soundFreq);
+        return new ConfigData(newBooleanValue, pickupType, soundFreq, sasimonoStyle);
     }
 
     private boolean hasFlag(int flag) {
@@ -146,7 +151,7 @@ public record ConfigData(long booleanValue, PickType pickupType, float soundFreq
     }
 
     public ConfigData setPickupType(PickType pickupType) {
-        return new ConfigData(booleanValue, pickupType, soundFreq);
+        return new ConfigData(booleanValue, pickupType, soundFreq, sasimonoStyle);
     }
 
     public PickType getPickupType() {
@@ -154,6 +159,10 @@ public record ConfigData(long booleanValue, PickType pickupType, float soundFreq
     }
 
     public ConfigData setSoundFreq(float soundFreq) {
-        return new ConfigData(booleanValue, pickupType, soundFreq);
+        return new ConfigData(booleanValue, pickupType, soundFreq, sasimonoStyle);
+    }
+
+    public ConfigData setSasimonoStyle(int sasimonoStyle) {
+        return new ConfigData(booleanValue, pickupType, soundFreq, Mth.clamp(sasimonoStyle, 0, SASIMONO_STYLE_MAX));
     }
 }

@@ -104,6 +104,8 @@ public interface InitItems {
     Item FAVORABILITY_TOOL_FULL = register("favorability_tool_full", id -> new ItemFavorabilityTool(id, "full"));
     Item OWNER_CONVERSION_TOOL = register("owner_conversion_tool", ItemOwnerConversionTool::new);
     Item SUBSTITUTE_JIZO = register("substitute_jizo", ItemSubstituteJizo::new);
+    // 旗指物
+    Item HATA_SASIMONO = register("hata_sasimono", ItemHataSasimono::new);
 
     // 成就图标
     Item CHANGE_CHAIR_MODEL = register("change_chair_model", ItemAdvancementIcon::new);

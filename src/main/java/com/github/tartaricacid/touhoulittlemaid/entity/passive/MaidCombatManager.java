@@ -83,6 +83,10 @@ public class MaidCombatManager {
     }
 
     boolean doHurtTarget(ServerLevel level, Entity target, BiPredicate<ServerLevel, Entity> superHurtTarget) {
+        // 旗指物友伤防护：即使某条 task 绕过了 canAttack，也不真正伤到玩家/宠物
+        if (maid.getConfigManager().getSasimonoStyle() > 0 && EntityMaid.isSasimonoProtected(target)) {
+            return false;
+        }
         MaidHurtTarget.Pre event = new MaidHurtTarget.Pre(maid, target);
         MaidHurtTarget.PRE.invoker().onPre(event);
         if (event.isCanceled()) {
@@ -130,6 +134,10 @@ public class MaidCombatManager {
         var event = new MaidAttackEvent(maid, source, amount);
         MaidAttackEvent.CALLBACK.invoker().post(event);
         if (event.isCanceled()) {
+            return false;
+        }
+        // 装备了旗指物：女仆不受玩家伤害（原版"受玩家伤害减少"的强化版，见旗指物功能改动）
+        if (source.getEntity() instanceof Player && maid.getConfigManager().getSasimonoStyle() > 0) {
             return false;
         }
         if (source.getEntity() instanceof Player player && maid.isAlliedTo(player)) {
