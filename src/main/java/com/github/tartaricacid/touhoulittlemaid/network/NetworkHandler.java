@@ -50,7 +50,6 @@ public class NetworkHandler {
         ClientPlayNetworking.registerGlobalReceiver(WChessToClientPackage.TYPE, WChessToClientPackage::handle);
         ClientPlayNetworking.registerGlobalReceiver(TTSAudioToClientPackage.TYPE, TTSAudioToClientPackage::handle);
         ClientPlayNetworking.registerGlobalReceiver(TTSSystemAudioToClientPackage.TYPE, TTSSystemAudioToClientPackage::handle);
-        ClientPlayNetworking.registerGlobalReceiver(PortableAudioToClientPackage.TYPE, PortableAudioToClientPackage::handle);
 
         ClientPlayNetworking.registerGlobalReceiver(AdvancedAddEntityPayload.TYPE, AdvancedAddEntityPayload::handle);
         ClientPlayNetworking.registerGlobalReceiver(OpenPlayerInventoryPackage.TYPE, OpenPlayerInventoryPackage::handle);
@@ -82,7 +81,6 @@ public class NetworkHandler {
         registerS2CPacket(WChessToClientPackage.TYPE, WChessToClientPackage.STREAM_CODEC);
         registerS2CPacket(TTSAudioToClientPackage.TYPE, TTSAudioToClientPackage.STREAM_CODEC);
         registerS2CPacket(TTSSystemAudioToClientPackage.TYPE, TTSSystemAudioToClientPackage.STREAM_CODEC);
-        registerS2CPacket(PortableAudioToClientPackage.TYPE, PortableAudioToClientPackage.STREAM_CODEC);
 
         registerS2CPacket(AdvancedAddEntityPayload.TYPE, AdvancedAddEntityPayload.STREAM_CODEC);
         registerS2CPacket(OpenPlayerInventoryPackage.TYPE, OpenPlayerInventoryPackage.STREAM_CODEC);
@@ -132,7 +130,6 @@ public class NetworkHandler {
         registerC2SPacket(OpenMaidAIChatPacket.TYPE, OpenMaidAIChatPacket.STREAM_CODEC, OpenMaidAIChatPacket::handle);
         registerC2SPacket(SaveLLMSitePacket.TYPE, SaveLLMSitePacket.STREAM_CODEC, SaveLLMSitePacket::handle);
         registerC2SPacket(SaveTTSSitePacket.TYPE, SaveTTSSitePacket.STREAM_CODEC, SaveTTSSitePacket::handle);
-        registerC2SPacket(PortableAudioControlPackage.TYPE, PortableAudioControlPackage.STREAM_CODEC, PortableAudioControlPackage::handle);
     }
 
     public static void sendToClientPlayer(CustomPacketPayload payload, ServerPlayer player) {

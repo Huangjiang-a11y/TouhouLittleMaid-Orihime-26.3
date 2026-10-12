@@ -106,8 +106,6 @@ public interface InitItems {
     Item SUBSTITUTE_JIZO = register("substitute_jizo", ItemSubstituteJizo::new);
     // 旗指物
     Item HATA_SASIMONO = register("hata_sasimono", ItemHataSasimono::new);
-    // 手提音响
-    Item PORTABLE_AUDIO = register("portable_audio", ItemPortableAudio::new);
 
     // 成就图标
     Item CHANGE_CHAIR_MODEL = register("change_chair_model", ItemAdvancementIcon::new);

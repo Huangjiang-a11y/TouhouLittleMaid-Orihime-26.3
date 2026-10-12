@@ -1166,13 +1166,6 @@
   "gui.touhou_little_maid.maid_config.value.sasimono.2": "White Flag",
   "gui.touhou_little_maid.maid_config.value.sasimono.3": "Blue Flag",
   "gui.touhou_little_maid.maid_config.value.sasimono.4": "Black Flag",
-  "item.touhou_little_maid.portable_audio": "Portable Audio",
-  "tooltips.touhou_little_maid.portable_audio.desc": "Right-click to open the player screen and fill in a URL (http(s):// or file://)",
-  "tooltips.touhou_little_maid.portable_audio.empty": "No URL set",
-  "gui.touhou_little_maid.portable_audio.title": "Portable Audio",
-  "gui.touhou_little_maid.portable_audio.url": "URL",
-  "gui.touhou_little_maid.portable_audio.play": "Play",
-  "gui.touhou_little_maid.portable_audio.stop": "Stop",
   "message.touhou_little_maid.hata_sasimono.equipped": "Banner equipped",
   "message.touhou_little_maid.hata_sasimono.already": "This maid already wears a banner (style is switchable in the maid config screen)",
   "message.touhou_little_maid.hata_sasimono.not_owner": "This is not your maid"

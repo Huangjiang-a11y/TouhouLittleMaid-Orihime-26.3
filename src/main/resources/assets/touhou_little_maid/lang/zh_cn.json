@@ -1166,13 +1166,6 @@
   "gui.touhou_little_maid.maid_config.value.sasimono.2": "白旗",
   "gui.touhou_little_maid.maid_config.value.sasimono.3": "蓝旗",
   "gui.touhou_little_maid.maid_config.value.sasimono.4": "黑旗",
-  "item.touhou_little_maid.portable_audio": "手提音响",
-  "tooltips.touhou_little_maid.portable_audio.desc": "手持右击打开播放界面，填入链接即可播放（支持 http(s):// 与 file://）",
-  "tooltips.touhou_little_maid.portable_audio.empty": "尚未设置播放链接",
-  "gui.touhou_little_maid.portable_audio.title": "手提音响",
-  "gui.touhou_little_maid.portable_audio.url": "播放链接",
-  "gui.touhou_little_maid.portable_audio.play": "播放",
-  "gui.touhou_little_maid.portable_audio.stop": "停止",
   "message.touhou_little_maid.hata_sasimono.equipped": "已为女仆装备旗指物",
   "message.touhou_little_maid.hata_sasimono.already": "这面旗已经装备过了（样式可在女仆配置页切换）",
   "message.touhou_little_maid.hata_sasimono.not_owner": "这不是你的女仆"

@@ -409,13 +409,6 @@ public class RecipeGenerator extends RecipeProvider {
                 .unlockedBy(getHasName(Items.REDSTONE), has(ConventionalItemTags.REDSTONE_DUSTS))
                 .save(recipeOutput);
 
-        // 手提音响：黑羊毛 ×5 + 唱片机 ×1（照搬 1.12.2 原版祭坛配方）
-        AltarRecipeBuilder.shapeless(items, InitItems.PORTABLE_AUDIO)
-                .power(0.5F)
-                .requires(5, Items.WOOL.black())
-                .requires(Items.JUKEBOX)
-                .save(recipeOutput);
-
         // 旗指物：木棍 ×3 + 蓝色羊毛 ×2（照搬 1.12.2 原版配方）
         this.shaped(RecipeCategory.MISC, InitItems.HATA_SASIMONO)
                 .pattern(" WS")
