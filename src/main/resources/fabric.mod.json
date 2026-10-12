@@ -3,7 +3,7 @@
   "id": "touhou_little_maid",
   "version": "${version}",
   "name": "Touhou Little Maid: Orihime",
-  "description": "Touhou Little Maid Unofficial Fabric port",
+  "description": "东方小女仆（Touhou Little Maid: Orihime）的非官方 Fabric 移植，目标 Minecraft 26.3。\n上游为 NeoForge 版本，本移植只保留「官方移植会做」的内容：依赖第三方模组才能生效的联动已基本移除（Aquaculture 2、Embeddium/Oculus、Farmer's Delight、Kaleidoscope Cookery、Superb Warfare、Immersive Melodies、PatPat、Ponder、Sophisticated/Traveler's Backpack、Simple Hats、SlashBlade、JMC 等），仅保留 JEI、Jade、Sodium、Iris、Patchouli、Cloth Config、Curios、IPN、Extra Container 的联动。\n与原作者及团队无关；不保证与上游存档完全兼容。\n\nAn unofficial Fabric port of Touhou Little Maid: Orihime for Minecraft 26.3.\nOnly the parts an official port would ship are kept: integrations that require third-party mods have been pruned (Aquaculture 2, Embeddium/Oculus, Farmer's Delight, Kaleidoscope Cookery, Superb Warfare, Immersive Melodies, PatPat, Ponder, Sophisticated/Traveler's Backpack, Simple Hats, SlashBlade, JMC, ...), while JEI, Jade, Sodium, Iris, Patchouli, Cloth Config, Curios, IPN and Extra Container hooks remain.\nNot affiliated with the original authors; save compatibility with upstream builds is not guaranteed.",
   "authors": [
     "Sh1roCu"
   ],
