@@ -420,6 +420,16 @@ public class EntityMaid extends MaidManagerHost implements IEntity, CrossbowAtta
         return super.canAttack(target);
     }
 
+    @Override
+    public boolean skipAttackInteraction(Entity entity) {
+        // 旗指物：玩家无法攻击女仆——整个攻击动作被跳过（见 Player#cannotAttack），
+        // 不会产生伤害、音效、击退，也不会触发复仇/仇恨。
+        if (this.getConfigManager().getSasimonoStyle() > 0 && entity instanceof Player) {
+            return true;
+        }
+        return super.skipAttackInteraction(entity);
+    }
+
     /**
      * 旗指物的友伤防护对象：玩家、以及已驯服的宠物（狼/猫等）。
      */

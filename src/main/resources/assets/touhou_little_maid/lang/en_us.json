@@ -1159,7 +1159,7 @@
   "config.touhou_little_maid.vanilla.replace_xp_bottle_texture.tooltip": "Whether to replace the vanilla bottle of xp texture with the point items",
   "ai.touhou_little_maid.chat.site.openai_realtime.name": "OpenAI Realtime",
   "item.touhou_little_maid.hata_sasimono": "Hata Sasimono",
-  "tooltips.touhou_little_maid.hata_sasimono.desc": "Right-click a maid to equip a back banner. The maid becomes immune to player damage and will not attack players or tamed pets. Style is switchable in the maid config screen",
+  "tooltips.touhou_little_maid.hata_sasimono.desc": "Right-click a maid to equip a back banner. Once equipped, players cannot attack the maid at all, and the maid will not attack players or tamed pets. Style is switchable in the maid config screen",
   "gui.touhou_little_maid.maid_config.sasimono": "Back Banner",
   "gui.touhou_little_maid.maid_config.value.sasimono.0": "Hidden",
   "gui.touhou_little_maid.maid_config.value.sasimono.1": "Red Flag",

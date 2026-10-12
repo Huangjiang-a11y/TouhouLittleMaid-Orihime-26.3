@@ -1159,7 +1159,7 @@
   "config.touhou_little_maid.vanilla.replace_xp_bottle_texture.tooltip": "将附魔之瓶纹理替换为得分道具",
   "ai.touhou_little_maid.chat.site.openai_realtime.name": "OpenAI 实时",
   "item.touhou_little_maid.hata_sasimono": "旗指物",
-  "tooltips.touhou_little_maid.hata_sasimono.desc": "右击女仆为它装备旗指物。装备后女仆不受玩家伤害，也不会攻击玩家和已驯服的宠物。样式可在女仆配置界面切换",
+  "tooltips.touhou_little_maid.hata_sasimono.desc": "右击女仆为它装备旗指物。装备后玩家无法攻击女仆（攻击动作直接跳过），女仆也不会攻击玩家和已驯服的宠物。样式可在女仆配置界面切换",
   "gui.touhou_little_maid.maid_config.sasimono": "旗指物",
   "gui.touhou_little_maid.maid_config.value.sasimono.0": "隐藏",
   "gui.touhou_little_maid.maid_config.value.sasimono.1": "红旗",
