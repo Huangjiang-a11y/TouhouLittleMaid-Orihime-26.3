@@ -338,9 +338,15 @@ processResources {
     filteringCharset "UTF-8"
 
     filesMatching("fabric.mod.json") {
-        expand "version": project.version,
-                "minecraft_version": project.minecraft_version,
-                "loader_version": project.loader_version
+        // 注意：不要用 expand()——Groovy 模板会把 JSON 字符串里的 \n、\" 等转义还原成真字符，
+        // 打出来的 fabric.mod.json 变成非法 JSON（Invalid control character），jar 直接加载失败。
+        // ReplaceTokens 只替换 ${...} 占位符，不碰任何转义。
+        filter(org.apache.tools.ant.filters.ReplaceTokens,
+                beginToken: '${',
+                endToken: '}',
+                tokens: [version          : project.version.toString(),
+                         minecraft_version: project.minecraft_version.toString(),
+                         loader_version   : project.loader_version.toString()])
     }
 }
 
