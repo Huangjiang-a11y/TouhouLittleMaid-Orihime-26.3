@@ -1,6 +1,7 @@
 package com.github.tartaricacid.touhoulittlemaid.client.renderer.entity.layer;
 
 import com.github.tartaricacid.simplebedrockmodel.client.bedrock.model.BedrockPart;
+import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.client.model.bedrock.EntityMaidModel;
 import com.github.tartaricacid.touhoulittlemaid.client.model.bedrock.SimpleBedrockModel;
 import com.github.tartaricacid.touhoulittlemaid.client.renderer.entity.EntityMaidRenderer;
@@ -40,6 +41,7 @@ public class LayerHataSasimono extends RenderLayer<EntityMaidRenderState, Entity
     private final SimpleBedrockModel<Unit> banner;
     private final SpriteGetter sprites;
     private final BannerFlagModel flag;
+    private static boolean logged = false;
 
     public LayerHataSasimono(EntityMaidRenderer renderer, EntityRendererProvider.Context context) {
         super(renderer);
@@ -59,10 +61,25 @@ public class LayerHataSasimono extends RenderLayer<EntityMaidRenderState, Entity
 
         // 定位：优先 body 骨（旗子随躯干摆动），无 body 骨则退回 root
         BedrockPart body = this.getParentModel().getModelMap().get("body");
+        if (body == null) {
+            body = this.getParentModel().getModelMap().get("Body");
+        }
         if (body != null) {
             body.translateAndRotate(poseStack);
+            // 抵消 body 骨的 pivot 位移：静止时落点与已验证的背旗层（挂 root）完全一致，
+            // 躯干转动/摆动时旗子仍跟着身体走。
+            poseStack.translate(-body.x / 16.0F, -body.y / 16.0F, -body.z / 16.0F);
+            if (!logged && state.sasimonoStyle > 0) {
+                logged = true;
+                TouhouLittleMaid.LOGGER.info("[Sasimono] 渲染：挂 body 骨 pivot=({},{},{}) style={}",
+                        body.x, body.y, body.z, state.sasimonoStyle);
+            }
         } else if (this.getParentModel().root() instanceof BedrockPart part) {
             part.translateAndRotate(poseStack);
+            if (!logged && state.sasimonoStyle > 0) {
+                logged = true;
+                TouhouLittleMaid.LOGGER.info("[Sasimono] 渲染：无 body 骨，退回 root，style={}", state.sasimonoStyle);
+            }
         }
 
         poseStack.translate(0, -0.25, 0.25);

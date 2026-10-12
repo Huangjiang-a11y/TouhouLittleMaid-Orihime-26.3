@@ -29,8 +29,8 @@ import static net.minecraft.client.renderer.blockentity.BannerRenderer.submitPat
 import static net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY;
 
 /**
- * 旗指物渲染层（GeckoLib 模型）。定位挂在 {@link GeoLocatorType#BODY}（模型里名为 Body 的骨）上，
- * 样式由 {@code state.sasimonoStyle} 决定。偏移沿用背旗层 {@link GeckoLayerMaidBanner}。
+ * 旗指物渲染层（GeckoLib 模型）。定位与偏移完全沿用现成的背旗层 {@link GeckoLayerMaidBanner}
+ * （BACKPACK 定位骨 + 同一组平移/缩放/旋转），保证落点一致；样式由 {@code state.sasimonoStyle} 决定。
  */
 public class GeckoLayerHataSasimono implements GeoLayerRenderer<EntityMaidRenderState, GeckoMaidRenderData> {
     private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(MOD_ID, "textures/bedrock/entity/maid_banner.png");
@@ -51,7 +51,8 @@ public class GeckoLayerHataSasimono implements GeoLayerRenderer<EntityMaidRender
         if (color == null) {
             return;
         }
-        data.modelState.visitLocatorGroup(GeoLocatorType.BODY, poseStack, locator -> {
+        // 用现成背旗层同一套定位（BACKPACK 骨 + 同一组偏移），保证落点一致
+        data.modelState.visitLocatorGroup(GeoLocatorType.BACKPACK, poseStack, locator -> {
             locator.translate(0, 0.75, 0.3);
             locator.scale(0.65F, -0.65F, -0.65F);
             locator.rotate(Axis.YN.rotationDegrees(180));

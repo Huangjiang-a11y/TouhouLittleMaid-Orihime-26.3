@@ -125,6 +125,7 @@ public class TouhouLittleMaidFabric implements ModInitializer {
         InteractMaidEvent.CALLBACK.register(SlabClickEvent::onInteract);
         InteractMaidEvent.CALLBACK.register(LOWEST, SwitchSittingEvent::onInteractMaid);
         InteractMaidEvent.CALLBACK.register(UseFavorabilityToolEvent::onInteract);
+        InteractMaidEvent.CALLBACK.register(HataSasimonoClickEvent::onInteract);
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
             InteractMaidEvent.CALLBACK.register(UseNameTagEvent::onInteractServer);
         }
