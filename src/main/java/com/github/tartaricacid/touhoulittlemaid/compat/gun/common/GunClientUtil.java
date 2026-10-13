@@ -10,6 +10,8 @@ import com.github.tartaricacid.touhoulittlemaid.geckolib3.core.PlayState;
 import com.github.tartaricacid.touhoulittlemaid.geckolib3.core.builder.LoopType;
 import com.github.tartaricacid.touhoulittlemaid.geckolib3.core.event.AnimationEvent;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
+import com.tacz.guns.api.item.IGun;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.world.item.ItemStack;
 
@@ -46,7 +48,14 @@ public class GunClientUtil {
         // TODO 背枪渲染待按 26.3 的 SubmitNodeCollector 管线补全
     }
 
+    /** 手持枪械时的位移（加特林额外转个角度） */
     public static void addItemTranslate(PoseStack poseStack, ItemStack itemStack, boolean isLeft) {
-        // TODO 手持位移待补
+        if (!isLeft && itemStack.getItem() instanceof IGun gun) {
+            poseStack.translate(0, -0.125, 0);
+            if (TacCompat.MINIGUN_ID.equals(gun.getGunId(itemStack))) {
+                poseStack.rotate(Axis.ZP.rotationDegrees(20));
+                poseStack.rotate(Axis.XP.rotationDegrees(50));
+            }
+        }
     }
 }
