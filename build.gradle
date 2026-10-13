@@ -228,6 +228,9 @@ dependencies {
     implementation "maven.modrinth:inventory-profiles-next:fabric-26.3-2.3.8"
 
     // 第三方兼容（26.3 上仍有对应版本/移植版，见 fabric.mod.json 描述）
+    // TACZ（Timeless and Classics Zero）非官方 Refabricated 移植版
+    // TACZ 非官方移植版没有走 Modrinth maven，用本地 libs jar（与 1.21.1 上游同样做法）
+    compileOnly "libs:tacz-refabricated:26.3-0.8.5-beta1"
     compileOnly "maven.modrinth:farmers-delight-refabricated:26.3-3.6.28"
     compileOnly "maven.modrinth:kaleidoscope-cookery-refabricated:1.6.0.4-fabric+mc26.3"
     compileOnly "maven.modrinth:patpat:1.3.2+26.3+fabric"

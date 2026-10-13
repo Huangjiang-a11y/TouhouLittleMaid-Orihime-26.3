@@ -2,6 +2,7 @@ package com.github.tartaricacid.touhoulittlemaid.entity.task;
 
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.api.ILittleMaid;
+import com.github.tartaricacid.touhoulittlemaid.compat.gun.common.GunCommonUtil;
 import com.github.tartaricacid.touhoulittlemaid.api.task.IMaidTask;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.google.common.collect.ImmutableList;
@@ -49,6 +50,9 @@ public final class TaskManager {
         manager.add(new TaskFishing());
         manager.add(new TaskExtinguishing());
         manager.add(new TaskBoardGames());
+        // 枪械任务：装了 TaCZ 才加（见 GunCommonUtil）
+        GunCommonUtil.initAndAddTask(manager);
+
         for (ILittleMaid littleMaid : TouhouLittleMaid.EXTENSIONS) {
             littleMaid.addMaidTask(manager);
         }
