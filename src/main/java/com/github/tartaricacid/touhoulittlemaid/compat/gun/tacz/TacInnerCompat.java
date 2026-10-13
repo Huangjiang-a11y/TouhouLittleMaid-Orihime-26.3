@@ -83,7 +83,7 @@ public class TacInnerCompat {
         float yaw = (float) -Math.toDegrees(Math.atan2(x, z));
         float pitch = (float) -Math.toDegrees(Math.atan2(y, Math.sqrt(x * x + z * z)));
 
-        float radius = shooter.getRestrictRadius();
+        float radius = shooter.getHomeRadius();
 
         IGunOperator gunOperator = IGunOperator.fromLivingEntity(shooter);
         ShootResult result = gunOperator.shoot(() -> pitch, () -> yaw);

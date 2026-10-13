@@ -59,9 +59,10 @@ public class TaskGunAttack implements IRangedAttackTask {
     @Override
     public List<Pair<Integer, BehaviorControl<? super EntityMaid>>> createBrainTasks(EntityMaid maid) {
         BehaviorControl<EntityMaid> supplementedTask = StartAttacking.create(
-                this::mainhandHoldGun, IRangedAttackTask::findFirstValidAttackTarget);
-        BehaviorControl<EntityMaid> findTargetTask = StopAttackingIfTargetInvalid.create(target ->
-                !this.mainhandHoldGun(maid) || farAway(target, maid));
+                (_, e) -> this.mainhandHoldGun(e),
+                (_, e) -> IRangedAttackTask.findFirstValidAttackTarget(e));
+        BehaviorControl<EntityMaid> findTargetTask = StopAttackingIfTargetInvalid.create(
+                (_, target) -> !this.mainhandHoldGun(maid) || farAway(target, maid));
         BehaviorControl<EntityMaid> gunWalkTargetTask = MaidRangedWalkToTarget.create(0.6f);
         BehaviorControl<EntityMaid> gunAttackStrafingTask = new GunAttackStrafingTask();
         BehaviorControl<EntityMaid> gunShootTargetTask = new GunShootTargetTask();
@@ -81,9 +82,10 @@ public class TaskGunAttack implements IRangedAttackTask {
     public List<Pair<Integer, BehaviorControl<? super EntityMaid>>> createRideBrainTasks(EntityMaid maid) {
         // 因为骑乘载具时，也会有射击，故此处设定敌对目标使用 canStartAttacking 方法
         BehaviorControl<EntityMaid> supplementedTask = StartAttacking.create(
-                GunCommonUtil::canStartAttacking, IRangedAttackTask::findFirstValidAttackTarget);
-        BehaviorControl<EntityMaid> findTargetTask = StopAttackingIfTargetInvalid.create(target ->
-                !GunCommonUtil.canStartAttacking(maid) || farAway(target, maid));
+                (_, e) -> GunCommonUtil.canStartAttacking(e),
+                (_, e) -> IRangedAttackTask.findFirstValidAttackTarget(e));
+        BehaviorControl<EntityMaid> findTargetTask = StopAttackingIfTargetInvalid.create(
+                (_, target) -> !GunCommonUtil.canStartAttacking(maid) || farAway(target, maid));
         BehaviorControl<EntityMaid> gunShootTargetTask = new GunShootTargetTask();
 
         return Lists.newArrayList(
@@ -97,8 +99,8 @@ public class TaskGunAttack implements IRangedAttackTask {
     public AABB searchDimension(EntityMaid maid) {
         if (GunCommonUtil.canStartAttacking(maid)) {
             float searchRange = this.searchRadius(maid);
-            if (maid.hasRestriction()) {
-                return new AABB(maid.getRestrictCenter()).inflate(searchRange);
+            if (maid.hasHome()) {
+                return new AABB(maid.getHomePosition()).inflate(searchRange);
             } else {
                 return maid.getBoundingBox().inflate(searchRange);
             }

@@ -22,7 +22,7 @@ public class GunHurtMaidEvent {
     public void onMaidHurt(MaidHurtEvent event) {
         DamageSource source = event.getSource();
         EntityMaid maid = event.getMaid();
-        if (maid.getOwnerUUID() == null) {
+        if (maid.getOwner() == null) {
             return;
         }
         if (isBulletDamage(source)) {
