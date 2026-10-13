@@ -1,6 +1,5 @@
 package com.github.tartaricacid.touhoulittlemaid.compat.gun.tacz.event;
 
-import cn.sh1rocu.touhoulittlemaid.api.event.LivingAttackEvent;
 import com.github.tartaricacid.touhoulittlemaid.api.event.MaidHurtEvent;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.tacz.guns.api.event.common.EntityHurtByGunEvent;
@@ -50,21 +49,6 @@ public class GunHurtMaidEvent {
         if (attacker instanceof Player player) {
             // 主人和同 Team 玩家免伤
             if (hurtEntity instanceof EntityMaid maid && maid.isAlliedTo(player)) {
-                event.setCanceled(true);
-            }
-        }
-    }
-
-    /**
-     * 不伤害他人
-     */
-    public void onPlayerHurt(LivingAttackEvent event) {
-        LivingEntity entity = event.getEntity();
-        DamageSource source = event.getSource();
-        if (entity instanceof Player player && isBulletDamage(source)) {
-            Entity causingEntity = source.getEntity();
-            // 主人和同 Team 玩家免伤
-            if (causingEntity instanceof EntityMaid maid && maid.isAlliedTo(player)) {
                 event.setCanceled(true);
             }
         }

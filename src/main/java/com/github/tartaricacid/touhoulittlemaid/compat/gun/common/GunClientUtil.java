@@ -1,70 +1,47 @@
 package com.github.tartaricacid.touhoulittlemaid.compat.gun.common;
 
-import com.github.tartaricacid.touhoulittlemaid.api.entity.IMaid;
-import com.github.tartaricacid.touhoulittlemaid.client.animation.script.ModelRendererWrapper;
+import com.github.tartaricacid.simplebedrockmodel.client.bedrock.model.BedrockPart;
 import com.github.tartaricacid.touhoulittlemaid.client.entity.GeckoMaidEntity;
-import com.github.tartaricacid.touhoulittlemaid.compat.gun.swarfare.SWarfareCompat;
-import com.github.tartaricacid.touhoulittlemaid.compat.gun.tacz.TacCompat;
+import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.geckolib3.core.PlayState;
-import com.github.tartaricacid.touhoulittlemaid.geckolib3.core.builder.ILoopType;
-import com.github.tartaricacid.touhoulittlemaid.geckolib3.core.event.predicate.AnimationEvent;
-import com.github.tartaricacid.touhoulittlemaid.geckolib3.geo.animated.ILocationModel;
+import com.github.tartaricacid.touhoulittlemaid.geckolib3.core.builder.LoopType;
+import com.github.tartaricacid.touhoulittlemaid.geckolib3.core.event.AnimationEvent;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nullable;
 
-@Environment(EnvType.CLIENT)
+/**
+ * 枪械客户端工具。方法签名已按 26.3 的架构重建（旧版的 IMaid / ModelRendererWrapper /
+ * ILocationModel / MultiBufferSource 在 26.3 都不存在了）：
+ * <ul>
+ *     <li>动画：{@code AnimationManager} 调用（gecko 侧）</li>
+ *     <li>手臂姿态：{@code MaidBaseAnimation} 调用（基岩侧）</li>
+ *     <li>背枪渲染 / 手持位移：{@code LayerMaidBackItem}、{@code LayerMaidHeldItem} 调用</li>
+ * </ul>
+ * TODO 方法体待按 26.3 的动画与渲染管线补全（见 tacz-wip 分支说明）。
+ */
 public class GunClientUtil {
-    public static boolean onHoldGun(IMaid maid, @Nullable ModelRendererWrapper armLeft, @Nullable ModelRendererWrapper armRight) {
-        return TacCompat.onHoldGun(maid, armLeft, armRight)
-                || SWarfareCompat.onHoldGun(maid, armLeft, armRight);
-    }
-
-    public static void addItemTranslate(PoseStack poseStack, ItemStack itemStack, boolean isLeft) {
-        if (TacCompat.isGun(itemStack)) {
-            TacCompat.addItemTranslate(poseStack, itemStack, isLeft);
-        } else if (SWarfareCompat.isGun(itemStack)) {
-            SWarfareCompat.addItemTranslate(poseStack, itemStack, isLeft);
-        }
-    }
-
-    public static void renderBackGun(PoseStack matrixStack, MultiBufferSource bufferIn, int packedLightIn, ItemStack stack, IMaid maid) {
-        if (TacCompat.isGun(stack)) {
-            TacCompat.renderBackGun(matrixStack, bufferIn, packedLightIn, stack, maid);
-        } else if (SWarfareCompat.isGun(stack)) {
-            SWarfareCompat.renderBackGun(matrixStack, bufferIn, packedLightIn, stack, maid);
-        }
-    }
-
-    public static void renderBackGun(ItemStack offhandItem, ILocationModel geoModel, IMaid maid, PoseStack poseStack, MultiBufferSource bufferIn, int packedLight) {
-        if (TacCompat.isGun(offhandItem)) {
-            TacCompat.renderBackGun(offhandItem, geoModel, maid, poseStack, bufferIn, packedLight);
-        } else if (SWarfareCompat.isGun(offhandItem)) {
-            SWarfareCompat.renderBackGun(offhandItem, geoModel, maid, poseStack, bufferIn, packedLight);
-        }
-    }
-
     @Nullable
-    public static PlayState playGunMainAnimation(IMaid maid, AnimationEvent<GeckoMaidEntity<?>> event, String animationName, ILoopType loopType) {
-        if (TacCompat.isGun(maid.asEntity().getMainHandItem())) {
-            return TacCompat.playGunMainAnimation(maid, event, animationName, loopType);
-        } else if (SWarfareCompat.isGun(maid.asEntity().getMainHandItem())) {
-            return SWarfareCompat.playGunMainAnimation(maid, event, animationName, loopType);
-        }
+    public static PlayState playGunMainAnimation(EntityMaid maid, AnimationEvent<GeckoMaidEntity<?>> event,
+                                                 String animationName, LoopType loopType) {
         return null;
     }
 
     @Nullable
     public static PlayState playGunHoldAnimation(ItemStack mainHandItem, AnimationEvent<GeckoMaidEntity<?>> event) {
-        if (TacCompat.isGun(mainHandItem)) {
-            return TacCompat.playGunHoldAnimation(mainHandItem, event);
-        } else if (SWarfareCompat.isGun(mainHandItem)) {
-            return SWarfareCompat.playGunHoldAnimation(mainHandItem, event);
-        }
         return null;
+    }
+
+    public static boolean onHoldGun(EntityMaid maid, @Nullable BedrockPart armLeft, @Nullable BedrockPart armRight) {
+        return false;
+    }
+
+    public static void renderBackGun(PoseStack poseStack, SubmitNodeCollector buffer, int packedLight,
+                                     ItemStack stack, EntityMaid maid) {
+    }
+
+    public static void addItemTranslate(PoseStack poseStack, ItemStack itemStack, boolean isLeft) {
     }
 }

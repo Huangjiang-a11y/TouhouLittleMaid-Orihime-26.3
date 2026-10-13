@@ -1,6 +1,7 @@
 package cn.sh1rocu.touhoulittlemaid.mixin.compat.tacz;
 
 import cn.sh1rocu.touhoulittlemaid.util.compat.tacz.ItemHandlerUtil;
+import cn.sh1rocu.touhoulittlemaid.util.transfer.ItemUtil;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.tacz.guns.api.item.IAmmo;
 import com.tacz.guns.api.item.IAmmoBox;
@@ -34,8 +35,8 @@ public class ModernKineticGunScriptAPIMixin {
         if (this.shooter instanceof EntityMaid maid) {
             var cap = maid.getAllInv();
             // 背包检查
-            for (int i = 0; i < cap.getSlots(); i++) {
-                ItemStack checkAmmoStack = cap.getStackInSlot(i);
+            for (int i = 0; i < cap.getSlotCount(); i++) {
+                ItemStack checkAmmoStack = ItemUtil.getStack(cap, i);
                 if (checkAmmoStack.getItem() instanceof IAmmo iAmmo && iAmmo.isAmmoOfGun(itemStack, checkAmmoStack)) {
                     cir.setReturnValue(true);
                     return;
