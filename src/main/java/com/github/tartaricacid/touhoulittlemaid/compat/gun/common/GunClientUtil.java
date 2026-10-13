@@ -2,6 +2,9 @@ package com.github.tartaricacid.touhoulittlemaid.compat.gun.common;
 
 import com.github.tartaricacid.simplebedrockmodel.client.bedrock.model.BedrockPart;
 import com.github.tartaricacid.touhoulittlemaid.client.entity.GeckoMaidEntity;
+import com.github.tartaricacid.touhoulittlemaid.compat.gun.tacz.TacCompat;
+import com.github.tartaricacid.touhoulittlemaid.compat.gun.tacz.client.GunBaseAnimation;
+import com.github.tartaricacid.touhoulittlemaid.compat.gun.tacz.client.GunGeckoAnimation;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.geckolib3.core.PlayState;
 import com.github.tartaricacid.touhoulittlemaid.geckolib3.core.builder.LoopType;
@@ -13,35 +16,37 @@ import net.minecraft.world.item.ItemStack;
 import javax.annotation.Nullable;
 
 /**
- * 枪械客户端工具。方法签名已按 26.3 的架构重建（旧版的 IMaid / ModelRendererWrapper /
- * ILocationModel / MultiBufferSource 在 26.3 都不存在了）：
- * <ul>
- *     <li>动画：{@code AnimationManager} 调用（gecko 侧）</li>
- *     <li>手臂姿态：{@code MaidBaseAnimation} 调用（基岩侧）</li>
- *     <li>背枪渲染 / 手持位移：{@code LayerMaidBackItem}、{@code LayerMaidHeldItem} 调用</li>
- * </ul>
- * TODO 方法体待按 26.3 的动画与渲染管线补全（见 tacz-wip 分支说明）。
+ * 枪械客户端工具（方法签名已按 26.3 架构重建）。
+ * 动画 / 手臂姿态已接上；背枪渲染与手持位移待补。
  */
 public class GunClientUtil {
     @Nullable
     public static PlayState playGunMainAnimation(EntityMaid maid, AnimationEvent<GeckoMaidEntity<?>> event,
                                                  String animationName, LoopType loopType) {
+        if (TacCompat.isInstalled()) {
+            return GunGeckoAnimation.playGunMainAnimation(event, animationName, loopType);
+        }
         return null;
     }
 
     @Nullable
     public static PlayState playGunHoldAnimation(ItemStack mainHandItem, AnimationEvent<GeckoMaidEntity<?>> event) {
+        if (TacCompat.isInstalled() && TacCompat.isGun(mainHandItem)) {
+            return GunGeckoAnimation.playGunHoldAnimation(event, mainHandItem);
+        }
         return null;
     }
 
     public static boolean onHoldGun(EntityMaid maid, @Nullable BedrockPart armLeft, @Nullable BedrockPart armRight) {
-        return false;
+        return TacCompat.isInstalled() && GunBaseAnimation.onHoldGun(maid, armLeft, armRight);
     }
 
     public static void renderBackGun(PoseStack poseStack, SubmitNodeCollector buffer, int packedLight,
                                      ItemStack stack, EntityMaid maid) {
+        // TODO 背枪渲染待按 26.3 的 SubmitNodeCollector 管线补全
     }
 
     public static void addItemTranslate(PoseStack poseStack, ItemStack itemStack, boolean isLeft) {
+        // TODO 手持位移待补
     }
 }

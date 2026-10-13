@@ -3,6 +3,7 @@ package com.github.tartaricacid.touhoulittlemaid.client.animation.gecko;
 import com.github.tartaricacid.touhoulittlemaid.client.animation.gecko.condition.*;
 import com.github.tartaricacid.touhoulittlemaid.client.animation.gecko.controller.IAnimationPredicate;
 import com.github.tartaricacid.touhoulittlemaid.client.entity.GeckoMaidEntity;
+import com.github.tartaricacid.touhoulittlemaid.compat.gun.common.GunClientUtil;
 import com.github.tartaricacid.touhoulittlemaid.entity.item.EntityChair;
 import com.github.tartaricacid.touhoulittlemaid.entity.item.EntitySit;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
@@ -87,7 +88,10 @@ public final class AnimationManager {
                 if (state.getPredicate().test(maid, event)) {
                     String animationName = state.getAnimationName();
                     LoopType loopType = state.getLoopType();
-                    return playAnimation(event, animationName, loopType);
+                    // 装了 TACZ 且手持枪械时优先用 tac: 前缀的动画
+                    PlayState gunMainAnimation = GunClientUtil.playGunMainAnimation(maid, event, animationName, loopType);
+                    return java.util.Objects.requireNonNullElseGet(gunMainAnimation,
+                            () -> playAnimation(event, animationName, loopType));
                 }
             }
         }
@@ -123,6 +127,11 @@ public final class AnimationManager {
         EntityMaid maid = event.getAnimatableEntity().getMaid();
         if (!maid.isSwinging() && !maid.isUsingItem()) {
             ItemStack mainHandItem = maid.getItemInHand(InteractionHand.MAIN_HAND);
+            // 装了 TACZ 且手持枪械时用枪械动画
+            PlayState gunHoldAnimation = GunClientUtil.playGunHoldAnimation(mainHandItem, event);
+            if (gunHoldAnimation != null) {
+                return gunHoldAnimation;
+            }
             if (mainHandItem.is(Items.CROSSBOW) && CrossbowItem.isCharged(mainHandItem)) {
                 return playAnimation(event, "hold_mainhand:charged_crossbow", LoopType.LOOP);
             }
