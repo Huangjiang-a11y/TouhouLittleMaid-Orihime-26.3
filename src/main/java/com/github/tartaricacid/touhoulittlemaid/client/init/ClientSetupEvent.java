@@ -6,6 +6,7 @@ import com.github.tartaricacid.touhoulittlemaid.client.overlay.BroomTipsOverlay;
 import com.github.tartaricacid.touhoulittlemaid.client.overlay.MaidTipsOverlay;
 import com.github.tartaricacid.touhoulittlemaid.client.overlay.ShowPowerOverlay;
 import com.github.tartaricacid.touhoulittlemaid.compat.iris.IrisCompat;
+import com.github.tartaricacid.touhoulittlemaid.compat.patpat.PatPatCompat;
 import com.github.tartaricacid.touhoulittlemaid.compat.sodium.SodiumCompat;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
@@ -21,6 +22,7 @@ public class ClientSetupEvent {
 
         // 客户端兼容
         SodiumCompat.init();
+        PatPatCompat.init();
     }
 
     public static void onRegisterGuiLayers() {

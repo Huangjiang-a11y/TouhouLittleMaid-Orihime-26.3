@@ -1,6 +1,7 @@
 package com.github.tartaricacid.touhoulittlemaid.init.registry;
 
 import com.github.tartaricacid.touhoulittlemaid.compat.patchouli.PatchouliCompat;
+import com.github.tartaricacid.touhoulittlemaid.compat.tbackpack.TBackpackCompat;
 import net.fabricmc.loader.api.FabricLoader;
 
 /**
@@ -13,9 +14,11 @@ public final class CompatRegistry {
     // 为什么 Fabric 端的 id 要改（
     public static final String CLOTH_CONFIG = "cloth-config";
     public static final String TRINKETS = "trinkets";
+    public static final String TBACKPACK = "travelersbackpack";
 
     public static void onEnqueue() {
         checkModLoad(PATCHOULI, PatchouliCompat::init);
+        checkModLoad(TBACKPACK, TBackpackCompat::init);
     }
 
     private static void checkModLoad(String modId, Runnable runnable) {
