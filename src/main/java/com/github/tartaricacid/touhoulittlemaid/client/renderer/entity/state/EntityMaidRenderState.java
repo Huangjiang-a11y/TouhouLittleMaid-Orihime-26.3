@@ -168,10 +168,6 @@ public class EntityMaidRenderState extends HumanoidRenderState {
      */
     public @Nullable BannerRenderState backBanner;
     /**
-     * 旗指物样式（0 = 未装备），见 ConfigData#sasimonoStyle
-     */
-    public int sasimonoStyle;
-    /**
      * 装饰栏的方块物品，会渲染在头部，故叫做 headBlock
      */
     public final BlockModelRenderState headBlock = new BlockModelRenderState();
@@ -233,7 +229,6 @@ public class EntityMaidRenderState extends HumanoidRenderState {
         hasBackpack = false;
         backpack = null;
         backBanner = null;
-        sasimonoStyle = 0;
 
         headBlock.clear();
         backItem.clear();
@@ -256,7 +251,6 @@ public class EntityMaidRenderState extends HumanoidRenderState {
         extractAttributeState(maid, state);
         extractBehaviorState(maid, state);
         extractModelState(maid, state);
-        state.sasimonoStyle = maid.getConfigManager().getSasimonoStyle();
         extractBackDecorationState(maid, state, blockModelResolver);
         extractChatBubbleState(maid, state, partialTicks);
         extractBackpackState(maid, state, itemModelResolver);

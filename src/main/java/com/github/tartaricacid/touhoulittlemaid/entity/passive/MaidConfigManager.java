@@ -103,14 +103,6 @@ public class MaidConfigManager {
         this.setConfigData(this.getConfigData().setActiveClimbing(activeClimbing));
     }
 
-    public int getSasimonoStyle() {
-        return this.getConfigData().sasimonoStyle();
-    }
-
-    public void setSasimonoStyle(int style) {
-        this.setConfigData(this.getConfigData().setSasimonoStyle(style));
-    }
-
     private ConfigData getConfigData() {
         return this.maid.getAttachedOrCreate(CONFIG);
     }
@@ -210,12 +202,5 @@ public class MaidConfigManager {
             getConfigManager().setActiveClimbing(activeClimbing);
         }
 
-        default int getSasimonoStyle() {
-            return getConfigManager().getSasimonoStyle();
-        }
-
-        default void setSasimonoStyle(int style) {
-            getConfigManager().setSasimonoStyle(style);
-        }
     }
 }

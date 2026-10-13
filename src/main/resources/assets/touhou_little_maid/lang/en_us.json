@@ -1157,16 +1157,5 @@
   "config.touhou_little_maid.vanilla.replace_totem_texture.tooltip": "Whether to replace the vanilla totem texture with the life point",
   "config.touhou_little_maid.vanilla.replace_xp_bottle_texture": "Replace XP Bottle Texture",
   "config.touhou_little_maid.vanilla.replace_xp_bottle_texture.tooltip": "Whether to replace the vanilla bottle of xp texture with the point items",
-  "ai.touhou_little_maid.chat.site.openai_realtime.name": "OpenAI Realtime",
-  "item.touhou_little_maid.hata_sasimono": "Hata Sasimono",
-  "tooltips.touhou_little_maid.hata_sasimono.desc": "Right-click a maid to equip this banner.\nPlayers cannot attack the maid,\nand she will not attack players or tamed pets.\nSwitch the style in the maid config screen.",
-  "gui.touhou_little_maid.maid_config.sasimono": "Back Banner",
-  "gui.touhou_little_maid.maid_config.value.sasimono.0": "Hidden",
-  "gui.touhou_little_maid.maid_config.value.sasimono.1": "Red Flag",
-  "gui.touhou_little_maid.maid_config.value.sasimono.2": "White Flag",
-  "gui.touhou_little_maid.maid_config.value.sasimono.3": "Blue Flag",
-  "gui.touhou_little_maid.maid_config.value.sasimono.4": "Black Flag",
-  "message.touhou_little_maid.hata_sasimono.equipped": "Banner equipped",
-  "message.touhou_little_maid.hata_sasimono.already": "This maid already wears a banner (style is switchable in the maid config screen)",
-  "message.touhou_little_maid.hata_sasimono.not_owner": "This is not your maid"
+  "ai.touhou_little_maid.chat.site.openai_realtime.name": "OpenAI Realtime"
 }

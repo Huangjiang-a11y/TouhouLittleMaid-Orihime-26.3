@@ -20,7 +20,6 @@ public class GeckoEntityMaidRenderer extends GeoReplacedEntityRenderer<EntityMai
         this.addLayer(new GeckoLayerMaidBackpack());
         this.addLayer(new GeckoLayerMaidBackItem());
         this.addLayer(new GeckoLayerMaidBanner(context));
-        this.addLayer(new GeckoLayerHataSasimono(context));
 
         AddMaidLayerEvent.GECKO.invoker().post(new AddMaidLayerEvent.Gecko(context, this));
     }

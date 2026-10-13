@@ -140,31 +140,6 @@ public class MaidConfigContainerGui extends AbstractMaidContainerGui<MaidConfigC
         ));
         buttonTop += 13;
 
-        // 旗指物样式切换（左键下一个样式，右键上一个）
-        this.addRenderableWidget(new MaidConfigButton(buttonLeft, buttonTop,
-                Component.translatable("gui.touhou_little_maid.maid_config.sasimono"),
-                sasimonoValue(this.configData.sasimonoStyle()),
-                button -> {
-                    this.syncConfigData(this.configData.setSasimonoStyle(nextSasimonoStyle(this.configData.sasimonoStyle())));
-                    button.setValue(sasimonoValue(this.configData.sasimonoStyle()));
-                },
-                button -> {
-                    this.syncConfigData(this.configData.setSasimonoStyle(prevSasimonoStyle(this.configData.sasimonoStyle())));
-                    button.setValue(sasimonoValue(this.configData.sasimonoStyle()));
-                }
-        ));
-    }
-
-    private static Component sasimonoValue(int style) {
-        return Component.translatable("gui.touhou_little_maid.maid_config.value.sasimono." + style);
-    }
-
-    private static int nextSasimonoStyle(int style) {
-        return (style + 1) % (ConfigData.SASIMONO_STYLE_MAX + 1);
-    }
-
-    private static int prevSasimonoStyle(int style) {
-        return (style + ConfigData.SASIMONO_STYLE_MAX) % (ConfigData.SASIMONO_STYLE_MAX + 1);
     }
 
     @Override

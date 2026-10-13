@@ -1157,16 +1157,5 @@
   "config.touhou_little_maid.vanilla.replace_totem_texture.tooltip": "将不死图腾纹理替换为命点",
   "config.touhou_little_maid.vanilla.replace_xp_bottle_texture": "替换附魔之瓶纹理",
   "config.touhou_little_maid.vanilla.replace_xp_bottle_texture.tooltip": "将附魔之瓶纹理替换为得分道具",
-  "ai.touhou_little_maid.chat.site.openai_realtime.name": "OpenAI 实时",
-  "item.touhou_little_maid.hata_sasimono": "旗指物",
-  "tooltips.touhou_little_maid.hata_sasimono.desc": "手持右击女仆装备旗指物。\n装备后玩家无法攻击该女仆，\n她也不会攻击玩家与已驯服的宠物。\n样式在女仆配置页切换",
-  "gui.touhou_little_maid.maid_config.sasimono": "旗指物",
-  "gui.touhou_little_maid.maid_config.value.sasimono.0": "隐藏",
-  "gui.touhou_little_maid.maid_config.value.sasimono.1": "红旗",
-  "gui.touhou_little_maid.maid_config.value.sasimono.2": "白旗",
-  "gui.touhou_little_maid.maid_config.value.sasimono.3": "蓝旗",
-  "gui.touhou_little_maid.maid_config.value.sasimono.4": "黑旗",
-  "message.touhou_little_maid.hata_sasimono.equipped": "已为女仆装备旗指物",
-  "message.touhou_little_maid.hata_sasimono.already": "这面旗已经装备过了（样式可在女仆配置页切换）",
-  "message.touhou_little_maid.hata_sasimono.not_owner": "这不是你的女仆"
+  "ai.touhou_little_maid.chat.site.openai_realtime.name": "OpenAI 实时"
 }

@@ -410,34 +410,10 @@ public class EntityMaid extends MaidManagerHost implements IEntity, CrossbowAtta
 
     @Override
     public boolean canAttack(LivingEntity target) {
-        // 旗指物友伤防护：不把玩家和已驯服的宠物当作攻击目标
-        if (this.getConfigManager().getSasimonoStyle() > 0 && isSasimonoProtected(target)) {
-            return false;
-        }
         if (this.getTask() instanceof IAttackTask attackTask) {
             return attackTask.canAttack(this, target);
         }
         return super.canAttack(target);
-    }
-
-    @Override
-    public boolean skipAttackInteraction(Entity entity) {
-        // 旗指物：玩家无法攻击女仆——整个攻击动作被跳过（见 Player#cannotAttack），
-        // 不会产生伤害、音效、击退，也不会触发复仇/仇恨。
-        if (this.getConfigManager().getSasimonoStyle() > 0 && entity instanceof Player) {
-            return true;
-        }
-        return super.skipAttackInteraction(entity);
-    }
-
-    /**
-     * 旗指物的友伤防护对象：玩家、以及已驯服的宠物（狼/猫等）。
-     */
-    public static boolean isSasimonoProtected(Entity target) {
-        if (target instanceof Player) {
-            return true;
-        }
-        return target instanceof TamableAnimal animal && animal.isTame();
     }
 
     @Override
