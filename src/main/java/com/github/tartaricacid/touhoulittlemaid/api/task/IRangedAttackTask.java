@@ -34,7 +34,13 @@ public interface IRangedAttackTask extends IAttackTask {
         if (memory.isEmpty()) {
             return Optional.empty();
         }
-        // 改回 for 循环，避免 stream 带来的额外开销
+        // 首先尝试寻找不在岩浆中的目标
+        for (LivingEntity e : memory.get()) {
+            if (maid.canAttack(e) && maid.canSee(e) && !e.isInLava()) {
+                return Optional.of(e);
+            }
+        }
+        // 如果未找到则尝试任何目标（包括岩浆中的）
         for (LivingEntity e : memory.get()) {
             if (maid.canAttack(e) && maid.canSee(e)) {
                 return Optional.of(e);

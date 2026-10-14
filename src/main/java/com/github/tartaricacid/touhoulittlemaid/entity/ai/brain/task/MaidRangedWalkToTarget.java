@@ -52,7 +52,7 @@ public class MaidRangedWalkToTarget {
                 walkTargetMemory.erase();
             } else {
                 positionMemory.set(new EntityTracker(target, true));
-                walkTargetMemory.set(new WalkTarget(new EntityTracker(target, false), speedModifier.apply(maid), 0));
+                walkTargetMemory.set(new WalkTarget(new EntityTracker(target, true), speedModifier.apply(maid), 0));
             }
             return true;
         };
