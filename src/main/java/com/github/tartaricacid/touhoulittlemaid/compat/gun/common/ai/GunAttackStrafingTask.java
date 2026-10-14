@@ -42,9 +42,13 @@ public class GunAttackStrafingTask extends Behavior<EntityMaid> {
         }
         owner.getBrain().getMemory(MemoryModuleType.ATTACK_TARGET).ifPresent((target) -> {
             double distance = owner.distanceTo(target);
-            float maxAttackDistance = owner.getHomeRadius();
+            // 用"自己武器的射程"（TaskGunAttack#searchRadius = MAID_GUN_*_DISTANCE，默认 64/48/32）
+            // 而不是家半径：家半径在未开家模式时等于 MAID_NON_HOME_RANGE（默认 8），
+            // 与枪械射程完全脱节 —— 结果女仆只想贴到 5 格内开枪，而离主人超过 8 格就被
+            // 下面的 stopInPlace 按住，看着就是"拿着枪卡住不动"
+            float maxAttackDistance = owner.searchRadius();
 
-            // 如果在最大攻击距离（128）之内，而且看见的时长足够长
+            // 如果在自己的交战距离之内，而且看见的时长足够长
             if (distance < owner.searchRadius()) {
                 ++this.strafingTime;
             } else {
@@ -71,7 +75,7 @@ public class GunAttackStrafingTask extends Behavior<EntityMaid> {
                     this.strafingBackwards = true;
                 }
 
-                // 应用走位，但需要考虑玩家位置
+                // 应用走位，但别离主人太远（远到超出自己的交战距离就停住，避免追着目标跑飞）
                 if (!owner.hasHome() && owner.getOwner() instanceof Player player && owner.distanceTo(player) >= maxAttackDistance) {
                     owner.stopInPlace();
                 } else {

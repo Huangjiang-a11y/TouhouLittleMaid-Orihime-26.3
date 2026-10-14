@@ -59,7 +59,10 @@ public class MaidRangedWalkToTarget {
     }
 
     private static boolean shouldEraseWalkTarget(EntityMaid maid, LivingEntity target) {
-        float restrictRadius = maid.getHomeRadius() - 2;
+        // 用"自己武器的射程"（各远程任务的 searchRadius：弓 48 / 弩 64 / 三叉戟 48 / 弹幕 64 / 枪 64）
+        // 而不是家半径（未开家模式时 = MAID_NON_HOME_RANGE = 8）—— 否则目标一旦离主人超过 6 格，
+        // 远程女仆就再也不迈步，只会站桩
+        float maxWalkRange = maid.searchRadius() - 2;
         double checkRadius = 8;
         if (maid.hasHome()) {
             BlockPos center = maid.getHomePosition();
@@ -67,7 +70,7 @@ public class MaidRangedWalkToTarget {
         } else if (maid.getOwner() instanceof Player player) {
             checkRadius = target.distanceTo(player);
         }
-        // 如果目标在 4 格外，在 最大限制范围-2 内，可以直接走过去，否则清除目标
-        return checkRadius <= 4 || checkRadius >= restrictRadius;
+        // 如果目标在 4 格外，在自己武器射程-2 内，可以直接走过去，否则清除目标
+        return checkRadius <= 4 || checkRadius >= maxWalkRange;
     }
 }

@@ -71,8 +71,8 @@ public class MaidAttackStrafingTask extends Behavior<EntityMaid> {
                     this.strafingBackwards = true;
                 }
 
-                // 应用走位，但需要考虑玩家位置
-                if (!owner.hasHome() && owner.getOwner() instanceof Player player && owner.distanceTo(player) >= owner.getHomeRadius()) {
+                // 应用走位，但别离主人太远（同上：按自己武器射程算，不再用家半径）
+                if (!owner.hasHome() && owner.getOwner() instanceof Player player && owner.distanceTo(player) >= owner.searchRadius()) {
                     owner.stopInPlace();
                 } else {
                     owner.getMoveControl().strafe(this.strafingBackwards ? -0.5F : 0.5F, this.strafingClockwise ? 0.5F : -0.5F);
