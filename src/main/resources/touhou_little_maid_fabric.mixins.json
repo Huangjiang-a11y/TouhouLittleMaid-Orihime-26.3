@@ -56,7 +56,8 @@
     "client.EntityRenderStateMixin",
     "client.ItemInHandRendererMixin",
     "client.KeyboardHandlerMixin",
-    "client.SoundEngineMixin"
+    "client.SoundEngineMixin",
+    "compat.tacz.EntityMaidRenderStateCompatMixin"
   ],
   "injectors": {
     "defaultRequire": 1

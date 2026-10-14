@@ -12,14 +12,14 @@ import com.github.tartaricacid.touhoulittlemaid.geckolib3.core.event.AnimationEv
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import com.tacz.guns.api.item.IGun;
-import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nullable;
 
 /**
- * 枪械客户端工具（方法签名已按 26.3 架构重建）。
- * 动画 / 手臂姿态已接上；背枪渲染与手持位移待补。
+ * 枪械客户端工具（方法签名按 26.3 架构重建）。背枪显示走
+ * {@code EntityMaidRenderStateCompatMixin} + 现成的 LayerMaidBackItem / GeckoLayerMaidBackItem，
+ * 不在这里重复实现。
  */
 public class GunClientUtil {
     @Nullable
@@ -41,11 +41,6 @@ public class GunClientUtil {
 
     public static boolean onHoldGun(EntityMaid maid, @Nullable BedrockPart armLeft, @Nullable BedrockPart armRight) {
         return TacCompat.isInstalled() && GunBaseAnimation.onHoldGun(maid, armLeft, armRight);
-    }
-
-    public static void renderBackGun(PoseStack poseStack, SubmitNodeCollector buffer, int packedLight,
-                                     ItemStack stack, EntityMaid maid) {
-        // TODO 背枪渲染待按 26.3 的 SubmitNodeCollector 管线补全
     }
 
     /** 手持枪械时的位移（加特林额外转个角度） */
