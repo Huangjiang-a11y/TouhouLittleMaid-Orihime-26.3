@@ -6,6 +6,7 @@ import com.github.tartaricacid.touhoulittlemaid.compat.gun.tacz.event.GunHurtMai
 import com.github.tartaricacid.touhoulittlemaid.compat.gun.tacz.event.MaidGunEquipEvent;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.tacz.guns.api.event.common.EntityHurtByGunEvent;
+import com.tacz.guns.api.item.ammo.AmmoSourceRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
@@ -32,6 +33,10 @@ public class TacCompat {
 
             MaidGunEquipEvent maidGunEquipEvent = new MaidGunEquipEvent();
             MaidEquipEvent.CALLBACK.register(maidGunEquipEvent::onMaidEquip);
+
+            // 女仆背包作为弹药来源：TaCZ 1.1.8 起的官方下游扩展点（AmmoSourceRegistry.EVENT），
+            // 客户端动画预测与服务端实际消耗共用同一来源；非女仆返回 null，回退 TaCZ 自身逻辑。
+            AmmoSourceRegistry.EVENT.register(MaidAmmoSource::find);
 
             INSTALLED = true;
         }

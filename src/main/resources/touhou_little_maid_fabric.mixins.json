@@ -36,11 +36,7 @@
     "common.ServerLevelMixin",
     "common.ServerLevelMixin$EntityCallbacksMixin",
     "common.ShulkerBulletMixin",
-    "common.ThrowableProjectileMixin",
-    "compat.tacz.AbstractGunItemMixin",
-    "compat.tacz.GunAnimationStateContextMixin",
-    "compat.tacz.LivingEntityShootMixin",
-    "compat.tacz.ModernKineticGunScriptAPIMixin"
+    "common.ThrowableProjectileMixin"
   ],
   "client": [
     "accessor.AbstractContainerScreenAccessor",
