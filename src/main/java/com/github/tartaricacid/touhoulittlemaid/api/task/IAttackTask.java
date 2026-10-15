@@ -38,8 +38,39 @@ public interface IAttackTask extends IMaidTask {
      * @return 合适的攻击目标
      */
     static Optional<? extends LivingEntity> findFirstValidAttackTarget(EntityMaid maid) {
+        // 谁打了女仆 / 谁打了主人，就先打回去，而不是傻傻只挑最近的
+        Optional<? extends LivingEntity> revenge = findRevengeTarget(maid);
+        if (revenge.isPresent()) {
+            return revenge;
+        }
         return maid.getBrain().getMemory(MemoryModuleType.NEAREST_VISIBLE_LIVING_ENTITIES).flatMap(
                 mobs -> mobs.findClosest((e) -> maid.canAttack(e) && maid.isWithinHome(e.blockPosition())));
+    }
+
+    /**
+     * 找"该报复的人"：优先是刚刚打了女仆自己的，其次是刚刚打了主人的
+     * <p>
+     * 原版近战只挑最近的敌人，于是女仆被远程怪/边上的怪偷袭时会一直无动于衷。
+     */
+    static Optional<? extends LivingEntity> findRevengeTarget(EntityMaid maid) {
+        LivingEntity selfAttacker = maid.getLastHurtByMob();
+        if (isValidRevengeTarget(maid, selfAttacker)) {
+            return Optional.of(selfAttacker);
+        }
+        LivingEntity owner = maid.getOwner();
+        if (owner != null) {
+            LivingEntity ownerAttacker = owner.getLastHurtByMob();
+            if (isValidRevengeTarget(maid, ownerAttacker)) {
+                return Optional.of(ownerAttacker);
+            }
+        }
+        return Optional.empty();
+    }
+
+    static boolean isValidRevengeTarget(EntityMaid maid, LivingEntity attacker) {
+        return attacker != null && attacker.isAlive() && attacker != maid
+                && maid.canAttack(attacker) && maid.canSee(attacker)
+                && maid.isWithinHome(attacker.blockPosition());
     }
 
     /**

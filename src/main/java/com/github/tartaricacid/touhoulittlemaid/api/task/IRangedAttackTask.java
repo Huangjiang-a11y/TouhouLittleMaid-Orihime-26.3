@@ -24,10 +24,10 @@ public interface IRangedAttackTask extends IAttackTask {
      * @return 第一个可视对象
      */
     static Optional<? extends LivingEntity> findFirstValidAttackTarget(EntityMaid maid) {
-        // 先检查攻击女仆的对象
-        LivingEntity lastAttacker = maid.getLastHurtByMob();
-        if (lastAttacker != null && maid.canAttack(lastAttacker) && maid.canSee(lastAttacker)) {
-            return Optional.of(lastAttacker);
+        // 先检查攻击女仆自己的 / 攻击主人的对象（报复优先）
+        Optional<? extends LivingEntity> revenge = IAttackTask.findRevengeTarget(maid);
+        if (revenge.isPresent()) {
+            return revenge;
         }
         // 再检查记忆中的可见对象
         var memory = maid.getBrain().getMemory(MemoryModuleType.NEAREST_LIVING_ENTITIES);
