@@ -402,6 +402,15 @@ public class EntityMaid extends MaidManagerHost implements IEntity, CrossbowAtta
         this.combatManager.performRangedAttack(target, distanceFactor);
     }
 
+    /**
+     * 弹道上是否有友军（主人 / 玩家 / 其他女仆 / 已驯服宠物）
+     * <p>
+     * 枪械的射击不经过 {@link #performRangedAttack}，由 GunShootTargetTask 自行调用本方法判断
+     */
+    public boolean isFriendlyInLineOfFire(LivingEntity target) {
+        return this.combatManager.isFriendlyInLineOfFire(target);
+    }
+
     @Override
     public boolean wantsToAttack(LivingEntity target, @Nullable LivingEntity owner) {
         // 避免女仆攻击盔甲

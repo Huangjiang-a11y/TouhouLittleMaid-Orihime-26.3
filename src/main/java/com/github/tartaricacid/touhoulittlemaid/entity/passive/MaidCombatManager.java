@@ -27,6 +27,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
@@ -35,6 +36,7 @@ import net.minecraft.world.item.component.BlocksAttacks;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.mutable.MutableFloat;
 
 import javax.annotation.Nullable;
@@ -176,6 +178,10 @@ public class MaidCombatManager {
     void performRangedAttack(LivingEntity target, float distanceFactor) {
         IMaidTask maidTask = maid.getTask();
         if (maidTask instanceof IRangedAttackTask rangedAttackTask) {
+            // 弹道上有友军就先别开枪，免得一箭/一梭子糊在主人脸上
+            if (isFriendlyInLineOfFire(target)) {
+                return;
+            }
             // 调用饰品的攻击
             maid.getMaidBauble().fireEvent((b, s) -> {
                 b.onRangedAttack(maid, s, rangedAttackTask);
@@ -183,6 +189,45 @@ public class MaidCombatManager {
             });
             rangedAttackTask.performRangedAttack(maid, target, distanceFactor);
         }
+    }
+
+    /**
+     * 从女仆眼睛到目标眼睛的这条线段上，是否站着友军（主人、玩家、其他女仆、已驯服的宠物）
+     * <p>
+     * 用来避免远程攻击误伤友军：原版 {@code canSee} 只判断"目标可不可见"，不判断中间挡了谁，
+     * 于是女仆会隔着主人朝对面开火。
+     */
+    public boolean isFriendlyInLineOfFire(LivingEntity target) {
+        Vec3 from = this.maid.getEyePosition();
+        Vec3 to = target.getEyePosition();
+        AABB sweep = new AABB(from, to).inflate(1.0);
+        for (LivingEntity entity : this.maid.level().getEntitiesOfClass(LivingEntity.class, sweep)) {
+            if (entity == this.maid || entity == target || !entity.isAlive()) {
+                continue;
+            }
+            if (!isFriendly(entity)) {
+                continue;
+            }
+            // 实体碰撞箱与弹道线段相交 → 会挡住这一枪
+            if (entity.getBoundingBox().inflate(0.3).clip(from, to).isPresent()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isFriendly(LivingEntity entity) {
+        // 女仆本来就不会攻击玩家（见 IAttackTask#canAttack），所以任何玩家都算友军
+        if (entity instanceof Player) {
+            return true;
+        }
+        if (entity instanceof EntityMaid) {
+            return true;
+        }
+        if (entity instanceof TamableAnimal tamableAnimal) {
+            return tamableAnimal.getOwnerReference() != null;
+        }
+        return false;
     }
 
     boolean canUseShield() {

@@ -62,6 +62,10 @@ public class GunShootTargetTask extends Behavior<EntityMaid> {
 
             // 如果实体手部处于激活状态
             if (--this.attackCooldown <= 0 && this.seeTime >= -60 && canSee) {
+                // 弹道上有友军就先别开枪，免得误伤主人/其他女仆/宠物（枪械不走 performRangedAttack，这里单独判断）
+                if (owner.isFriendlyInLineOfFire(target)) {
+                    return;
+                }
                 try {
                     // 由于部分枪包作者可能在写 lua 脚本时没有规范书写，导致 lua 脚本抛出异常
                     // 所以这里捕获异常，避免因为 lua 脚本错误导致游戏崩溃
