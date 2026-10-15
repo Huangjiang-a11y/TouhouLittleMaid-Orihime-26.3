@@ -76,6 +76,22 @@
     {
       "id": "mob_grinding_utils:saw",
       "required": false
+    },
+    {
+      "id": "minecraft:lava",
+      "required": false
+    },
+    {
+      "id": "minecraft:flowing_lava",
+      "required": false
+    },
+    {
+      "id": "minecraft:fire",
+      "required": false
+    },
+    {
+      "id": "minecraft:soul_fire",
+      "required": false
     }
   ]
 }

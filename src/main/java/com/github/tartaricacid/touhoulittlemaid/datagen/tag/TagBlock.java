@@ -243,6 +243,10 @@ public class TagBlock extends FabricTagsProvider.BlockTagsProvider {
                 .addOptional(createResourceKey(Identifier.parse("irons_spellbooks:brazier_soul")))
                 // 刷怪塔实用设备的锥刺和研磨机
                 .addOptional(createResourceKey(Identifier.parse("mob_grinding_utils:spikes")))
-                .addOptional(createResourceKey(Identifier.parse("mob_grinding_utils:saw")));
+                .addOptional(createResourceKey(Identifier.parse("mob_grinding_utils:saw")))
+                .addOptional(createResourceKey(Identifier.parse("minecraft:lava")))
+                .addOptional(createResourceKey(Identifier.parse("minecraft:flowing_lava")))
+                .addOptional(createResourceKey(Identifier.parse("minecraft:fire")))
+                .addOptional(createResourceKey(Identifier.parse("minecraft:soul_fire")));
     }
 }
