@@ -14,8 +14,18 @@ import net.minecraft.world.entity.ai.memory.MemoryStatus;
 import javax.annotation.Nullable;
 
 public class MaidFollowOwnerTask extends Behavior<EntityMaid> {
+    /**
+     * 连续这么多 tick 都"想去但去不了"就直接传送到主人身边
+     */
+    private static final long STUCK_TELEPORT_TICKS = 40;
+    /**
+     * 竖直方向差这么多格，就算水平贴着脸也算"不在一层"，得往上/往下够
+     */
+    private static final double VERTICAL_APART = 2.0;
+
     private final float speedModifier;
     private final int stopDistance;
+    private long nextStuckTeleportTime = 0;
 
     public MaidFollowOwnerTask(float speedModifier, int stopDistance) {
         super(ImmutableMap.of(MemoryModuleType.WALK_TARGET, MemoryStatus.REGISTERED));
@@ -52,10 +62,34 @@ public class MaidFollowOwnerTask extends Behavior<EntityMaid> {
             return;
         }
 
-        // 否则正常传送
+        if (!ownerStateConditions(owner, maid) || !maidStateConditions(maid)) {
+            return;
+        }
+
+        // 够不着主人就别原地杵着了 —— 直接传送。
+        // 原因：MoveToTargetSink 计算路径时 reachRange 是写死的 0（不看 WalkTarget 的
+        // closeEnoughDist），只要"主人所在那一格"走不到就直接判定寻路失败，于是女仆会一直
+        // 站着不动；而这时她离主人往往只有几格（前面一堵墙 / 主人在楼上楼下），
+        // 走不到 minTeleportDistance，原来的逻辑不会传送她。
+        // 引擎在寻路失败时会写 CANT_REACH_WALK_TARGET_SINCE，拿它当"卡住"的信号即可。
+        if (gameTimeIn >= this.nextStuckTeleportTime
+                && !maid.closerThan(owner, 2)
+                && isStuckFor(gameTimeIn, maid)
+                && maid.teleportToOwner(owner)) {
+            this.nextStuckTeleportTime = gameTimeIn + STUCK_TELEPORT_TICKS;
+            maid.getNavigationManager().resetNavigation();
+            maid.getBrain().eraseMemory(MemoryModuleType.WALK_TARGET);
+            maid.getBrain().eraseMemory(InitBrains.TARGET_POS);
+            this.doStop(worldIn, maid, gameTimeIn);
+            return;
+        }
+
+        // 否则正常传送 / 走位
         int startDistance = (int) maid.getHomeRadius() - 2;
         int minTeleportDistance = startDistance + 4;
-        if (ownerStateConditions(owner, maid) && maidStateConditions(maid) && !maid.closerThan(owner, startDistance)) {
+        // 主人在楼上/楼下时，即使水平贴着也得走过去（不然连走位目标都不会设，直接站着）
+        boolean verticallyApart = Math.abs(owner.getY() - maid.getY()) > VERTICAL_APART;
+        if (!maid.closerThan(owner, startDistance) || verticallyApart) {
             if (!maid.closerThan(owner, minTeleportDistance)) {
                 maid.teleportToOwner(owner);
                 maid.getNavigationManager().resetNavigation();
@@ -63,6 +97,15 @@ public class MaidFollowOwnerTask extends Behavior<EntityMaid> {
                 BehaviorUtils.setWalkAndLookTargetMemories(maid, owner, speedModifier, stopDistance);
             }
         }
+    }
+
+    /**
+     * 女仆是不是"想去但去不了"：寻路失败时引擎会往 CANT_REACH_WALK_TARGET_SINCE 写时间戳
+     */
+    private boolean isStuckFor(long gameTime, EntityMaid maid) {
+        return maid.getBrain().getMemory(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE)
+                .map(since -> gameTime - since >= STUCK_TELEPORT_TICKS)
+                .orElse(false);
     }
 
     private boolean maidStateConditions(EntityMaid maid) {
