@@ -92,6 +92,18 @@
     {
       "id": "minecraft:soul_fire",
       "required": false
+    },
+    {
+      "id": "minecraft:magma_block",
+      "required": false
+    },
+    {
+      "id": "minecraft:campfire",
+      "required": false
+    },
+    {
+      "id": "minecraft:soul_campfire",
+      "required": false
     }
   ]
 }

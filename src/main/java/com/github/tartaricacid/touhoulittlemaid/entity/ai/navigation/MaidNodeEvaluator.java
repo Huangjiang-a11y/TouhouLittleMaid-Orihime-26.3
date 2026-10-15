@@ -50,7 +50,7 @@ public class MaidNodeEvaluator extends WalkNodeEvaluator {
                 if (!node.closed) {
                     node.costMalus = 0;
                     node.type = PathType.WALKABLE;
-                    if (nodeId + 1 < nodes.length) {
+                    if (nodeId < nodes.length) {
                         nodes[nodeId++] = node;
                     }
                 }
@@ -62,7 +62,7 @@ public class MaidNodeEvaluator extends WalkNodeEvaluator {
                 if (!node.closed) {
                     node.costMalus = 0;
                     node.type = PathType.WALKABLE;
-                    if (nodeId + 1 < nodes.length) {
+                    if (nodeId < nodes.length) {
                         nodes[nodeId++] = node;
                     }
                 }

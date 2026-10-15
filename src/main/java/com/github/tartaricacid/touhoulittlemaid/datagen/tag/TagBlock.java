@@ -247,6 +247,11 @@ public class TagBlock extends FabricTagsProvider.BlockTagsProvider {
                 .addOptional(createResourceKey(Identifier.parse("minecraft:lava")))
                 .addOptional(createResourceKey(Identifier.parse("minecraft:flowing_lava")))
                 .addOptional(createResourceKey(Identifier.parse("minecraft:fire")))
-                .addOptional(createResourceKey(Identifier.parse("minecraft:soul_fire")));
+                .addOptional(createResourceKey(Identifier.parse("minecraft:soul_fire")))
+                // 原版 getPathTypeFromState 只标了仙人掌/甜浆果丛（DAMAGING）与凋灵玫瑰/石笋（DAMAGE_CAUTIOUS），
+                // 岩浆块和营火不在其中 —— 女仆会直接踩上去把自己烤了
+                .addOptional(createResourceKey(Identifier.parse("minecraft:magma_block")))
+                .addOptional(createResourceKey(Identifier.parse("minecraft:campfire")))
+                .addOptional(createResourceKey(Identifier.parse("minecraft:soul_campfire")));
     }
 }

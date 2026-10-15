@@ -61,7 +61,8 @@ public class MaidUnderWaterNodeEvaluator extends AmphibiousNodeEvaluator impleme
         BlockPos blockPos = node.asBlockPos();
         if (mob.level.getFluidState(blockPos).is(FluidTags.WATER) && mob.level.getFluidState(blockPos.above()).isEmpty()) {
             Node aboveNode = this.getNode(node.x, node.y + 1, node.z);
-            if (!aboveNode.closed) {
+            // 原版这里是裸写数组（没有边界检查），一旦节点正好写满就会 AIOOBE
+            if (!aboveNode.closed && nodeId < outputArray.length) {
                 aboveNode.costMalus++;
                 outputArray[nodeId++] = aboveNode;
             }
