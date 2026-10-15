@@ -26,6 +26,12 @@ public class MaidFollowOwnerTask extends Behavior<EntityMaid> {
     private final float speedModifier;
     private final int stopDistance;
     private long nextStuckTeleportTime = 0;
+    /**
+     * "跟不上去"探测：定期比较与主人的距离，连续几轮没缩短就算卡住
+     */
+    private long nextProgressCheckTime = 0;
+    private double lastDistanceToOwner = Double.MAX_VALUE;
+    private int noProgressChecks = 0;
 
     public MaidFollowOwnerTask(float speedModifier, int stopDistance) {
         super(ImmutableMap.of(MemoryModuleType.WALK_TARGET, MemoryStatus.REGISTERED));
@@ -74,7 +80,7 @@ public class MaidFollowOwnerTask extends Behavior<EntityMaid> {
         // 引擎在寻路失败时会写 CANT_REACH_WALK_TARGET_SINCE，拿它当"卡住"的信号即可。
         if (gameTimeIn >= this.nextStuckTeleportTime
                 && !maid.closerThan(owner, 2)
-                && isStuckFor(gameTimeIn, maid)
+                && isStuckFor(gameTimeIn, maid, owner)
                 && maid.teleportToOwner(owner)) {
             this.nextStuckTeleportTime = gameTimeIn + STUCK_TELEPORT_TICKS;
             maid.getNavigationManager().resetNavigation();
@@ -100,12 +106,34 @@ public class MaidFollowOwnerTask extends Behavior<EntityMaid> {
     }
 
     /**
-     * 女仆是不是"想去但去不了"：寻路失败时引擎会往 CANT_REACH_WALK_TARGET_SINCE 写时间戳
+     * 女仆是不是"想去主人那儿但去不了"。两个信号取或：
+     * <ol>
+     *   <li>引擎信号：寻路失败时 {@code MoveToTargetSink} 会往
+     *       {@code CANT_REACH_WALK_TARGET_SINCE} 写时间戳，连续 {@code STUCK_TELEPORT_TICKS}
+     *       没被清掉就算卡住；</li>
+     *   <li>距离信号：寻路"成功"但其实只是绕到墙边/楼下几格就停下（WalkTarget 被判定为
+     *       已抵达并清除）时，{@code CANT_REACH} 是清空的 —— 这时靠"连续两轮距离没缩短"
+     *       兜底。</li>
+     * </ol>
      */
-    private boolean isStuckFor(long gameTime, EntityMaid maid) {
-        return maid.getBrain().getMemory(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE)
+    private boolean isStuckFor(long gameTime, EntityMaid maid, LivingEntity owner) {
+        boolean cantReach = maid.getBrain().getMemory(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE)
                 .map(since -> gameTime - since >= STUCK_TELEPORT_TICKS)
                 .orElse(false);
+        if (cantReach) {
+            return true;
+        }
+        if (gameTime >= this.nextProgressCheckTime) {
+            this.nextProgressCheckTime = gameTime + STUCK_TELEPORT_TICKS;
+            double distance = maid.distanceTo(owner);
+            if (distance < this.lastDistanceToOwner - 0.5) {
+                this.noProgressChecks = 0;
+            } else {
+                this.noProgressChecks++;
+            }
+            this.lastDistanceToOwner = distance;
+        }
+        return this.noProgressChecks >= 2;
     }
 
     private boolean maidStateConditions(EntityMaid maid) {
