@@ -20,9 +20,16 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  * 该方法仅修改了栅栏门和梯子的寻路判断
  */
 public class MaidNodeEvaluator extends WalkNodeEvaluator {
+    /**
+     * 复用同一个 MutableBlockPos：getPathType 在寻路过程中会被调用上万次
+     * （每个节点都要对女仆碰撞箱内的所有方块求一次），原来每次都 new 一个
+     * MutableBlockPos + 两个 BlockPos，是实打实的 GC 压力。
+     */
+    private final BlockPos.MutableBlockPos maidTmpPos = new BlockPos.MutableBlockPos();
+
     @Override
     public PathType getPathType(PathfindingContext pContext, int pX, int pY, int pZ) {
-        return getMaidBlockPathTypeStatic(pContext, new BlockPos.MutableBlockPos(pX, pY, pZ));
+        return getMaidBlockPathTypeStatic(pContext, pX, pY, pZ);
     }
 
     @Override
@@ -64,21 +71,20 @@ public class MaidNodeEvaluator extends WalkNodeEvaluator {
         return nodeId;
     }
 
-    private PathType getMaidBlockPathTypeStatic(PathfindingContext context, BlockPos.MutableBlockPos pos) {
-        int x = pos.getX();
-        int y = pos.getY();
-        int z = pos.getZ();
-
+    private PathType getMaidBlockPathTypeStatic(PathfindingContext context, int x, int y, int z) {
         PathType pathType = getMaidBlockPathTypeRaw(context, x, y, z);
         if (pathType == PathType.OPEN && y >= context.level().getMinY() + 1) {
+            // 对应 26.3 原版 WalkNodeEvaluator#getPathTypeStatic 的映射：
+            // 脚下是"雪/活板门"时原版返回的是 ON_TOP_OF_POWDER_SNOW / ON_TOP_OF_TRAPDOOR，
+            // 移植时错写成了 DAMAGE_CAUTIOUS / TRAPDOOR（虽然 malus 一样，但语义不同）。
             return switch (getMaidBlockPathTypeRaw(context, x, y - 1, z)) {
                 case OPEN, WATER, LAVA, WALKABLE -> PathType.OPEN;
                 case FIRE -> PathType.FIRE;
                 case DAMAGING -> PathType.DAMAGING;
                 case STICKY_HONEY -> PathType.STICKY_HONEY;
-                case POWDER_SNOW -> PathType.DAMAGE_CAUTIOUS;
+                case POWDER_SNOW -> PathType.ON_TOP_OF_POWDER_SNOW;
                 case DAMAGE_CAUTIOUS -> PathType.DAMAGE_CAUTIOUS;
-                case TRAPDOOR -> PathType.TRAPDOOR;
+                case TRAPDOOR -> PathType.ON_TOP_OF_TRAPDOOR;
                 default -> checkNeighbourBlocks(context, x, y, z, PathType.WALKABLE);
             };
         } else {
@@ -87,7 +93,7 @@ public class MaidNodeEvaluator extends WalkNodeEvaluator {
     }
 
     private PathType getMaidBlockPathTypeRaw(PathfindingContext context, int pX, int pY, int pZ) {
-        BlockPos pos = new BlockPos(pX, pY, pZ);
+        BlockPos pos = this.maidTmpPos.set(pX, pY, pZ);
         // 女仆在限定范围内寻路寻到了范围外，失败
         if (this.mob instanceof EntityMaid maid && maid.isWithinHome() && !maid.isWithinHome(pos)) {
             return PathType.BLOCKED;
@@ -125,7 +131,10 @@ public class MaidNodeEvaluator extends WalkNodeEvaluator {
     }
 
     private boolean heightCheckExclusions(PathType pathType) {
-        return pathType == PathType.DOOR_OPEN || pathType == PathType.DOOR_WOOD_CLOSED;
+        // 26.3 新增了 WALKABLE_DOOR（原版对"打开的门"返回这个），漏掉它会让打开的门
+        // 被下面的高度检查当成实心方块
+        return pathType == PathType.DOOR_OPEN || pathType == PathType.DOOR_WOOD_CLOSED
+                || pathType == PathType.WALKABLE_DOOR;
     }
 
     private boolean canOpenDoor(Block block, EntityMaid maid) {
