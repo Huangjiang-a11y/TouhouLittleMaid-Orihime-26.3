@@ -38,9 +38,11 @@ public class GunHurtMaidEvent {
         LivingEntity attacker = event.getAttacker();
 
         // 不伤害自己 x2
-        if (attacker instanceof EntityMaid maid) {
-            // 主人和同 Team 玩家免伤
-            if (hurtEntity instanceof Player player && maid.isAlliedTo(player)) {
+        if (attacker instanceof EntityMaid) {
+            // 女仆不会主动攻击玩家（IAttackTask#canAttack 直接排除 Player），弹幕那边也是
+            // "女仆射出的弹幕不能伤害玩家"，所以枪械同样不该伤到任何玩家。
+            // 原来只挡 isAlliedTo（同队伍），单机玩家没有队伍 → 会被自己的女仆打死。
+            if (hurtEntity instanceof Player) {
                 event.setCanceled(true);
             }
         }
