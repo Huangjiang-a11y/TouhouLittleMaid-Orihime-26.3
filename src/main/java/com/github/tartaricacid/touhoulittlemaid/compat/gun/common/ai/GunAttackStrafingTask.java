@@ -42,11 +42,10 @@ public class GunAttackStrafingTask extends Behavior<EntityMaid> {
         }
         owner.getBrain().getMemory(MemoryModuleType.ATTACK_TARGET).ifPresent((target) -> {
             double distance = owner.distanceTo(target);
-            // 用"自己武器的射程"（TaskGunAttack#searchRadius = MAID_GUN_*_DISTANCE，默认 64/48/32）
-            // 而不是家半径：家半径在未开家模式时等于 MAID_NON_HOME_RANGE（默认 8），
-            // 与枪械射程完全脱节 —— 结果女仆只想贴到 5 格内开枪，而离主人超过 8 格就被
-            // 下面的 stopInPlace 按住，看着就是"拿着枪卡住不动"
-            float maxAttackDistance = owner.searchRadius();
+            // maxAttackDistance 是"保持距离"的目标值（下面按 *0.6 / *0.65 前后走位用它），
+            // 不能直接拿武器射程当它 —— 否则女仆会一路后退到 ~40 格（64*0.65）。
+            // 取"合适交战距离"：不超过武器射程，也不超过 20 格（64 射程 → 约 13 格）。
+            float maxAttackDistance = Math.min(owner.searchRadius(), 20.0F);
 
             // 如果在自己的交战距离之内，而且看见的时长足够长
             if (distance < owner.searchRadius()) {
@@ -75,8 +74,9 @@ public class GunAttackStrafingTask extends Behavior<EntityMaid> {
                     this.strafingBackwards = true;
                 }
 
-                // 应用走位，但别离主人太远（远到超出自己的交战距离就停住，避免追着目标跑飞）
-                if (!owner.hasHome() && owner.getOwner() instanceof Player player && owner.distanceTo(player) >= maxAttackDistance) {
+                // 停住阈值另算：用武器射程（能打多远就能追多远），与上面的"保持距离"解耦，
+                // 否则未开家模式时家半径=8 会把女仆按在原地"卡住不动"
+                if (!owner.hasHome() && owner.getOwner() instanceof Player player && owner.distanceTo(player) >= owner.searchRadius()) {
                     owner.stopInPlace();
                 } else {
                     owner.getMoveControl().strafe(this.strafingBackwards ? -0.4F : 0.4F, this.strafingClockwise ? 0.2F : -0.2F);
