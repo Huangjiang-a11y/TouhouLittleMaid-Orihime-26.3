@@ -4,6 +4,7 @@ import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.mojang.datafixers.kinds.IdF;
 import com.mojang.datafixers.kinds.OptionalBox;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.behavior.BehaviorControl;
 import net.minecraft.world.entity.ai.behavior.EntityTracker;
@@ -59,6 +60,13 @@ public class MaidRangedWalkToTarget {
     }
 
     private static boolean shouldEraseWalkTarget(EntityMaid maid, LivingEntity target) {
+        // 已经进到自己的有效射程里，就别再往目标身上凑了（否则远程女仆会一路走成近战，
+        // 因为 WalkTarget 的 closeEnough 是 0，MoveToTargetSink 会一直走到目标所在方块）。
+        // 交给 GunAttackStrafingTask / MaidAttackStrafingTask 保持距离即可。
+        float engageDistance = Mth.clamp(maid.searchRadius() * 0.25F, 8.0F, 16.0F);
+        if (maid.distanceTo(target) <= engageDistance) {
+            return true;
+        }
         // 未开家模式：能走多远由"自己武器的射程"决定（弓 48 / 弩 64 / 三叉戟 48 / 弹幕 64 / 枪 64），
         // 而不是家半径（未开家模式时 = MAID_NON_HOME_RANGE = 8）—— 否则目标一旦离主人超过 6 格，
         // 远程女仆就再也不迈步，只会站桩。
