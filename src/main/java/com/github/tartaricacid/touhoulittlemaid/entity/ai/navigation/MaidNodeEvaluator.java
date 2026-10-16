@@ -143,8 +143,17 @@ public class MaidNodeEvaluator extends WalkNodeEvaluator {
     }
 
     private boolean heightCheckExclusions(PathType pathType) {
-        // 26.3 新增了 WALKABLE_DOOR（原版对"打开的门"返回这个），漏掉它会让打开的门
-        // 被下面的高度检查当成实心方块
+        // 门（门板）是满高的薄板：DoorBlock 的形状是 Block.box(0, 0, 13, 16, 16, 16) 的旋转结果，
+        // maxY 恒为 1.0，所以门必须一律跳过下面的高度检查，否则会被当成实心方块。
+        //
+        // 订正（2026-10-16，javap 核对 26.3 原版）：WALKABLE_DOOR 不是"打开的门"。
+        // 原版 WalkNodeEvaluator#getPathTypeFromState 对打开的门返回的是 DOOR_OPEN；
+        // WALKABLE_DOOR 出现在 getPathTypeWithinMobBB —— 语义是"还关着、但这个生物开得了的木门"：
+        //     DOOR_WOOD_CLOSED && canOpenDoors() && canPassDoors -> WALKABLE_DOOR
+        //     DOOR_OPEN        && !canPassDoors                 -> BLOCKED
+        // TLM 这条路径走 PathfindingContext#getPathTypeFromState，只会产出 DOOR_OPEN /
+        // DOOR_WOOD_CLOSED / DOOR_IRON_CLOSED，目前拿不到 WALKABLE_DOOR。这里保留它只是为了
+        // 语义完整（真拿到也不该被高度检查判成实心），不是"修好了打开的门"。
         return pathType == PathType.DOOR_OPEN || pathType == PathType.DOOR_WOOD_CLOSED
                 || pathType == PathType.WALKABLE_DOOR;
     }
