@@ -85,15 +85,17 @@ public class MaidCollectHoneyTask extends MaidCheckRateTask {
     }
 
     private void collectHoneyBottle(ServerLevel level, EntityMaid maid, CombinedResourceHandler<ItemVariant> maidAvailableInv, BlockState hiveBlockState, BlockPos hivePos) {
-        int slot = ItemsUtil.findStackSlot(maidAvailableInv, stack -> stack.is(Items.HONEY_BOTTLE));
+        // 要的是空瓶：掏出一个玻璃瓶，放进一瓶蜂蜜。原来这里两处都写成了 HONEY_BOTTLE，
+        // 变成"拿出一个蜂蜜瓶再放回一个蜂蜜瓶"，净变化为 0 —— 蜂巢被清空、蜂蜜却没了。
+        int slot = ItemsUtil.findStackSlot(maidAvailableInv, stack -> stack.is(Items.GLASS_BOTTLE));
         if (slot == -1)
             return;
         try (Transaction transaction = Transaction.openOuter()) {
-            int bottle = maidAvailableInv.extract(slot, ItemVariant.of(Items.HONEY_BOTTLE), 1, transaction);
+            int bottle = maidAvailableInv.extract(slot, ItemVariant.of(Items.GLASS_BOTTLE), 1, transaction);
             if (bottle != 0) {
                 int result = maidAvailableInv.insert(ItemVariant.of(Items.HONEY_BOTTLE), 1, transaction);
                 // 背包满了就不收集了
-                if (result != 0) {
+                if (result != 1) {
                     return;
                 }
                 level.playSound(null, maid.getX(), maid.getY(), maid.getZ(), SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS, 1.0F, 1.0F);
@@ -108,9 +110,11 @@ public class MaidCollectHoneyTask extends MaidCheckRateTask {
         boolean hasShears = maid.getMainHandItem().is(ConventionalItemTags.SHEAR_TOOLS) || maid.getMainHandItem().getItem() instanceof ShearsItem;
         if (hasShears) {
             try (Transaction transaction = Transaction.openOuter()) {
-                int result = maidAvailableInv.extract(ItemVariant.of(Items.HONEYCOMB), 3, transaction);
+                // 原来这里是 extract（从背包里掏走 3 个蜜脾），方向写反了：
+                // 后果是"背包里有蜜脾就直接放弃采集、没有蜜脾反而清空蜂巢却什么都没拿到"。
+                int result = maidAvailableInv.insert(ItemVariant.of(Items.HONEYCOMB), 3, transaction);
                 // 背包满了就不收集了
-                if (result != 0) {
+                if (result != 3) {
                     return false;
                 }
                 level.playSound(null, maid.getX(), maid.getY(), maid.getZ(), SoundEvents.BEEHIVE_SHEAR, SoundSource.BLOCKS, 1.0F, 1.0F);
