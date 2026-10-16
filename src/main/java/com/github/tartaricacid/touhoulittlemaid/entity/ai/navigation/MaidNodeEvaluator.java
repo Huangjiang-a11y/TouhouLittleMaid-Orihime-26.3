@@ -24,6 +24,10 @@ public class MaidNodeEvaluator extends WalkNodeEvaluator {
      * 复用同一个 MutableBlockPos：getPathType 在寻路过程中会被调用上万次
      * （每个节点都要对女仆碰撞箱内的所有方块求一次），原来每次都 new 一个
      * MutableBlockPos + 两个 BlockPos，是实打实的 GC 压力。
+     * <p>
+     * 只发给"即时求值、不会留存引用"的原版内部调用（{@code isWithinHome} /
+     * {@code PathfindingContext#getBlockState}）；发给可被模组覆写的方法的坐标见
+     * {@code getMaidBlockPathTypeRaw} 里的 {@code externalPos}。
      */
     private final BlockPos.MutableBlockPos maidTmpPos = new BlockPos.MutableBlockPos();
 
@@ -105,17 +109,25 @@ public class MaidNodeEvaluator extends WalkNodeEvaluator {
             return PathType.DAMAGING;
         }
 
+        // 下面两处会把坐标交给"可能被其它模组覆写"的方法：
+        //   canClimb -> CommonHooks.isLadder(BlockState, Level, BlockPos, Entity)
+        //   BlockState#getCollisionShape(BlockGetter, BlockPos)
+        // 原版这边每次都是新对象，所以有些模组会把引用留下来事后读（原版允许它们这么写）。
+        // 因此这两处只能用独立的一份，不能和上面的 maidTmpPos 共用。
+        // 一次调用内共享同一份即可 —— 它不会被修改，同时发给两个调用也安全。
+        BlockPos externalPos = new BlockPos(pX, pY, pZ);
+
         PathType pathType;
         if (blockState.getBlock() instanceof FenceGateBlock) {
             pathType = blockState.getValue(FenceGateBlock.OPEN) ? PathType.DOOR_OPEN : PathType.DOOR_WOOD_CLOSED;
-        } else if (this.mob instanceof EntityMaid maid && this.canClimb(blockState, pos, maid)) {
+        } else if (this.mob instanceof EntityMaid maid && this.canClimb(blockState, externalPos, maid)) {
             // 将楼梯视为可行走方块，便于后续将楼梯加入路径节点
             pathType = PathType.WALKABLE;
         } else {
             pathType = context.getPathTypeFromState(pX, pY, pZ);
             // 判断目标方块的碰撞高度。有些半透明方块拥有超过 0.5（台阶）的高度，此时女仆是不能从其中穿过的，需要将其视为不可通行方块
             if (!heightCheckExclusions(pathType)) {
-                VoxelShape shape = blockState.getCollisionShape(context.level(), pos);
+                VoxelShape shape = blockState.getCollisionShape(context.level(), externalPos);
                 double maxY = shape.max(Direction.Axis.Y);
                 if (pathType != PathType.BLOCKED) {
                     if (maxY > 0.5) {
