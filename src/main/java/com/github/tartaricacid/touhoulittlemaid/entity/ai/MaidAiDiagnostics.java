@@ -3,6 +3,8 @@ package com.github.tartaricacid.touhoulittlemaid.entity.ai;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.init.InitBrains;
 import com.mojang.logging.LogUtils;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.schedule.Activity;
@@ -61,10 +63,16 @@ public final class MaidAiDiagnostics {
                 ? maid.getHomePosition() + " d=" + fmt(Math.sqrt(maid.getHomePosition().distSqr(maid.blockPosition())))
                 : "无";
         String owner = maid.getOwner() == null ? "-" : fmt(maid.distanceTo(maid.getOwner()));
-        LOGGER.info("[MaidDiag] task={} act=[{}] run=[{}] ATK={} WALK={} TPOS={} nav(inProg={} done={} {}) pos={} home={} owner={} guiOpening={} noAi={}",
+        String line = String.format(
+                "task=%s act=[%s] run=[%s] ATK=%s WALK=%s TPOS=%s nav(inProg=%s done=%s %s) pos=%s home=%s owner=%s guiOpening=%s noAi=%s",
                 maid.getTask().getUid(), activities, running, atk, walk, tpos,
                 nav.isInProgress(), nav.isDone(), path,
                 maid.blockPosition(), home, owner, maid.guiOpening, maid.isNoAi());
+        LOGGER.info("[MaidDiag] {}", line);
+        // 直接发到主人聊天栏，省得去翻日志文件（16 格内才发，免得刷屏）
+        if (maid.getOwner() instanceof ServerPlayer player && player.distanceTo(maid) <= 16.0F) {
+            player.sendSystemMessage(Component.literal("[MaidDiag] " + line));
+        }
     }
 
     private static String fmt(double v) {
