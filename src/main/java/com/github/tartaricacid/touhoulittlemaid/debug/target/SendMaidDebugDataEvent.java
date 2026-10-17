@@ -3,15 +3,22 @@ package com.github.tartaricacid.touhoulittlemaid.debug.target;
 import cn.sh1rocu.touhoulittlemaid.api.event.PlayerTickEvent;
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
+import com.github.tartaricacid.touhoulittlemaid.network.message.MaidDebugDataPacket;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.VisibleForDebug;
 import net.minecraft.world.level.pathfinder.Path;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 
 @VisibleForDebug
 public class SendMaidDebugDataEvent {
+    /** 一条路径最多同步这么多个节点，防止极端情况下包过大 */
+    private static final int MAX_PATH_NODES = 64;
+
     public static void onPlayerTick(PlayerTickEvent.Pre event) {
         if (!TouhouLittleMaid.DEBUG) {
             return;
@@ -23,28 +30,26 @@ public class SendMaidDebugDataEvent {
         if (serverPlayer.tickCount % 4 == 0) {
             List<EntityMaid> debuggingMaid = DebugMaidManager.getDebuggingMaid(serverPlayer);
             for (EntityMaid maid : debuggingMaid) {
-                renderForMaid(maid, serverPlayer);
+                sendForMaid(maid, serverPlayer);
             }
         }
     }
 
-    private static void renderForMaid(@Nullable EntityMaid maid, ServerPlayer player) {
+    private static void sendForMaid(@Nullable EntityMaid maid, ServerPlayer player) {
         if (maid == null) {
             return;
         }
-        // TODO
-
-//        if (!maid.getNavigation().isDone()) {
-//            Path path = maid.getNavigation().getPath();
-//            if (path != null) {
-//                player.connection.send(new ClientboundCustomPayloadPacket(new PathfindingDebugPayload(maid.getId(), path, 0.5f)));
-//            }
-//        }
-//
-//        DebugMaidManager.getDebugTargets(maid).forEach(target -> {
-//            GameTestAddMarkerDebugPayload payload = new GameTestAddMarkerDebugPayload(
-//                    target.chestPos(), target.color(), target.text(), target.lifeTime());
-//            player.connection.send(new ClientboundCustomPayloadPacket(payload));
-//        });
+        List<BlockPos> nodes = new ArrayList<>();
+        int currentNode = -1;
+        Path path = maid.getNavigation().getPath();
+        if (path != null) {
+            currentNode = path.getNextNodeIndex();
+            int count = Math.min(path.getNodeCount(), MAX_PATH_NODES);
+            for (int i = 0; i < count; i++) {
+                nodes.add(path.getNodePos(i));
+            }
+        }
+        List<DebugTarget> targets = DebugMaidManager.getDebugTargets(maid);
+        ServerPlayNetworking.send(player, new MaidDebugDataPacket(maid.getId(), nodes, currentNode, targets));
     }
 }

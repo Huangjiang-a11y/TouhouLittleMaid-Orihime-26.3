@@ -45,6 +45,7 @@ public class NetworkHandler {
         ClientPlayNetworking.registerGlobalReceiver(GomokuClientPackage.TYPE, GomokuClientPackage::handle);
         ClientPlayNetworking.registerGlobalReceiver(FoxScrollPackage.TYPE, FoxScrollPackage::handle);
         ClientPlayNetworking.registerGlobalReceiver(CheckSchedulePosPacket.TYPE, CheckSchedulePosPacket::handle);
+        ClientPlayNetworking.registerGlobalReceiver(MaidDebugDataPacket.TYPE, MaidDebugDataPacket::handle);
         ClientPlayNetworking.registerGlobalReceiver(SyncMaidAreaPackage.TYPE, SyncMaidAreaPackage::handle);
         ClientPlayNetworking.registerGlobalReceiver(CChessToClientPackage.TYPE, CChessToClientPackage::handle);
         ClientPlayNetworking.registerGlobalReceiver(WChessToClientPackage.TYPE, WChessToClientPackage::handle);
@@ -76,6 +77,7 @@ public class NetworkHandler {
         registerS2CPacket(GomokuClientPackage.TYPE, GomokuClientPackage.STREAM_CODEC);
         registerS2CPacket(FoxScrollPackage.TYPE, FoxScrollPackage.STREAM_CODEC);
         registerS2CPacket(CheckSchedulePosPacket.TYPE, CheckSchedulePosPacket.STREAM_CODEC);
+        registerS2CPacket(MaidDebugDataPacket.TYPE, MaidDebugDataPacket.STREAM_CODEC);
         registerS2CPacket(SyncMaidAreaPackage.TYPE, SyncMaidAreaPackage.STREAM_CODEC);
         registerS2CPacket(CChessToClientPackage.TYPE, CChessToClientPackage.STREAM_CODEC);
         registerS2CPacket(WChessToClientPackage.TYPE, WChessToClientPackage.STREAM_CODEC);
