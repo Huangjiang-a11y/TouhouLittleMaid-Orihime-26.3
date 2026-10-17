@@ -25,6 +25,10 @@ public class MaidFollowOwnerTask extends Behavior<EntityMaid> {
 
     @Override
     protected boolean checkExtraStartConditions(ServerLevel level, EntityMaid maid) {
+        // 有攻击目标时不跟随：否则远程/枪械女仆会在交战中被拉回主人身边（和战斗任务的走位打架）
+        if (maid.getBrain().hasMemoryValue(MemoryModuleType.ATTACK_TARGET)) {
+            return false;
+        }
         LivingEntity owner = maid.getOwner();
         if (ownerStateConditions(owner, maid)) {
             // 如果女仆在前往呼吸点，玩家不在水中

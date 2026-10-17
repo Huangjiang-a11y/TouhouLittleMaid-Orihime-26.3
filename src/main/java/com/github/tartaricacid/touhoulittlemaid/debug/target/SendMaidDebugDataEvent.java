@@ -18,6 +18,7 @@ import java.util.List;
 public class SendMaidDebugDataEvent {
     /** 一条路径最多同步这么多个节点，防止极端情况下包过大 */
     private static final int MAX_PATH_NODES = 64;
+    private static final java.util.Map<Integer, Boolean> LAST_PATH_NULL = new java.util.concurrent.ConcurrentHashMap<>();
 
     public static void onPlayerTick(PlayerTickEvent.Pre event) {
         if (!TouhouLittleMaid.DEBUG) {
@@ -50,6 +51,13 @@ public class SendMaidDebugDataEvent {
             }
         }
         List<DebugTarget> targets = DebugMaidManager.getDebugTargets(maid);
+        // 只在"路径从无到有 / 从有到无"时打一条，方便定位路径为空的时机
+        boolean pathNull = nodes.isEmpty();
+        Boolean last = LAST_PATH_NULL.put(maid.getId(), pathNull);
+        if (last == null || last != pathNull) {
+            TouhouLittleMaid.LOGGER.info("[MaidDebug] 状态变化: maid={} pathNull={} pathNodes={} currentNode={} targets={}",
+                    maid.getId(), pathNull, nodes.size(), currentNode, targets.size());
+        }
         ServerPlayNetworking.send(player, new MaidDebugDataPacket(maid.getId(), nodes, currentNode, targets));
     }
 }
