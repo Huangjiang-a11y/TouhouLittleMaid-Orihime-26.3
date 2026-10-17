@@ -36,6 +36,9 @@ public class MaidFollowOwnerTask extends Behavior<EntityMaid> {
 
     @Override
     protected boolean checkExtraStartConditions(ServerLevel level, EntityMaid maid) {
+        if (isResting(maid)) {
+            return false;
+        }
         LivingEntity owner = maid.getOwner();
         if (ownerStateConditions(owner, maid)) {
             // 如果女仆在前往呼吸点，玩家不在水中
@@ -54,11 +57,6 @@ public class MaidFollowOwnerTask extends Behavior<EntityMaid> {
      */
     private static boolean isResting(EntityMaid maid) {
         return maid.getBrain().isActive(Activity.REST);
-    }
-
-    @Override
-    protected boolean checkExtraStartConditions(ServerLevel worldIn, EntityMaid maid) {
-        return !isResting(maid);
     }
 
     @Override
