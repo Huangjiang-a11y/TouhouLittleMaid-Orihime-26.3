@@ -28,7 +28,12 @@ public class GunGeckoAnimation {
         if (isMaidCarrying(maid)) {
             return null;
         }
-        return playAnimation(event, "tac:" + animationName, loopType);
+        // 模型里必须真的有这个 tac: 动画才用，否则回退原名（上游 1.21.1 同款保护，移植时丢了这个判断）
+        String tacName = "tac:" + animationName;
+        if (event.getAnimatableEntity().getAnimation(tacName) == null) {
+            return null;
+        }
+        return playAnimation(event, tacName, loopType);
     }
 
     public static PlayState playGunHoldAnimation(AnimationEvent<GeckoMaidEntity<?>> event, ItemStack heldItem) {
