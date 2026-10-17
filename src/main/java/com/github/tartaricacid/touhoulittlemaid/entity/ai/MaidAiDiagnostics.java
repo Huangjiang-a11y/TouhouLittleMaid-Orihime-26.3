@@ -18,6 +18,9 @@ import java.util.stream.Collectors;
  * dump 每 2 秒打印一次她的真实内部状态；hardReset 在每次加载时把 AI 状态强清一遍。
  */
 public final class MaidAiDiagnostics {
+    /** 聊天框输出开关：排查时临时打开即可，默认关闭（日志里仍会打印） */
+    public static final boolean CHAT_OUTPUT = false;
+
     private static final Logger LOGGER = LogUtils.getLogger();
     /** 是否开启体检日志（定位期间 true） */
     private static final boolean ENABLED = true;
@@ -71,7 +74,9 @@ public final class MaidAiDiagnostics {
         LOGGER.info("[MaidDiag] {}", line);
         // 直接发到主人聊天栏，省得去翻日志文件（16 格内才发，免得刷屏）
         if (maid.getOwner() instanceof ServerPlayer player && player.distanceTo(maid) <= 16.0F) {
-            player.sendSystemMessage(Component.literal("[MaidDiag] " + line));
+            if (CHAT_OUTPUT) {
+                player.sendSystemMessage(Component.literal("[MaidDiag] " + line));
+            }
         }
     }
 
