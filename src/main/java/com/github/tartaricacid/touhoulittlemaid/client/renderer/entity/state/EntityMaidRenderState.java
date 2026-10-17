@@ -46,6 +46,7 @@ import static com.github.tartaricacid.touhoulittlemaid.client.resource.loader.Cu
 
 public class EntityMaidRenderState extends HumanoidRenderState {
     private static final String DEFAULT_MODEL_ID = "touhou_little_maid:hakurei_reimu";
+    private static final java.util.Set<String> EMPTY_MODEL_LOGGED = java.util.concurrent.ConcurrentHashMap.newKeySet();
     private static final BlockDisplayContext BLOCK_DISPLAY_CONTEXT = BlockDisplayContext.create();
 
     /**
@@ -319,10 +320,12 @@ public class EntityMaidRenderState extends HumanoidRenderState {
         // 或资源/贴图缺失）会让女仆"整个消失"，只留下阴影，非常难排查。
         // 这里兜底成默认模型，并在日志里点名是哪个模型坏了。
         if (isEmptyModel(state.bedrockModel)) {
-            TouhouLittleMaid.LOGGER.warn(
-                    "Maid model [{}] is empty (no bones/cubes), fallback to default model [{}]. "
-                            + "Check the model pack: unsupported format_version or missing model/texture file.",
-                    state.modelId, DEFAULT_MODEL_ID);
+            if (EMPTY_MODEL_LOGGED.add(state.modelId)) {
+                TouhouLittleMaid.LOGGER.warn(
+                        "Maid model [{}] is empty (no bones/cubes), fallback to default model [{}]. "
+                                + "Check the model pack: unsupported format_version or missing model/texture file.",
+                        state.modelId, DEFAULT_MODEL_ID);
+            }
             MAID_MODELS.getModel(DEFAULT_MODEL_ID).ifPresent(model -> state.bedrockModel = model);
             MAID_MODELS.getInfo(DEFAULT_MODEL_ID).ifPresent(info -> state.modelInfo = info);
             MAID_MODELS.getAnimation(DEFAULT_MODEL_ID).ifPresent(animations -> state.animations = animations);
@@ -431,31 +434,6 @@ public class EntityMaidRenderState extends HumanoidRenderState {
             state.modelType = ModelType.SIMPLE_BEDROCK;
         }
 
-        logModelOnce(state);
     }
 
-    /**
-     * 诊断用：每个"模型 id + 贴图"只打一次，把客户端真正解析到的结果摊开，
-     * 用于定位"模型看不见"到底是模型为空、贴图为空、还是被判定成了 gecko。
-     * 排查完可以删掉这一段（不影响功能）。
-     */
-    private static final java.util.Set<String> DEBUG_LOGGED_MODELS = java.util.concurrent.ConcurrentHashMap.newKeySet();
-
-    private static void logModelOnce(EntityMaidRenderState state) {
-        String texture = state.modelInfo == null ? "-" : String.valueOf(state.modelInfo.getTexture());
-        String key = state.modelId + "|" + texture;
-        if (!DEBUG_LOGGED_MODELS.add(key)) {
-            return;
-        }
-        TouhouLittleMaid.LOGGER.info(
-                "[maid-model] id={} modelType={} infoClass={} gecko={} texture={} entityScale={} bedrockModel={} parts={}",
-                state.modelId, state.modelType,
-                state.modelInfo == null ? "null" : state.modelInfo.getClass().getSimpleName(),
-                state.modelInfo != null && state.modelInfo.isGeckoModel(),
-                texture,
-                state.modelInfo == null ? -1F : state.modelInfo.getRenderEntityScale(),
-                state.bedrockModel == null ? "null" : state.bedrockModel.getClass().getSimpleName(),
-                state.bedrockModel == null ? -1 : state.bedrockModel.getModelMap().size()
-        );
-    }
 }
