@@ -1,5 +1,7 @@
 package com.github.tartaricacid.touhoulittlemaid.entity.passive;
 
+import com.github.tartaricacid.touhoulittlemaid.entity.data.ConfigData;
+import com.github.tartaricacid.touhoulittlemaid.init.InitDataAttachment;
 import cn.sh1rocu.touhoulittlemaid.api.extension.IEntity;
 import cn.sh1rocu.touhoulittlemaid.util.transfer.ItemUtil;
 import com.github.tartaricacid.touhoulittlemaid.entity.ai.MaidAiDiagnostics;
@@ -443,6 +445,8 @@ public class EntityMaid extends MaidManagerHost implements IEntity, CrossbowAtta
         this.taskManager.save(output);
         this.killRecordManager.save(output);
         this.aiChatManager.save(output);
+        // 家模式、拾取、显示背物等开关（ConfigData 位掩码）之前完全没进存档，重进就丢
+        output.store("config", ConfigData.CODEC, this.getAttachedOrCreate(InitDataAttachment.CONFIG));
     }
 
     @Override
@@ -455,6 +459,7 @@ public class EntityMaid extends MaidManagerHost implements IEntity, CrossbowAtta
         this.taskManager.read(input);
         this.killRecordManager.read(input);
         this.aiChatManager.read(input);
+        input.read("config", ConfigData.CODEC).ifPresent(data -> this.setAttached(InitDataAttachment.CONFIG, data));
 
         // 因为原版的无敌状态不会自动同步，故需要在这里手动设置同步
         this.setSyncInvulnerable(this.isInvulnerable());

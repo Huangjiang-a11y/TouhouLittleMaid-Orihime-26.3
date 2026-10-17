@@ -36,7 +36,7 @@ public record ConfigData(long booleanValue, PickType pickupType, float soundFreq
 
     private static final float DEFAULT_SOUND_FREQ = 1.0f;
 
-    private static final Codec<ConfigData> CODEC = RecordCodecBuilder.create(ins -> ins.group(
+    public static final Codec<ConfigData> CODEC = RecordCodecBuilder.create(ins -> ins.group(
             Codec.LONG.fieldOf("boolean_value").forGetter(ConfigData::booleanValue),
             PickType.CODEC.fieldOf("pickup_type").forGetter(ConfigData::pickupType),
             Codec.FLOAT.fieldOf("sound_freq").forGetter(ConfigData::soundFreq)
