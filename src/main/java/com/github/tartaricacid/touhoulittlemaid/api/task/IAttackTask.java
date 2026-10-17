@@ -68,14 +68,16 @@ public interface IAttackTask extends IMaidTask {
     static Optional<? extends LivingEntity> findRevengeTarget(EntityMaid maid) {
         LivingEntity selfAttacker = maid.getLastHurtByMob();
         if (isValidRevengeTarget(maid, selfAttacker)
-            && isRevengeFresh(maid, maid.getLastHurtByMobTimestamp())) {
+            && isRevengeFresh(maid.tickCount, maid.getLastHurtByMobTimestamp())) {
             return Optional.of(selfAttacker);
         }
         return Optional.empty();
     }
 
-    static boolean isRevengeFresh(LivingEntity source, int hurtTimestamp) {
-        return source.tickCount - hurtTimestamp <= REVENGE_MEMORY_TICKS;
+    static boolean isRevengeFresh(int nowTick, int hurtTimestamp) {
+        // 必须用女仆自己的 tickCount：lastHurtByMobTimestamp 也是在女仆的 tickCount 基准上写入的。
+        // 之前误用了攻击者的 tickCount，两个实体计数器原点不同，几乎永远判定为"过期"，复仇目标永远拿不到。
+        return nowTick - hurtTimestamp <= REVENGE_MEMORY_TICKS;
     }
 
     static boolean isValidRevengeTarget(EntityMaid maid, LivingEntity attacker) {
