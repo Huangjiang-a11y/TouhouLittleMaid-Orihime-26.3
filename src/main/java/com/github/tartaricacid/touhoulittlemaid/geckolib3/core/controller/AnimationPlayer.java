@@ -36,6 +36,8 @@ import org.joml.Vector3f;
 import java.util.List;
 
 public class AnimationPlayer {
+    private static long DIAG_LAST = 0L;
+
     /**
      * 模型所有骨骼
      */
@@ -139,6 +141,11 @@ public class AnimationPlayer {
 
         var animation = animatableEntity.getAnimation(animationName);
         if (animation == null) {
+            // 临时探针：模型里查不到这个名字 → 先 resetToIdle 再返回 → 什么都不播（回落默认姿态）
+            if (System.currentTimeMillis() - DIAG_LAST > 1000L) {
+                DIAG_LAST = System.currentTimeMillis();
+                com.mojang.logging.LogUtils.getLogger().info("[MaidAnimDiag] 模型里查不到动画名: {}", animationName);
+            }
             return;
         }
 

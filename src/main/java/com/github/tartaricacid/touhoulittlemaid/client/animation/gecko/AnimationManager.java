@@ -81,6 +81,7 @@ public final class AnimationManager {
             if (i == Priority.HIGH) {
                 PlayState vehicleAnimation = getVehicleAnimation(event);
                 if (vehicleAnimation != null) {
+                    MaidAnimDiag.logVehicle("HIGH 桶被载具动画短路");
                     return vehicleAnimation;
                 }
             }
@@ -88,6 +89,7 @@ public final class AnimationManager {
                 if (state.getPredicate().test(maid, event)) {
                     String animationName = state.getAnimationName();
                     LoopType loopType = state.getLoopType();
+                    MaidAnimDiag.log(maid, animationName);
                     // 装了 TACZ 且手持枪械时优先用 tac: 前缀的动画
                     PlayState gunMainAnimation = GunClientUtil.playGunMainAnimation(maid, event, animationName, loopType);
                     return java.util.Objects.requireNonNullElseGet(gunMainAnimation,
@@ -95,6 +97,7 @@ public final class AnimationManager {
                 }
             }
         }
+        MaidAnimDiag.log(maid, "NONE");
         return PlayState.STOP;
     }
 
