@@ -2,6 +2,7 @@ package com.github.tartaricacid.touhoulittlemaid.entity.passive;
 
 import cn.sh1rocu.touhoulittlemaid.api.extension.IEntity;
 import cn.sh1rocu.touhoulittlemaid.util.transfer.ItemUtil;
+import com.github.tartaricacid.touhoulittlemaid.entity.ai.MaidAiDiagnostics;
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.advancements.maid.TriggerType;
 import com.github.tartaricacid.touhoulittlemaid.api.client.render.MaidRenderState;
@@ -177,6 +178,13 @@ public class EntityMaid extends MaidManagerHost implements IEntity, CrossbowAtta
     @Override
     protected void customServerAiStep(ServerLevel level) {
         long timeRecord = Util.getNanos();
+
+        // ==== 临时体检（定位"一动不动"用，定位完删）====
+        if (this.tickCount == 1) {
+            MaidAiDiagnostics.hardReset(this);
+        } else if (this.tickCount % 40 == 0) {
+            MaidAiDiagnostics.dump(this);
+        }
 
         // 当玩家打开女仆的 GUI 时，暂停女仆的 Brain 执行
         if (!guiOpening) {
