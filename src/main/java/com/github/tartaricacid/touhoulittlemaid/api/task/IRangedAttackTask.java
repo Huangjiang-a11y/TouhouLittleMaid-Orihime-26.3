@@ -24,7 +24,7 @@ public interface IRangedAttackTask extends IAttackTask {
      * @return 第一个可视对象
      */
     static Optional<? extends LivingEntity> findFirstValidAttackTarget(EntityMaid maid) {
-        // 先检查攻击女仆自己的 / 攻击主人的对象（报复优先）
+        // 先检查刚攻击女仆自己的对象（报复优先）
         Optional<? extends LivingEntity> revenge = IAttackTask.findRevengeTarget(maid);
         if (revenge.isPresent()) {
             return revenge;

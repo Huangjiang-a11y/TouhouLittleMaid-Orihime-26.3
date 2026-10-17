@@ -38,7 +38,7 @@ public interface IAttackTask extends IMaidTask {
      * @return 合适的攻击目标
      */
     static Optional<? extends LivingEntity> findFirstValidAttackTarget(EntityMaid maid) {
-        // 谁打了女仆 / 谁打了主人，就先打回去，而不是傻傻只挑最近的
+        // 谁刚打了女仆自己，就先打回去，而不是傻傻只挑最近的
         Optional<? extends LivingEntity> revenge = findRevengeTarget(maid);
         if (revenge.isPresent()) {
             return revenge;
@@ -48,34 +48,28 @@ public interface IAttackTask extends IMaidTask {
     }
 
     /**
-     * 找"该报复的人"：优先是刚刚打了女仆自己的，其次是刚刚打了主人的
-     * <p>
-     * 原版近战只挑最近的敌人，于是女仆被远程怪/边上的怪偷袭时会一直无动于衷。
-     */
-    /**
      * 复仇记忆的时效（tick）。
      * <p>
      * 原版 {@code HurtByTargetGoal} 用 300 tick 判断"这口气还值不值得记"，
      * 这里对齐同一个语义：{@code getLastHurtByMob()} 返回的是永不过期的字段，
-     * 不自己判时效的话，女仆会把"很久以前打过我 / 打过主人的东西"当成终身追杀目标，
+     * 不自己判时效的话，女仆会把"很久以前打过她的东西"当成终身追杀目标，
      * 于是永远退不出攻击状态 —— 枪械女仆的走位任务（GunAttackStrafingTask）会因此
      * 一直接管移动（strafe / stopInPlace），表现就是"一动不动、根本没从枪械 AI 里切出来"。
      */
     int REVENGE_MEMORY_TICKS = 300;
 
+    /**
+     * 找"该报复的人"：只有"刚打了女仆自己的"那份仇才算数。
+     * <p>
+     * 原版近战只挑最近的敌人，于是女仆被远程怪 / 边上的怪偷袭时会一直无动于衷；
+     * 这里把上游远程那条自我复仇推广到近战，但**不含主人那边** ——
+     * 护主会让锁定面变得太宽（任何打过主人的东西都会被她当成目标），收益不值这个风险。
+     */
     static Optional<? extends LivingEntity> findRevengeTarget(EntityMaid maid) {
         LivingEntity selfAttacker = maid.getLastHurtByMob();
         if (isValidRevengeTarget(maid, selfAttacker)
             && isRevengeFresh(maid, maid.getLastHurtByMobTimestamp())) {
             return Optional.of(selfAttacker);
-        }
-        LivingEntity owner = maid.getOwner();
-        if (owner != null) {
-            LivingEntity ownerAttacker = owner.getLastHurtByMob();
-            if (isValidRevengeTarget(maid, ownerAttacker)
-                && isRevengeFresh(owner, owner.getLastHurtByMobTimestamp())) {
-                return Optional.of(ownerAttacker);
-            }
         }
         return Optional.empty();
     }
