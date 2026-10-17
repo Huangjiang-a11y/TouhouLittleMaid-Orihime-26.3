@@ -10,6 +10,7 @@ import net.minecraft.world.entity.ai.behavior.BehaviorUtils;
 import net.minecraft.world.entity.ai.behavior.EntityTracker;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.MemoryStatus;
+import net.minecraft.world.entity.schedule.Activity;
 
 import javax.annotation.Nullable;
 
@@ -44,6 +45,33 @@ public class MaidFollowOwnerTask extends Behavior<EntityMaid> {
             return true;
         }
         return false;
+    }
+
+    /**
+     * 休息（晚上/午休）期间不跟随主人。
+     * 否则"跟随主人"会和"找床睡觉"轮流覆盖 WALK_TARGET，女仆在床和你之间来回走，
+     * 永远进不了床的 2 格内，于是永远不上床。
+     */
+    private static boolean isResting(EntityMaid maid) {
+        return maid.getBrain().isActive(Activity.REST);
+    }
+
+    @Override
+    protected boolean checkExtraStartConditions(ServerLevel worldIn, EntityMaid maid) {
+        return !isResting(maid);
+    }
+
+    @Override
+    protected boolean canStillUse(ServerLevel worldIn, EntityMaid maid, long gameTimeIn) {
+        return !isResting(maid);
+    }
+
+    @Override
+    protected void tick(ServerLevel worldIn, EntityMaid maid, long gameTimeIn) {
+        if (isResting(maid)) {
+            return;
+        }
+        super.tick(worldIn, maid, gameTimeIn);
     }
 
     @Override
