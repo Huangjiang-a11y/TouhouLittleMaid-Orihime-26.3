@@ -72,10 +72,13 @@ public class MaidTaskManager {
 
     void read(ValueInput input) {
         this.schedulePos.load(input, this.maid);
+        // 家的坐标/半径在 TaskData 里，之前只存了 schedulePos，重进游戏家就丢了
+        input.read("task", TaskData.CODEC).ifPresent(data -> this.maid.setAttached(TASK, data));
     }
 
     void save(ValueOutput output) {
         this.schedulePos.save(output);
+        output.store("task", TaskData.CODEC, this.getData());
     }
 
     void setHomeTo(BlockPos pos, int distance) {

@@ -59,6 +59,12 @@ public class MaidBedTask extends MaidCheckRateTask {
             if (blockState.is(TagBlock.MAID_BED) && blockState.getValue(BlockMaidBed.PART) == BedPart.HEAD && !blockState.getValue(BedBlock.OCCUPIED)) {
                 maid.startSleeping(pos);
                 maid.setPos(pos.getX() + 0.5, pos.getY() + 0.8, pos.getZ() + 0.5);
+            } else {
+                boolean isMaidBed = blockState.is(TagBlock.MAID_BED);
+                String part = isMaidBed ? String.valueOf(blockState.getValue(BlockMaidBed.PART)) : "n/a";
+                String occupied = isMaidBed ? String.valueOf(blockState.getValue(BedBlock.OCCUPIED)) : "n/a";
+                com.mojang.logging.LogUtils.getLogger().info(
+                        "[MaidBedDiag] 到床但条件不满足: pos={} 是女仆床={} part={} occupied={}", pos, isMaidBed, part, occupied);
             }
         });
         maid.getBrain().eraseMemory(InitBrains.TARGET_POS);

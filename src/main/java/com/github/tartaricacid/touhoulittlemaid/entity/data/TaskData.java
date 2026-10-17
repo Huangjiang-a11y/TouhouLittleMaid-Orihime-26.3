@@ -25,7 +25,7 @@ public record TaskData(
     private static final MaidSchedule DEFAULT_SCHEDULE = MaidSchedule.ALL;
     private static final BlockPos DEFAULT_RESTRICT_CENTER = BlockPos.ZERO;
 
-    private static final Codec<TaskData> CODEC = RecordCodecBuilder.create(ins -> ins.group(
+    public static final Codec<TaskData> CODEC = RecordCodecBuilder.create(ins -> ins.group(
             Codec.STRING.fieldOf("task_id").forGetter(TaskData::taskId),
             MaidSchedule.CODEC.fieldOf("schedule").forGetter(TaskData::schedule),
             BlockPos.CODEC.fieldOf("restrict_center").forGetter(TaskData::restrictCenter),
