@@ -52,19 +52,36 @@ public interface IAttackTask extends IMaidTask {
      * <p>
      * 原版近战只挑最近的敌人，于是女仆被远程怪/边上的怪偷袭时会一直无动于衷。
      */
+    /**
+     * 复仇记忆的时效（tick）。
+     * <p>
+     * 原版 {@code HurtByTargetGoal} 用 300 tick 判断"这口气还值不值得记"，
+     * 这里对齐同一个语义：{@code getLastHurtByMob()} 返回的是永不过期的字段，
+     * 不自己判时效的话，女仆会把"很久以前打过我 / 打过主人的东西"当成终身追杀目标，
+     * 于是永远退不出攻击状态 —— 枪械女仆的走位任务（GunAttackStrafingTask）会因此
+     * 一直接管移动（strafe / stopInPlace），表现就是"一动不动、根本没从枪械 AI 里切出来"。
+     */
+    int REVENGE_MEMORY_TICKS = 300;
+
     static Optional<? extends LivingEntity> findRevengeTarget(EntityMaid maid) {
         LivingEntity selfAttacker = maid.getLastHurtByMob();
-        if (isValidRevengeTarget(maid, selfAttacker)) {
+        if (isValidRevengeTarget(maid, selfAttacker)
+            && isRevengeFresh(maid, maid.getLastHurtByMobTimestamp())) {
             return Optional.of(selfAttacker);
         }
         LivingEntity owner = maid.getOwner();
         if (owner != null) {
             LivingEntity ownerAttacker = owner.getLastHurtByMob();
-            if (isValidRevengeTarget(maid, ownerAttacker)) {
+            if (isValidRevengeTarget(maid, ownerAttacker)
+                && isRevengeFresh(owner, owner.getLastHurtByMobTimestamp())) {
                 return Optional.of(ownerAttacker);
             }
         }
         return Optional.empty();
+    }
+
+    static boolean isRevengeFresh(LivingEntity source, int hurtTimestamp) {
+        return source.tickCount - hurtTimestamp <= REVENGE_MEMORY_TICKS;
     }
 
     static boolean isValidRevengeTarget(EntityMaid maid, LivingEntity attacker) {
