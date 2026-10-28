@@ -5,8 +5,7 @@ public enum STTApiType {
     ALIYUN("aliyun"),
     SILICONFLOW("siliconflow"),
     TENCENT("tencent"),
-    OPENAI("openai"),
-    OPENAI_REALTIME("openai_realtime");
+    OPENAI("openai");
 
     private final String name;
 

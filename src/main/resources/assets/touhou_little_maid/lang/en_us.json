@@ -1156,6 +1156,5 @@
   "config.touhou_little_maid.vanilla.replace_totem_texture": "Replace Totem Texture",
   "config.touhou_little_maid.vanilla.replace_totem_texture.tooltip": "Whether to replace the vanilla totem texture with the life point",
   "config.touhou_little_maid.vanilla.replace_xp_bottle_texture": "Replace XP Bottle Texture",
-  "config.touhou_little_maid.vanilla.replace_xp_bottle_texture.tooltip": "Whether to replace the vanilla bottle of xp texture with the point items",
-  "ai.touhou_little_maid.chat.site.openai_realtime.name": "OpenAI Realtime"
+  "config.touhou_little_maid.vanilla.replace_xp_bottle_texture.tooltip": "Whether to replace the vanilla bottle of xp texture with the point items"
 }
