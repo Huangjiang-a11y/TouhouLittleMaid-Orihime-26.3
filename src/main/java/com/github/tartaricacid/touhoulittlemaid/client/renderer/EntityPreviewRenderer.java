@@ -1,4 +1,4 @@
-package com.github.tartaricacid.touhoulittlemaid.client.book;
+package com.github.tartaricacid.touhoulittlemaid.client.renderer;
 
 import com.github.tartaricacid.touhoulittlemaid.util.migrate.EntityTypeUtil;
 import com.mojang.logging.LogUtils;
@@ -39,7 +39,7 @@ import java.util.Set;
  * </ol>
  * 注意：文字由 BookScreen#renderBody 统一绘制，这里**不要**再画一遍（会重影）。
  */
-public final class EntityPageRenderer {
+public final class EntityPreviewRenderer {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final float DEFAULT_SCALE = 45.0F;
     private static final float YAW = -28.0F;
@@ -47,7 +47,7 @@ public final class EntityPageRenderer {
     private static final Map<String, EntityRenderState> CACHE = new HashMap<>();
     private static final Set<String> FAILED = new HashSet<>();
 
-    private EntityPageRenderer() {
+    private EntityPreviewRenderer() {
     }
 
     /** 画实体，返回内容区新的 y（不画文字）。 */

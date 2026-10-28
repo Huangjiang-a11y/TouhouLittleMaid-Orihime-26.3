@@ -408,13 +408,6 @@ public class MenuIntegration {
                     MiscConfig.GIVE_SMART_SLAB.save();
                 }).build());
 
-        misc.addEntry(entryBuilder.startBooleanToggle(Component.translatable("config.touhou_little_maid.misc.give_patchouli_book"), MiscConfig.GIVE_PATCHOULI_BOOK.get())
-                .setDefaultValue(true).setTooltip(Component.translatable("config.touhou_little_maid.misc.give_patchouli_book.tooltip"))
-                .setSaveConsumer(b -> {
-                    MiscConfig.GIVE_PATCHOULI_BOOK.set(b);
-                    MiscConfig.GIVE_PATCHOULI_BOOK.save();
-                }).build());
-
         misc.addEntry(entryBuilder.startDoubleField(Component.translatable("config.touhou_little_maid.misc.shrine_lamp_effect_cost"), MiscConfig.SHRINE_LAMP_EFFECT_COST.get())
                 .setDefaultValue(0.9).setMin(0).setMax(Double.MAX_VALUE)
                 .setTooltip(Component.translatable("config.touhou_little_maid.misc.shrine_lamp_effect_cost.tooltip"))

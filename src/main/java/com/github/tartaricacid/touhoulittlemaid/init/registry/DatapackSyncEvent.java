@@ -9,7 +9,7 @@ public class DatapackSyncEvent {
         // 手册 crafting 页要显示的原版合成配方**不走这里**：Fabric 的配方同步是按序列化器
         // 逐项 opt-in 的，登记原版 Shaped/Shapeless 等于把**所有模组**的合成配方都推给客户端
         // （登录时一次性传输，modpack 下可能 MB 级）。手册改用烤进资源的静态配方数据
-        // （见 tools/gen_book_recipes.py 与 client/book/BookRecipeData）。
+        // （脚本与数据已随书壳搬去附属模组「车万女仆：技术性改进」）。
         RecipeSynchronization.synchronizeRecipeSerializer(InitRecipes.ALTAR_RECIPE_SERIALIZER);
     }
 }

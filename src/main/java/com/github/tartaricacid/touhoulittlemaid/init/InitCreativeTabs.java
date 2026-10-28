@@ -37,7 +37,6 @@ public class InitCreativeTabs {
                     output.accept(ItemModBook.forBook(book).create());
                 } else {
                     // 没装 Patchouli：用自包含手册物品（右键开自研书壳）
-                    output.accept(InitItems.MEMORIZABLE_GENSOKYO_MANUAL);
                 }
                 output.accept(MAID_SPAWN_EGG);
                 output.accept(FAIRY_SPAWN_EGG);

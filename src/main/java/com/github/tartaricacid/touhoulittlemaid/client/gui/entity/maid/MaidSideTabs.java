@@ -2,7 +2,6 @@ package com.github.tartaricacid.touhoulittlemaid.client.gui.entity.maid;
 
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.api.event.client.OpenPatchouliBookEvent;
-import com.github.tartaricacid.touhoulittlemaid.client.book.SelfBookOpen;
 import com.github.tartaricacid.touhoulittlemaid.client.gui.mod.PatchouliWarningScreen;
 import com.github.tartaricacid.touhoulittlemaid.client.gui.widget.button.MaidSideTabButton;
 import com.github.tartaricacid.touhoulittlemaid.compat.cloth.ClothConfigCompat;
@@ -35,16 +34,12 @@ public class MaidSideTabs<T extends AbstractMaidContainer> {
     }
 
     public MaidSideTabButton[] getTabs(AbstractMaidContainerGui<T> screen) {
-        // 跳转帕秋莉手册按钮
+        // 跳转手册按钮：统一发事件。装了 Patchouli 由它打开；没装则由附属模组
+        // 「车万女仆：技术性改进」监听同一事件，打开自研书壳（书壳已从主模组剥离）
         MaidSideTabButton taskBook = genSideTabButton(SideTab.TASK_BOOK, (b) -> {
-            if (FabricLoader.getInstance().isModLoaded(CompatRegistry.PATCHOULI)) {
-                EntityMaid maid = screen.getMaid();
-                if (maid != null) {
-                    OpenPatchouliBookEvent.CALLBACK.invoker().post(new OpenPatchouliBookEvent(maid, maid.getTask()));
-                }
-            } else {
-                // 没装 Patchouli：走自包含书壳
-                SelfBookOpen.openDefault();
+            EntityMaid maid = screen.getMaid();
+            if (maid != null) {
+                OpenPatchouliBookEvent.CALLBACK.invoker().post(new OpenPatchouliBookEvent(maid, maid.getTask()));
             }
         });
 

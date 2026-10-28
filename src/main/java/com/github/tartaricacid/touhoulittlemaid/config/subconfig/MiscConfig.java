@@ -15,7 +15,6 @@ public final class MiscConfig {
     public static ModConfigSpec.ConfigValue<List<? extends String>> MAID_FAIRY_BLACKLIST_DIMENSION;
     public static ModConfigSpec.DoubleValue PLAYER_DEATH_LOSS_POWER_POINT;
     public static ModConfigSpec.BooleanValue GIVE_SMART_SLAB;
-    public static ModConfigSpec.BooleanValue GIVE_PATCHOULI_BOOK;
     public static ModConfigSpec.DoubleValue SHRINE_LAMP_EFFECT_COST;
     public static ModConfigSpec.DoubleValue SHRINE_LAMP_MAX_STORAGE;
     public static ModConfigSpec.IntValue SHRINE_LAMP_MAX_RANGE;
@@ -49,9 +48,6 @@ public final class MiscConfig {
                 .translation(translateKey("give_smart_slab"));
         GIVE_SMART_SLAB = builder.define("GiveSoulSpell", true);
 
-        builder.comment("Give the Memorizable Gensokyo book item for player first join")
-                .translation(translateKey("give_patchouli_book"));
-        GIVE_PATCHOULI_BOOK = builder.define("GivePatchouliBook", true);
 
         builder.comment("Shrine Lamp Effect Cost (Power Point/Per Hour)")
                 .translation(translateKey("shrine_lamp_effect_cost"));

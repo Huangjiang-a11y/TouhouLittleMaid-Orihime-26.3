@@ -1,6 +1,6 @@
 package com.github.tartaricacid.touhoulittlemaid.compat.jei.category;
 
-import com.github.tartaricacid.touhoulittlemaid.client.book.EntityPageRenderer;
+import com.github.tartaricacid.touhoulittlemaid.client.renderer.EntityPreviewRenderer;
 import com.github.tartaricacid.touhoulittlemaid.util.IdentifierUtil;
 import com.github.tartaricacid.touhoulittlemaid.crafting.AltarRecipe;
 import com.github.tartaricacid.touhoulittlemaid.init.InitRecipes;
@@ -68,8 +68,8 @@ public class AltarRecipeCategory implements IRecipeCategory<RecipeHolder<AltarRe
         // 实体产物：26.x 丢了 entity_placeholder 那套（NeoForge ITEM_EXTENSIONS），产物槽只能显示刷怪蛋。
         // 这里直接把实体画在产物槽下方，复用书壳里的实体渲染（带失败缓存，不会每帧重建）。
         if (!recipe.isItemCraft()) {
-            EntityRenderState entityState = EntityPageRenderer.state(recipe.getEntityType().toString());
-            EntityPageRenderer.drawCentered(graphics, entityState, 22.0F, 131, 22, 157, 62, 0.12F);
+            EntityRenderState entityState = EntityPreviewRenderer.state(recipe.getEntityType().toString());
+            EntityPreviewRenderer.drawCentered(graphics, entityState, 22.0F, 131, 22, 157, 62, 0.12F);
         }
 
         graphics.text(font, powerText, 65, 55, TEXT_COLOR, false);
