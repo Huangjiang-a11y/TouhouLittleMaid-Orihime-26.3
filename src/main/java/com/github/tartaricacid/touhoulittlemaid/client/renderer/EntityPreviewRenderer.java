@@ -50,22 +50,6 @@ public final class EntityPreviewRenderer {
     private EntityPreviewRenderer() {
     }
 
-    /** 画实体，返回内容区新的 y（不画文字）。 */
-    public static int render(GuiGraphicsExtractor graphics, BookPage page, int x, int y, int width) {
-        EntityRenderState state = state(page.str("entity"));
-        if (state == null) {
-            return y;
-        }
-        float scale = DEFAULT_SCALE * page.decimal("scale", 1.0F);
-        float offset = page.decimal("offset", 0.0F);
-        int entityH = Math.max(32, Math.round(state.boundingBoxHeight * scale) + 8);
-        int cx = x + width / 2;
-        int centerY = y + entityH / 2;
-        int half = Math.max(8, Math.round(scale / 2.0F));
-        drawCentered(graphics, state, scale, cx - half, centerY - half, cx + half, centerY + half, offset);
-        return y + entityH + 6;
-    }
-
     /**
      * 在给定方块 (x0,y0)-(x1,y1) 内居中画一个已建好的实体状态（祭坛页复用）。
      * 实体的原点在方块中心、向上生长，所以 translate.y 要补上半个身高才正好居中。
