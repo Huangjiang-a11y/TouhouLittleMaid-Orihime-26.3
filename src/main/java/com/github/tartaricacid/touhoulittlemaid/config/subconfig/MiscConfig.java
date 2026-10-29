@@ -48,7 +48,6 @@ public final class MiscConfig {
                 .translation(translateKey("give_smart_slab"));
         GIVE_SMART_SLAB = builder.define("GiveSoulSpell", true);
 
-
         builder.comment("Shrine Lamp Effect Cost (Power Point/Per Hour)")
                 .translation(translateKey("shrine_lamp_effect_cost"));
         SHRINE_LAMP_EFFECT_COST = builder.defineInRange("ShrineLampEffectCost", 0.9, 0, Double.MAX_VALUE);

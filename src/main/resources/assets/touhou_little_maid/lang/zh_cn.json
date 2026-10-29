@@ -1004,5 +1004,5 @@
   "board_state.touhou_little_maid.gomoku.square": "口字阵",
   "board_state.touhou_little_maid.gomoku.bed": "床阵",
   "board_state.touhou_little_maid.xiangqi.default": "中国象棋残局",
-  "board_state.touhou_little_maid.chess.default": "国际象棋残局",
+  "board_state.touhou_little_maid.chess.default": "国际象棋残局"
 }

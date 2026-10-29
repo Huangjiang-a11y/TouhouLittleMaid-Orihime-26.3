@@ -1004,5 +1004,5 @@
   "board_state.touhou_little_maid.gomoku.square": "Square Endgame",
   "board_state.touhou_little_maid.gomoku.bed": "Bed Endgame",
   "board_state.touhou_little_maid.xiangqi.default": "Xiangqi Endgame",
-  "board_state.touhou_little_maid.chess.default": "Chess Endgame",
+  "board_state.touhou_little_maid.chess.default": "Chess Endgame"
 }

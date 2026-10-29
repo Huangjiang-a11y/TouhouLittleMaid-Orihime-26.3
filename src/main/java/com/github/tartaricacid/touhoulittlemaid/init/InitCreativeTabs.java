@@ -17,7 +17,6 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.EnchantmentInstance;
-import vazkii.patchouli.common.item.ItemModBook;
 
 import java.util.Optional;
 
@@ -32,12 +31,8 @@ public class InitCreativeTabs {
             .title(Component.translatable("item_group.touhou_little_maid.main"))
             .icon(HAKUREI_GOHEI::getDefaultInstance)
             .displayItems((par, output) -> {
-                if (FabricLoader.getInstance().isModLoaded("patchouli")) {
-                    Identifier book = Identifier.fromNamespaceAndPath(TouhouLittleMaid.MOD_ID, "memorizable_gensokyo");
-                    output.accept(ItemModBook.forBook(book).create());
-                } else {
-                    // 没装 Patchouli：用自包含手册物品（右键开自研书壳）
-                }
+                // 手册（自包含书壳 + 物品）已拆到附属模组「车万女仆：技术性改进」，
+                // 由它自己往这个标签页里塞物品，主模组这边不再处理。
                 output.accept(MAID_SPAWN_EGG);
                 output.accept(FAIRY_SPAWN_EGG);
                 output.accept(HAKUREI_GOHEI);
