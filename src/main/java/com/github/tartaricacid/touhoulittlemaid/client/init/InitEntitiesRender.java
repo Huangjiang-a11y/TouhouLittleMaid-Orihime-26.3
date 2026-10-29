@@ -32,10 +32,6 @@ public final class InitEntitiesRender {
         EntityRenderers.register(EntityBroom.TYPE, EntityBroomRender::new);
         EntityRenderers.register(MaidFishingHook.TYPE, MaidFishingHookRenderer::new);
 
-        // 原版替换（由 VanillaConfig 控制开关，与 1.21.1 一致）
-        EntityRendererRegistry.register(EntityTypes.SLIME, EntityYukkuriSlimeRender::new);
-        EntityRendererRegistry.register(EntityTypes.MAGMA_CUBE, EntityMarisaYukkuriSlimeRender::new);
-        EntityRendererRegistry.register(EntityTypes.EXPERIENCE_ORB, ReplaceExperienceOrbRenderer::new);
 
         BlockEntityRenderers.register(InitBlocks.ALTAR_BE, AltarRenderer::new);
         BlockEntityRenderers.register(InitBlocks.STATUE_BE, StatueRenderer::new);
