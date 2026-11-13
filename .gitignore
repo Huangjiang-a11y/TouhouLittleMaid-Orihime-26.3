@@ -27,3 +27,6 @@ src/test
 
 /src/generated/.cache/
 /src/main/generated/.cache/
+
+# 第三方兼容用的 jar 不随仓库分发（CI 构建前从各自的 Release 下载）
+libs/*.jar

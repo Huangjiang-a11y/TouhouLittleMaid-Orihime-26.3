@@ -57,7 +57,10 @@ jobs:
           mkdir -p libs
           curl -fsSL -o libs/create-fly-26.3-6.0.9-2.jar \
             https://github.com/ZurrTum/Create-Fly/releases/download/v6.0.9-26.3-2/create-fly-26.3-6.0.9-2.jar
+          curl -fsSL -o libs/tacz-refabricated-26.3-1.1.8.jar \
+            "https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial/releases/download/26.3_R1_HOTFIX/TACZ-Refabricated-26.3-1.1.8%2Bfabric.26.3.R1-hotfix.jar"
           echo "016b7a33a634b1964460d30c81f57aab9b4beae78673f1729f653cee3673e09e  libs/create-fly-26.3-6.0.9-2.jar" | sha256sum -c -
+          echo "f920094d4787bf206b3f4f1a34a2eb0c3a334c507fada0078453dc9a769cb3a5  libs/tacz-refabricated-26.3-1.1.8.jar" | sha256sum -c -
 
       - name: Build with Gradle
         run: |
