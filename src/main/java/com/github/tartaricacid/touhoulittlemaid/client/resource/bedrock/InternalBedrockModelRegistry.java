@@ -55,6 +55,8 @@ public final class InternalBedrockModelRegistry {
     public static final Identifier NEW_MAID_FAIRY = addEntityModel("new_maid_fairy", NewEntityFairyModel::new);
     public static final Identifier BABY_MAID_FAIRY = addEntityModel("baby_maid_fairy", NewEntityFairyModel::new);
     public static final Identifier BROOM = addEntityModel("broom", BroomModel::new);
+    public static final Identifier REIMU_YUKKURI = addEntityModel("reimu_yukkuri");
+    public static final Identifier MARISA_YUKKURI = addEntityModel("marisa_yukkuri");
 
     public static final Identifier TOMBSTONE = addEntityModel("tombstone");
 
