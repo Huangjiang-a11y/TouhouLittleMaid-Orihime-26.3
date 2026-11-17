@@ -19,6 +19,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.joml.Vector3fc;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -35,6 +37,13 @@ public class ChairItemRenderer implements SpecialModelRenderer<ChairRenderRender
      */
     private static final String DEFAULT_CHAIR_ID = "touhou_little_maid:cushion";
 
+    // 26.3 把带 SpecialModelRenderer 的物品一并标成 animated，界面里每帧都会重调
+    // extractArgument；不缓存就是每帧重建一次实体渲染状态。椅子只有 modelId 一个变量，
+    // 按它缓存即可。资源包重载/换世界时清空（见 clearCache 与 CustomPackReloadListener）。
+    private static final int CACHE_LIMIT = 128;
+    private static final Map<String, ChairRenderRenderState> STATE_CACHE = new HashMap<>();
+    private static Level cachedLevel;
+
     public ChairItemRenderer() {
     }
 
@@ -43,23 +52,33 @@ public class ChairItemRenderer implements SpecialModelRenderer<ChairRenderRender
      */
     @Override
     public ChairRenderRenderState extractArgument(ItemStack stack) {
-        ChairRenderRenderState state = new ChairRenderRenderState();
         if (!(stack.getItem() instanceof ItemChair)) {
-            return state;
+            return new ChairRenderRenderState();
+        }
+
+        Level level = Minecraft.getInstance().level;
+        if (level == null) {
+            return new ChairRenderRenderState();
+        }
+        if (level != cachedLevel) {
+            clearCache();
+            cachedLevel = level;
         }
 
         ItemChair.Data data = ItemChair.getData(stack);
         String modelId = data.modelId();
+
+        ChairRenderRenderState cached = STATE_CACHE.get(modelId);
+        if (cached != null) {
+            return cached;
+        }
+
+        ChairRenderRenderState state = new ChairRenderRenderState();
         state.modelId = modelId;
 
         CustomPackLoader.CHAIR_MODELS.getInfo(modelId).ifPresent(
                 info -> state.renderItemScale = info.getRenderItemScale()
         );
-
-        Level level = Minecraft.getInstance().level;
-        if (level == null) {
-            return state;
-        }
 
         EntityChair chair = EntityCacheUtil.getChair(level, EntitySpawnReason.LOAD);
         chair.setModelId(modelId);
@@ -67,7 +86,19 @@ public class ChairItemRenderer implements SpecialModelRenderer<ChairRenderRender
         EntityRenderDispatcher dispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
         state.entityRenderState = dispatcher.extractEntity(chair, 0);
 
+        if (state.entityRenderState != null) {
+            if (STATE_CACHE.size() >= CACHE_LIMIT) {
+                STATE_CACHE.clear();
+            }
+            STATE_CACHE.put(modelId, state);
+        }
         return state;
+    }
+
+    /** 资源包重载会换掉椅子模型与实体渲染器，缓存的实体渲染状态必须作废。 */
+    public static void clearCache() {
+        STATE_CACHE.clear();
+        cachedLevel = null;
     }
 
     /**

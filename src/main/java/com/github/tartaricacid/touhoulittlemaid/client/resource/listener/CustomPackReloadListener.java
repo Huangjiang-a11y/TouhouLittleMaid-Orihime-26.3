@@ -2,6 +2,8 @@ package com.github.tartaricacid.touhoulittlemaid.client.resource.listener;
 
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.client.animation.inner.InnerAnimation;
+import com.github.tartaricacid.touhoulittlemaid.client.renderer.item.ChairItemRenderer;
+import com.github.tartaricacid.touhoulittlemaid.client.renderer.item.GarageKitItemRenderer;
 import com.github.tartaricacid.touhoulittlemaid.client.resource.bedrock.GeckoContainerBuilder;
 import com.github.tartaricacid.touhoulittlemaid.client.resource.loader.CustomPackLoader;
 import com.github.tartaricacid.touhoulittlemaid.client.resource.models.PlayerMaidModels;
@@ -28,6 +30,9 @@ public final class CustomPackReloadListener extends SimplePreparableReloadListen
             InnerAnimation.init();
             CustomPackLoader.reloadPacks();
             PlayerMaidModels.reload();
+            // 椅子/手办物品的实体渲染状态缓存跟着模型一起作废
+            ChairItemRenderer.clearCache();
+            GarageKitItemRenderer.clearCache();
         }
         watch.stop();
 

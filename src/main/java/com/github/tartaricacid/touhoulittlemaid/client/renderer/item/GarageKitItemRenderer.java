@@ -34,6 +34,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.TagValueInput;
 import org.joml.Vector3fc;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
@@ -53,14 +55,34 @@ public class GarageKitItemRenderer implements SpecialModelRenderer<GarageKitRend
     private static final Identifier TEXTURE = IdentifierUtil.modLoc("textures/bedrock/block/statue_base.png");
     private final SimpleBedrockModel<Unit> baseModel;
 
+    // 同 ChairItemRenderer：这个渲染器每帧都会被重调，而 extractArgument 里一次 copyTag()
+    // 加一次完整实体 load + extractEntity 才是真开销。手办的数据挂在不可变组件上，同一个
+    // ItemStack 反复取到的是同一个 CustomData 实例，按它缓存即可。
+    private static final int CACHE_LIMIT = 128;
+    private static final Map<CustomData, GarageKitRenderState> STATE_CACHE = new HashMap<>();
+    private static Level cachedLevel;
+
     public GarageKitItemRenderer() {
         this.baseModel = InternalBedrockModelRegistry.getModel(STATUE_BASE);
     }
 
     @Override
     public GarageKitRenderState extractArgument(ItemStack stack) {
-        GarageKitRenderState state = new GarageKitRenderState();
         CustomData data = ItemGarageKit.getMaidData(stack);
+
+        Level currentLevel = Minecraft.getInstance().level;
+        if (currentLevel != cachedLevel) {
+            clearCache();
+            cachedLevel = currentLevel;
+        }
+        if (currentLevel != null) {
+            GarageKitRenderState cached = STATE_CACHE.get(data);
+            if (cached != null) {
+                return cached;
+            }
+        }
+
+        GarageKitRenderState state = new GarageKitRenderState();
         state.extraData = data.copyTag();
         state.entityRenderState = null;
 
@@ -83,7 +105,19 @@ public class GarageKitItemRenderer implements SpecialModelRenderer<GarageKitRend
                 TouhouLittleMaid.LOGGER.error("Failed to extract garage kit item entity render state", e);
             }
         });
+        if (state.entityRenderState != null && currentLevel != null) {
+            if (STATE_CACHE.size() >= CACHE_LIMIT) {
+                STATE_CACHE.clear();
+            }
+            STATE_CACHE.put(data, state);
+        }
         return state;
+    }
+
+    /** 资源包重载会换掉手办模型与实体渲染器，缓存的实体渲染状态必须作废。 */
+    public static void clearCache() {
+        STATE_CACHE.clear();
+        cachedLevel = null;
     }
 
     @SuppressWarnings("unchecked,rawtypes")
