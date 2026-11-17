@@ -76,11 +76,6 @@ public class ItemFilm extends AbstractStoreMaidItem {
     }
 
     @Override
-    public boolean isFoil(ItemStack stack) {
-        return true;
-    }
-
-    @Override
     public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext worldIn, TooltipDisplay display,
                                 Consumer<Component> tooltip, TooltipFlag flagIn) {
         if (!stack.has(InitDataComponent.MAID_INFO)) {

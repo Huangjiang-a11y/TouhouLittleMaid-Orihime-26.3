@@ -27,11 +27,6 @@ public class ItemFavorabilityTool extends Item {
     }
 
     @Override
-    public boolean isFoil(ItemStack pStack) {
-        return true;
-    }
-
-    @Override
     public void appendHoverText(ItemStack pStack, @Nullable Item.TooltipContext pLevel, TooltipDisplay display,
                                 Consumer<Component> components, TooltipFlag pIsAdvanced) {
         String key = "tooltips.touhou_little_maid.favorability_tool.%s".formatted(this.type);

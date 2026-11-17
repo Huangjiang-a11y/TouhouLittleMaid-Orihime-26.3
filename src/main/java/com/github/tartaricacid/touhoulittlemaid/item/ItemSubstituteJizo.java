@@ -45,11 +45,6 @@ public class ItemSubstituteJizo extends Item {
     }
 
     @Override
-    public boolean isFoil(ItemStack stack) {
-        return true;
-    }
-
-    @Override
     public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext worldIn, TooltipDisplay display,
                                 Consumer<Component> tooltip, TooltipFlag flagIn) {
         tooltip.accept(Component

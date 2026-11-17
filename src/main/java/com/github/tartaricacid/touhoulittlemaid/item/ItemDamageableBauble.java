@@ -19,11 +19,6 @@ public class ItemDamageableBauble extends Item {
     }
 
     @Override
-    public boolean isFoil(ItemStack stack) {
-        return true;
-    }
-
-    @Override
     public boolean canBeEnchantedWith(ItemStack stack, Holder<Enchantment> enchantment, EnchantingContext context) {
         if (enchantment.is(Enchantments.MENDING) && stack.is(TagItem.MAID_MENDING_BLOCKLIST_ITEM)) {
             return false;
