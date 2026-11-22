@@ -33,6 +33,9 @@ import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.arrow.Arrow;
+import net.minecraft.world.entity.projectile.FishingHook;
+import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
+import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -154,10 +157,10 @@ public class YSMBinding extends ContextBinding {
 
         playerVar("block_reach", ctx -> ctx.entity().getAttributeValue(Attributes.BLOCK_INTERACTION_RANGE));
         playerVar("entity_reach", ctx -> ctx.entity().getAttributeValue(Attributes.ENTITY_INTERACTION_RANGE));
-        playerVar("swim_speed", ctx -> 1 /*ctx.entity().getAttributeValue(NeoForgeMod.SWIM_SPEED)*/);
+        playerVar("swim_speed", ctx -> (float) ctx.entity().getAttributeValue(Attributes.SWIM_SPEED));
         playerVar("entity_gravity", ctx -> ctx.entity().getAttributeValue(Attributes.GRAVITY));
         playerVar("step_height_addition", ctx -> ctx.entity().getAttributeValue(Attributes.STEP_HEIGHT) - 0.6);
-        playerVar("nametag_distance", ctx -> 64 /*ctx.entity().getAttributeValue(NeoForgeMod.NAMETAG_DISTANCE)*/);
+        playerVar("nametag_distance", ctx -> (float) ctx.entity().getAttributeValue(Attributes.NAMETAG_DISTANCE));
 
         clientPlayerVar("elytra_rot_x", ctx -> Math.toDegrees(ctx.entity().elytraAnimationState.getRotX(ctx.animationEvent().getRequestedPartialTick())));
         clientPlayerVar("elytra_rot_y", ctx -> Math.toDegrees(ctx.entity().elytraAnimationState.getRotY(ctx.animationEvent().getRequestedPartialTick())));
@@ -180,15 +183,61 @@ public class YSMBinding extends ContextBinding {
 
         projectileVar("projectile_owner", ctx -> ctx.createChild(ctx.entity().getOwner()));
 
-        throwableItemProjectileVar("throwable_item", _ -> null);
+        throwableItemProjectileVar("throwable_item", ctx -> {
+            Entity entity = ctx.entity();
+            if (entity instanceof ThrowableItemProjectile tip) {
+                ItemStack item = tip.getItem();
+                return BuiltInRegistries.ITEM.getKey(item.getItem()).toString();
+            }
+            return "";
+        });
 
-        fishingHookVar("hooked_in", _ -> null);
-        fishingHookVar("is_biting", _ -> null);
+        fishingHookVar("hooked_in", ctx -> {
+            Entity entity = ctx.entity();
+            if (entity instanceof FishingHook hook) {
+                return hook.isHookedIn() ? 1.0f : 0.0f;
+            }
+            return 0.0f;
+        });
+        fishingHookVar("is_biting", ctx -> {
+            Entity entity = ctx.entity();
+            if (entity instanceof FishingHook hook) {
+                return hook.nibbleTime > 0 ? 1.0f : 0.0f;
+            }
+            return 0.0f;
+        });
 
-        abstractArrowVar("on_ground_time", _ -> null);
-        abstractArrowVar("in_ground", _ -> null);
-        abstractArrowVar("is_spectral_arrow", _ -> null);
-        abstractArrowVar("shoot_item_id", _ -> null);
+        abstractArrowVar("on_ground_time", ctx -> {
+            Entity entity = ctx.entity();
+            if (entity instanceof Arrow arrow) {
+                return arrow.inGroundTime;
+            }
+            return 0;
+        });
+        abstractArrowVar("in_ground", ctx -> {
+            Entity entity = ctx.entity();
+            if (entity instanceof Arrow arrow) {
+                return arrow.inGround ? 1.0f : 0.0f;
+            }
+            return 0.0f;
+        });
+        abstractArrowVar("is_spectral_arrow", ctx -> {
+            Entity entity = ctx.entity();
+            if (entity instanceof Arrow arrow) {
+                return arrow.getPierceLevel() > 0 ? 1.0f : 0.0f;
+            }
+            return 0.0f;
+        });
+        abstractArrowVar("shoot_item_id", ctx -> {
+            Entity entity = ctx.entity();
+            if (entity instanceof Arrow arrow) {
+                ItemStack item = arrow.getPickupItemStackOrigin();
+                if (!item.isEmpty()) {
+                    return BuiltInRegistries.ITEM.getKey(item.getItem()).toString();
+                }
+            }
+            return "";
+        });
     }
 
     private static String getHitId(IContext<LocalPlayer> context) {
@@ -246,8 +295,8 @@ public class YSMBinding extends ContextBinding {
     }
 
     private static boolean inShieldBlockCooldown(IContext<Player> context) {
-        // TODO: 女仆会用盾吗？
-        return false;
+        Player player = context.entity();
+        return player.isBlocking() || player.getCooldowns().getCooldown(Items.SHIELD) > 0;
     }
 
     private static boolean isFishing(IContext<EntityMaid> ctx) {
@@ -299,8 +348,9 @@ public class YSMBinding extends ContextBinding {
     }
 
     @Deprecated
-    private String getBiomeCategory(Entity entity) {
-        return null;
+    private static String getBiomeCategory(Entity entity) {
+        Holder<Biome> biome = entity.level().getBiome(entity.blockPosition());
+        return biome.unwrapKey().map(k -> k.location().getPath()).orElse("");
     }
 
     private static Object dumpMods(IContext<?> context) {
