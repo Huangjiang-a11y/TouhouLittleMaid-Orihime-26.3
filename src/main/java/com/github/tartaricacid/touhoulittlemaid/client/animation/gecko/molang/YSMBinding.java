@@ -113,7 +113,7 @@ public class YSMBinding extends ContextBinding {
         entityVar("vehicle_speed", ctx -> {
             Entity vehicle = ctx.entity().getVehicle();
             if (vehicle == null) return 0.0f;
-            return (float) Math.sqrt(vehicle.getDeltaMovement().x * vehicle.getDeltaMovement().x + vehicle.getDeltaMovement().z * vehicle.getDeltaMovement().z) * 20;
+            return (float) Mth.sqrt(vehicle.getDeltaMovement().x * vehicle.getDeltaMovement().x + vehicle.getDeltaMovement().z * vehicle.getDeltaMovement().z) * 20;
         });
 
         livingEntityVar("has_helmet", ctx -> getSlotValue(ctx.entity(), EquipmentSlot.HEAD));
@@ -238,7 +238,7 @@ public class YSMBinding extends ContextBinding {
         abstractArrowVar("is_spectral_arrow", ctx -> {
             Entity entity = ctx.entity();
             if (entity instanceof Arrow arrow) {
-                return arrow.getPierceLevel() > 0 ? 1.0f : 0.0f;
+                return arrow.isSpectral() ? 1.0f : 0.0f;
             }
             return 0.0f;
         });
@@ -310,7 +310,9 @@ public class YSMBinding extends ContextBinding {
 
     private static boolean inShieldBlockCooldown(IContext<Player> context) {
         Player player = context.entity();
-        return player.isBlocking() || player.getCooldowns().getCooldown(Items.SHIELD) > 0;
+        // 1.21+: isBlocking() 已废弃，改用 isUsingItem() 且手持盾牌
+        return (player.isUsingItem() && player.getUseItem().is(Items.SHIELD))
+                || player.getCooldowns().getCooldown(Items.SHIELD) > 0;
     }
 
     private static boolean isFishing(IContext<EntityMaid> ctx) {
@@ -361,7 +363,6 @@ public class YSMBinding extends ContextBinding {
         return 0;
     }
 
-    @Deprecated
     private static String getBiomeCategory(Entity entity) {
         Holder<Biome> biome = entity.level().getBiome(entity.blockPosition());
         return biome.unwrapKey().map(k -> k.location().getPath()).orElse("");
