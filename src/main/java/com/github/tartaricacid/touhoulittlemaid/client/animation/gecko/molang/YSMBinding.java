@@ -102,6 +102,20 @@ public class YSMBinding extends ContextBinding {
         entityVar("air_supply", ctx -> ctx.entity().getAirSupply());
         entityVar("delta_movement_length", ctx -> ctx.entity().getDeltaMovement().length());
 
+        // Vehicle 相关 query，适配 YSM 船/矿车动画
+        entityVar("is_in_boat", ctx -> ctx.entity().isPassenger() && ctx.entity().getVehicle() instanceof Boat);
+        entityVar("is_in_minecart", ctx -> ctx.entity().isPassenger() && ctx.entity().getVehicle() instanceof net.minecraft.world.entity.vehicle.AbstractMinecart);
+        entityVar("vehicle_type", ctx -> {
+            Entity vehicle = ctx.entity().getVehicle();
+            if (vehicle == null) return "";
+            return BuiltInRegistries.ENTITY_TYPE.getKey(vehicle.getType()).toString();
+        });
+        entityVar("vehicle_speed", ctx -> {
+            Entity vehicle = ctx.entity().getVehicle();
+            if (vehicle == null) return 0.0f;
+            return (float) Math.sqrt(vehicle.getDeltaMovement().x * vehicle.getDeltaMovement().x + vehicle.getDeltaMovement().z * vehicle.getDeltaMovement().z) * 20;
+        });
+
         livingEntityVar("has_helmet", ctx -> getSlotValue(ctx.entity(), EquipmentSlot.HEAD));
         livingEntityVar("has_chest_plate", ctx -> getSlotValue(ctx.entity(), EquipmentSlot.CHEST));
         livingEntityVar("has_leggings", ctx -> getSlotValue(ctx.entity(), EquipmentSlot.LEGS));
